@@ -2,6 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   height: 100%;
+}
+
+.antigravity-bg {
+  position: absolute;
+  inset: -20% -10%;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(59, 130, 246, 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 65%, rgba(236, 72, 153, 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.12) 0 1.5px, transparent 2.5px);
+  background-size: 180px 180px, 220px 220px, 120px 120px;
+  filter: blur(0.2px);
+  opacity: 0.8;
+  animation: driftA 24s linear infinite;
+  pointer-events: none;
+}
+
+.antigravity-bg::before,
+.antigravity-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.35) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 50% 50%, rgba(219, 39, 119, 0.28) 0 1.5px, transparent 2.5px);
+  background-size: 260px 260px, 320px 320px;
+  mix-blend-mode: multiply;
+}
+
+.antigravity-bg::before {
+  transform-origin: 50% 50%;
+  animation: spinSlow 36s linear infinite;
+  opacity: 0.35;
+}
+
+.antigravity-bg::after {
+  transform-origin: 50% 50%;
+  animation: spinReverse 40s linear infinite;
+  opacity: 0.25;
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+  to {
+    transform: rotate(360deg) scale(1.04);
+  }
+}
+
+@keyframes spinReverse {
+  from {
+    transform: rotate(0deg) scale(1.05);
+  }
+  to {
+    transform: rotate(-360deg) scale(1);
+  }
+}
+
+@keyframes driftA {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
 }

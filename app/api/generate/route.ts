@@ -1,14 +1,84 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+type GenerationMode = "full" | "brand" | "positioning" | "landing" | "marketing";
 
 type NexoraResult = {
   brandNames: string[];
+  tagline: string;
   description: string;
+  targetAudience: string;
+  positioning: string;
+  valueProposition: string;
+  landingPageCopy: {
+    heroHeadline: string;
+    heroSubheadline: string;
+    primaryCta: string;
+    featureBullets: string[];
+  };
+  marketingMessaging: {
+    hooks: string[];
+    emailSubjectLines: string[];
+    adAngles: string[];
+  };
 };
+
+const ALLOWED_MODES: GenerationMode[] = ["full", "brand", "positioning", "landing", "marketing"];
+
+function getPrompt(idea: string, mode: GenerationMode) {
+  const modeInstruction: Record<GenerationMode, string> = {
+    full: "Focus on producing a complete launch-ready package.",
+    brand: "Prioritize stronger brand names, tagline quality, and description clarity.",
+    positioning: "Prioritize target audience precision, positioning, and value proposition sharpness.",
+    landing: "Prioritize conversion-focused landing page copy with clear CTA and benefits.",
+    marketing: "Prioritize high-performing hooks, ad angles, and email subject lines.",
+  };
+
+  return `
+You are Nexora AI, a product creation studio that helps founders create revenue-ready digital products.
+Generate high-quality startup content from the user idea.
+${modeInstruction[mode]}
+
+User idea:
+${idea}
+
+Return ONLY valid JSON with exactly this shape:
+{
+  "brandNames": ["...", "...", "..."],
+  "tagline": "...",
+  "description": "...",
+  "targetAudience": "...",
+  "positioning": "...",
+  "valueProposition": "...",
+  "landingPageCopy": {
+    "heroHeadline": "...",
+    "heroSubheadline": "...",
+    "primaryCta": "...",
+    "featureBullets": ["...", "...", "..."]
+  },
+  "marketingMessaging": {
+    "hooks": ["...", "...", "..."],
+    "emailSubjectLines": ["...", "...", "..."],
+    "adAngles": ["...", "...", "..."]
+  }
+}
+
+Rules:
+- All text must be specific, commercial, and actionable
+- brandNames must be exactly 3 short brandable names
+- featureBullets, hooks, emailSubjectLines, and adAngles must each contain exactly 3 items
+- Keep wording concise and conversion-oriented
+- Avoid generic filler and avoid markdown
+`.trim();
+}
+
+function isValidString(value: unknown, min = 6) {
+  return typeof value === "string" && value.trim().length >= min;
+}
+
+function isValidArray(value: unknown, expectedLength: number) {
+  return Array.isArray(value) && value.length === expectedLength && value.every((item) => isValidString(item, 3));
+}
 
 export async function POST(req: Request) {
   try {
@@ -21,6 +91,8 @@ export async function POST(req: Request) {
 
     const body = await req.json().catch(() => null);
     const idea = (body?.idea ?? "").toString().trim();
+    const modeRaw = (body?.mode ?? "full").toString().trim().toLowerCase() as GenerationMode;
+    const mode: GenerationMode = ALLOWED_MODES.includes(modeRaw) ? modeRaw : "full";
 
     if (idea.length < 10) {
       return NextResponse.json(
@@ -29,28 +101,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const prompt = `
-You are Nexora AI. Generate a product-ready mini package.
-
-User idea:
-${idea}
-
-Return ONLY valid JSON with exactly this shape:
-{
-  "brandNames": ["...", "...", "..."],
-  "description": "2–4 sentences"
-}
-
-Rules:
-- brandNames must be exactly 3 items
-- names must be short, brandable, not generic
-- description must be clear and sellable
-`.trim();
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const response = await client.responses.create({
       model: "gpt-4.1-mini",
-      input: prompt,
-      // ✅ OpenAI SDK 6.x compatible structured JSON response
+      input: getPrompt(idea, mode),
       text: {
         format: { type: "json_object" },
       },
@@ -75,10 +130,21 @@ Rules:
     }
 
     if (
-      !Array.isArray(data.brandNames) ||
-      data.brandNames.length !== 3 ||
-      typeof data.description !== "string" ||
-      data.description.trim().length < 10
+      !isValidArray(data.brandNames, 3) ||
+      !isValidString(data.tagline, 6) ||
+      !isValidString(data.description, 20) ||
+      !isValidString(data.targetAudience, 10) ||
+      !isValidString(data.positioning, 10) ||
+      !isValidString(data.valueProposition, 10) ||
+      !data.landingPageCopy ||
+      !isValidString(data.landingPageCopy.heroHeadline, 8) ||
+      !isValidString(data.landingPageCopy.heroSubheadline, 10) ||
+      !isValidString(data.landingPageCopy.primaryCta, 3) ||
+      !isValidArray(data.landingPageCopy.featureBullets, 3) ||
+      !data.marketingMessaging ||
+      !isValidArray(data.marketingMessaging.hooks, 3) ||
+      !isValidArray(data.marketingMessaging.emailSubjectLines, 3) ||
+      !isValidArray(data.marketingMessaging.adAngles, 3)
     ) {
       return NextResponse.json(
         { error: "Invalid output format. Try again." },
@@ -86,9 +152,19 @@ Rules:
       );
     }
 
-    // Clean strings (light sanitize)
-    data.brandNames = data.brandNames.map((s) => String(s).trim()).slice(0, 3);
+    data.brandNames = data.brandNames.map((name) => name.trim());
+    data.tagline = data.tagline.trim();
     data.description = data.description.trim();
+    data.targetAudience = data.targetAudience.trim();
+    data.positioning = data.positioning.trim();
+    data.valueProposition = data.valueProposition.trim();
+    data.landingPageCopy.heroHeadline = data.landingPageCopy.heroHeadline.trim();
+    data.landingPageCopy.heroSubheadline = data.landingPageCopy.heroSubheadline.trim();
+    data.landingPageCopy.primaryCta = data.landingPageCopy.primaryCta.trim();
+    data.landingPageCopy.featureBullets = data.landingPageCopy.featureBullets.map((item) => item.trim());
+    data.marketingMessaging.hooks = data.marketingMessaging.hooks.map((item) => item.trim());
+    data.marketingMessaging.emailSubjectLines = data.marketingMessaging.emailSubjectLines.map((item) => item.trim());
+    data.marketingMessaging.adAngles = data.marketingMessaging.adAngles.map((item) => item.trim());
 
     return NextResponse.json(data);
   } catch (e: any) {
