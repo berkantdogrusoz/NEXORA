@@ -46,29 +46,16 @@ body {
 }
 
 @keyframes spinSlow {
-  from {
-    transform: rotate(0deg) scale(1);
-  }
-  to {
-    transform: rotate(360deg) scale(1.04);
-  }
+  from { transform: rotate(0deg) scale(1); }
+  to { transform: rotate(360deg) scale(1.04); }
 }
 
 @keyframes spinReverse {
-  from {
-    transform: rotate(0deg) scale(1.05);
-  }
-  to {
-    transform: rotate(-360deg) scale(1);
-  }
+  from { transform: rotate(0deg) scale(1.05); }
+  to { transform: rotate(-360deg) scale(1); }
 }
 
 @keyframes driftA {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(8px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(8px); }
 }

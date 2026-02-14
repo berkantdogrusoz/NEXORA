@@ -1,27 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-
-type GenerationMode = "full" | "brand" | "positioning" | "landing" | "marketing";
-
-type NexoraResult = {
-  brandNames: string[];
-  tagline: string;
-  description: string;
-  targetAudience: string;
-  positioning: string;
-  valueProposition: string;
-  landingPageCopy: {
-    heroHeadline: string;
-    heroSubheadline: string;
-    primaryCta: string;
-    featureBullets: string[];
-  };
-  marketingMessaging: {
-    hooks: string[];
-    emailSubjectLines: string[];
-    adAngles: string[];
-  };
-};
+import type { GenerationMode, NexoraResult } from "@/lib/types";
 
 const ALLOWED_MODES: GenerationMode[] = ["full", "brand", "positioning", "landing", "marketing"];
 
@@ -167,9 +146,10 @@ export async function POST(req: Request) {
     data.marketingMessaging.adAngles = data.marketingMessaging.adAngles.map((item) => item.trim());
 
     return NextResponse.json(data);
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "Server error. Please try again.";
     return NextResponse.json(
-      { error: e?.message || "Server error. Please try again." },
+      { error: msg },
       { status: 500 }
     );
   }
