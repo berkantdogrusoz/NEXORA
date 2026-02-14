@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Navbar from "@/app/components/navbar";
 
 type GenerationMode = "full" | "brand" | "positioning" | "landing" | "marketing";
 
@@ -89,16 +90,17 @@ export default function GeneratePage() {
 
       localStorage.setItem("nexora_uses", String(newUsed));
       setRemaining(Math.max(0, 3 - newUsed));
-    } catch (e: any) {
-      setErrorMsg(e?.message || "Something went wrong.");
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-16">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-5xl mx-auto px-6 py-10">
         <h2 className="text-3xl font-semibold mb-2">Create with Nexora AI</h2>
         <p className="text-gray-600 mb-6">
           Generate a full startup-ready package: brand, positioning, landing page copy, and marketing messaging.

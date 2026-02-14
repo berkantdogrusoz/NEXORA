@@ -1,29 +1,10 @@
 import Link from "next/link";
+import Navbar from "@/app/components/navbar";
 
 export default function PricingPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* Top bar */}
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <Link href="/" className="font-semibold tracking-tight">
-          Nexora AI
-        </Link>
-
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/generate" className="text-gray-600 hover:text-gray-900">
-            Generate
-          </Link>
-          <Link href="/pricing" className="text-gray-900 font-medium">
-            Pricing
-          </Link>
-          <Link
-            href="/generate"
-            className="px-4 py-2 bg-black text-white rounded-xl hover:opacity-90 transition"
-          >
-            Get Started
-          </Link>
-        </nav>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 pt-10 pb-10 text-center">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Navbar from "@/app/components/navbar";
 
 const builderFeatures = [
   "Prompt → app architecture + page map",
@@ -13,11 +14,11 @@ const roadmap = [
     items: ["Brand + positioning", "Landing page copy", "Marketing messaging"],
   },
   {
-    phase: "Phase 2 · Website Generator",
-    items: ["Section-based page generator", "Editable block library", "One-click export"],
+    phase: "Phase 2 · Agent Platform (Now)",
+    items: ["Custom AI agents", "Agent workflows", "AI agent builder"],
   },
   {
-    phase: "Phase 3 · App Builder (Replit-style)",
+    phase: "Phase 3 · App Builder (Next)",
     items: ["Prompt-to-app scaffolding", "Built-in AI coding assistant", "Deploy in one click"],
   },
 ];
@@ -27,56 +28,77 @@ export default function Home() {
     <main className="relative min-h-screen overflow-hidden bg-[#f8fafc] text-gray-900">
       <div className="antigravity-bg" aria-hidden="true" />
 
-      <header className="relative z-10 max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          Nexora AI
-        </Link>
-
-        <nav className="flex items-center gap-3 text-sm">
-          <Link href="/generate" className="px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-            Studio
-          </Link>
-          <Link href="/pricing" className="px-4 py-2 rounded-lg bg-black text-white hover:opacity-90 transition">
-            Pricing
-          </Link>
-        </nav>
-      </header>
+      <Navbar />
 
       <section className="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-16 text-center">
         <p className="inline-flex items-center gap-2 px-3 py-1 text-sm rounded-full bg-white/90 border border-gray-200 text-gray-700">
-          Nexora AI • Product Studio + Builder Vision
+          Nexora AI &middot; AI Agent Platform
         </p>
 
         <h1 className="mt-6 text-5xl md:text-6xl font-bold leading-tight tracking-tight">
-          Idea’dan Gelire: Ürünü, Siteyi ve İçeriği Tek Akışta Üret.
+          Build, Run, and Scale AI Agents for Your Startup.
         </h1>
 
         <p className="mt-6 text-lg text-gray-600 max-w-3xl mx-auto">
-          Nexora; marka, konumlandırma, landing copy ve pazarlama mesajlarını üretir. Hedefimiz bunu
-          bir sonraki adımda Replit benzeri “prompt ile web app oluşturma” deneyimine çevirmek.
+          Create custom AI agents or use built-in ones to generate brand identity, positioning,
+          landing page copy, and marketing messaging — all in one workflow.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/generate"
+            href="/run"
             className="inline-flex items-center justify-center px-8 py-4 bg-black text-white rounded-xl hover:opacity-90 transition"
           >
-            Generate Full Package
+            Run Agents
           </Link>
-
-          <a
-            href="#builder"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition"
-          >
-            Builder Vision
-          </a>
 
           <Link
-            href="/pricing"
+            href="/agents"
             className="inline-flex items-center justify-center px-8 py-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition"
           >
-            View Pricing
+            Manage Agents
           </Link>
+
+          <Link
+            href="/generate"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition"
+          >
+            Quick Generate
+          </Link>
+        </div>
+      </section>
+
+      <section className="relative z-10 max-w-6xl mx-auto px-6 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold">Built-in Agents</h2>
+            <p className="mt-3 text-gray-600 text-sm">
+              4 pre-configured agents ready to go: Brand, Positioning, Landing Page, Marketing.
+            </p>
+            <Link href="/run" className="mt-4 inline-flex text-sm font-medium text-gray-900 hover:underline">
+              Run now &rarr;
+            </Link>
+          </div>
+
+          <div className="p-6 rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold">Custom Agents</h2>
+            <p className="mt-3 text-gray-600 text-sm">
+              Create your own agents with custom prompts, or let AI build them for you.
+            </p>
+            <Link href="/agents" className="mt-4 inline-flex text-sm font-medium text-gray-900 hover:underline">
+              Build agents &rarr;
+            </Link>
+          </div>
+
+          <div className="p-6 rounded-2xl border border-gray-200 bg-white/90 backdrop-blur-sm">
+            <h2 className="text-xl font-semibold">Workflow Engine</h2>
+            <p className="mt-3 text-gray-600 text-sm">
+              Run agents in parallel or sequential mode. Chain outputs for coherent results.
+            </p>
+            <Link href="/run" className="mt-4 inline-flex text-sm font-medium text-gray-900 hover:underline">
+              Try workflows &rarr;
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -118,7 +140,7 @@ export default function Home() {
       <section className="relative z-10 max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-semibold text-center">Roadmap</h2>
         <p className="mt-3 text-gray-600 text-center max-w-2xl mx-auto">
-          Çalışan sistemi bozmadan, adım adım Product Studio → Website Generator → App Builder.
+          Çalışan sistemi bozmadan, adım adım Product Studio → Agent Platform → App Builder.
         </p>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -137,8 +159,14 @@ export default function Home() {
 
       <footer className="relative z-10 border-t border-gray-200 bg-white/60">
         <div className="max-w-6xl mx-auto px-6 py-10 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-3">
-          <div>© {new Date().getFullYear()} Nexora AI</div>
+          <div>&copy; {new Date().getFullYear()} Nexora AI</div>
           <div className="flex items-center gap-4">
+            <Link href="/agents" className="hover:text-gray-700">
+              Agents
+            </Link>
+            <Link href="/run" className="hover:text-gray-700">
+              Run
+            </Link>
             <Link href="/generate" className="hover:text-gray-700">
               Generate
             </Link>
