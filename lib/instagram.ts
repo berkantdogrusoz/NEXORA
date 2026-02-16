@@ -1,28 +1,30 @@
 /**
- * Instagram Graph API helper functions
- * Handles OAuth, token management, and content publishing
+ * Instagram Business Login API helpers
+ * Uses the new Instagram Business Login flow (not Facebook OAuth)
  */
 
-const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID!;
-const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET!;
+const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID!;
+const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET!;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
 
-const GRAPH_API_URL = "https://graph.facebook.com/v21.0";
+const GRAPH_API_URL = "https://graph.instagram.com/v21.0";
 
 // ─── OAuth ───────────────────────────────────────────────
 
 /**
- * Generate Facebook OAuth URL for Instagram permissions
+ * Generate Instagram OAuth URL
  */
 export function getInstagramAuthUrl(state?: string): string {
     const params = new URLSearchParams({
-        client_id: FACEBOOK_APP_ID,
+        enable_fb_login: "0",
+        force_authentication: "1",
+        client_id: INSTAGRAM_APP_ID,
         redirect_uri: `${APP_URL}/api/instagram/callback`,
-        scope: "instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement",
         response_type: "code",
+        scope: "instagram_business_basic,instagram_business_content_publish,instagram_business_manage_messages",
         state: state || "nexora_ig_connect",
     });
-    return `https://www.facebook.com/v21.0/dialog/oauth?${params.toString()}`;
+    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
 }
 
 /**
@@ -30,16 +32,21 @@ export function getInstagramAuthUrl(state?: string): string {
  */
 export async function exchangeCodeForToken(code: string): Promise<{
     access_token: string;
-    token_type: string;
+    user_id: string;
 }> {
-    const params = new URLSearchParams({
-        client_id: FACEBOOK_APP_ID,
-        client_secret: FACEBOOK_APP_SECRET,
+    const body = new URLSearchParams({
+        client_id: INSTAGRAM_APP_ID,
+        client_secret: INSTAGRAM_APP_SECRET,
+        grant_type: "authorization_code",
         redirect_uri: `${APP_URL}/api/instagram/callback`,
         code,
     });
 
-    const res = await fetch(`${GRAPH_API_URL}/oauth/access_token?${params.toString()}`);
+    const res = await fetch("https://api.instagram.com/oauth/access_token", {
+        method: "POST",
+        body,
+    });
+
     if (!res.ok) {
         const err = await res.json();
         throw new Error(`Token exchange failed: ${JSON.stringify(err)}`);
@@ -56,13 +63,12 @@ export async function getLongLivedToken(shortLivedToken: string): Promise<{
     expires_in: number;
 }> {
     const params = new URLSearchParams({
-        grant_type: "fb_exchange_token",
-        client_id: FACEBOOK_APP_ID,
-        client_secret: FACEBOOK_APP_SECRET,
-        fb_exchange_token: shortLivedToken,
+        grant_type: "ig_exchange_token",
+        client_secret: INSTAGRAM_APP_SECRET,
+        access_token: shortLivedToken,
     });
 
-    const res = await fetch(`${GRAPH_API_URL}/oauth/access_token?${params.toString()}`);
+    const res = await fetch(`${GRAPH_API_URL}/access_token?${params.toString()}`);
     if (!res.ok) {
         const err = await res.json();
         throw new Error(`Long-lived token exchange failed: ${JSON.stringify(err)}`);
@@ -70,47 +76,25 @@ export async function getLongLivedToken(shortLivedToken: string): Promise<{
     return res.json();
 }
 
-// ─── Account Discovery ──────────────────────────────────
+// ─── Account Info ────────────────────────────────────────
 
 /**
- * Get Facebook Pages the user manages
+ * Get Instagram user profile info
  */
-export async function getFacebookPages(accessToken: string): Promise<Array<{
+export async function getInstagramProfile(accessToken: string): Promise<{
     id: string;
-    name: string;
-    access_token: string;
-}>> {
-    const res = await fetch(`${GRAPH_API_URL}/me/accounts?access_token=${accessToken}`);
+    username: string;
+    profile_picture_url?: string;
+    name?: string;
+}> {
+    const res = await fetch(
+        `${GRAPH_API_URL}/me?fields=user_id,username,profile_picture_url,name&access_token=${accessToken}`
+    );
     if (!res.ok) {
         const err = await res.json();
-        throw new Error(`Failed to get pages: ${JSON.stringify(err)}`);
+        throw new Error(`Failed to get profile: ${JSON.stringify(err)}`);
     }
-    const data = await res.json();
-    return data.data || [];
-}
-
-/**
- * Get Instagram Business Account linked to a Facebook Page
- */
-export async function getInstagramAccount(pageId: string, pageAccessToken: string): Promise<{
-    ig_user_id: string;
-    username: string;
-    profile_picture_url: string;
-} | null> {
-    const res = await fetch(
-        `${GRAPH_API_URL}/${pageId}?fields=instagram_business_account{id,username,profile_picture_url}&access_token=${pageAccessToken}`
-    );
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const igAccount = data.instagram_business_account;
-    if (!igAccount) return null;
-
-    return {
-        ig_user_id: igAccount.id,
-        username: igAccount.username || "",
-        profile_picture_url: igAccount.profile_picture_url || "",
-    };
+    return res.json();
 }
 
 // ─── Content Publishing ─────────────────────────────────
@@ -144,7 +128,7 @@ export async function createMediaContainer(
     }
 
     const data = await res.json();
-    return data.id; // container ID
+    return data.id;
 }
 
 /**
@@ -171,16 +155,16 @@ export async function publishMedia(
     }
 
     const data = await res.json();
-    return data.id; // published media ID
+    return data.id;
 }
 
 /**
- * Check media container status (for async publishing)
+ * Check media container status
  */
 export async function checkContainerStatus(
     containerId: string,
     accessToken: string
-): Promise<{ status: string; status_code?: string }> {
+): Promise<{ status_code: string }> {
     const res = await fetch(
         `${GRAPH_API_URL}/${containerId}?fields=status_code&access_token=${accessToken}`
     );
@@ -200,24 +184,19 @@ export async function publishToInstagram(
     imageUrl: string,
     caption: string
 ): Promise<{ mediaId: string; success: boolean }> {
-    // Step 1: Create container
     const containerId = await createMediaContainer(igUserId, accessToken, {
         image_url: imageUrl,
         caption,
     });
 
-    // Step 2: Wait a moment for processing
+    // Wait for processing
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    // Step 3: Check status
     const status = await checkContainerStatus(containerId, accessToken);
     if (status.status_code && status.status_code !== "FINISHED") {
-        // Wait more if not ready
         await new Promise((resolve) => setTimeout(resolve, 5000));
     }
 
-    // Step 4: Publish
     const mediaId = await publishMedia(igUserId, containerId, accessToken);
-
     return { mediaId, success: true };
 }

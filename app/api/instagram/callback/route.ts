@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
     exchangeCodeForToken,
     getLongLivedToken,
-    getFacebookPages,
-    getInstagramAccount,
+    getInstagramProfile,
 } from "@/lib/instagram";
 import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
@@ -12,10 +11,10 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
 
 /**
  * GET /api/instagram/callback
- * Handles Facebook OAuth callback:
- * 1. Exchange code for token
+ * Handles Instagram OAuth callback:
+ * 1. Exchange code for short-lived token
  * 2. Get long-lived token
- * 3. Find Instagram Business Account
+ * 3. Get Instagram profile info
  * 4. Save connection to Supabase
  */
 export async function GET(request: NextRequest) {
@@ -42,56 +41,37 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Step 1: Exchange code for short-lived token
-        const shortToken = await exchangeCodeForToken(code);
+        // Step 1: Exchange code for short-lived token + user_id
+        const tokenResult = await exchangeCodeForToken(code);
 
         // Step 2: Get long-lived token (60 days)
-        const longToken = await getLongLivedToken(shortToken.access_token);
+        const longToken = await getLongLivedToken(tokenResult.access_token);
         const expiresAt = new Date(
             Date.now() + longToken.expires_in * 1000
         ).toISOString();
 
-        // Step 3: Get Facebook Pages
-        const pages = await getFacebookPages(longToken.access_token);
-        if (pages.length === 0) {
-            return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=no_pages`
-            );
+        // Step 3: Get Instagram profile
+        let username = "";
+        let profilePicture = "";
+        try {
+            const profile = await getInstagramProfile(longToken.access_token);
+            username = profile.username || "";
+            profilePicture = profile.profile_picture_url || "";
+        } catch (e) {
+            console.warn("Could not fetch Instagram profile:", e);
         }
 
-        // Step 4: Find Instagram Business Account on first page
-        let igAccount = null;
-        let connectedPageId = "";
-        let pageAccessToken = "";
-
-        for (const page of pages) {
-            const ig = await getInstagramAccount(page.id, page.access_token);
-            if (ig) {
-                igAccount = ig;
-                connectedPageId = page.id;
-                pageAccessToken = page.access_token;
-                break;
-            }
-        }
-
-        if (!igAccount) {
-            return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=no_instagram`
-            );
-        }
-
-        // Step 5: Save to Supabase (upsert)
+        // Step 4: Save to Supabase (upsert)
         const { error: dbError } = await supabase
             .from("instagram_connections")
             .upsert(
                 {
                     user_id: userId,
-                    ig_user_id: igAccount.ig_user_id,
-                    ig_username: igAccount.username,
-                    ig_profile_picture: igAccount.profile_picture_url,
-                    access_token: pageAccessToken,
+                    ig_user_id: tokenResult.user_id,
+                    ig_username: username,
+                    ig_profile_picture: profilePicture,
+                    access_token: longToken.access_token,
                     token_expires_at: expiresAt,
-                    fb_page_id: connectedPageId,
                     updated_at: new Date().toISOString(),
                 },
                 { onConflict: "user_id" }
@@ -106,7 +86,7 @@ export async function GET(request: NextRequest) {
 
         // Success!
         return NextResponse.redirect(
-            `${APP_URL}/connect-instagram?success=true&username=${igAccount.username}`
+            `${APP_URL}/connect-instagram?success=true&username=${encodeURIComponent(username)}`
         );
     } catch (err) {
         console.error("Instagram callback error:", err);
