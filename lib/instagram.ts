@@ -21,7 +21,7 @@ export function getInstagramAuthUrl(state?: string): string {
         client_id: INSTAGRAM_APP_ID,
         redirect_uri: `${APP_URL}/api/instagram/callback`,
         response_type: "code",
-        scope: "instagram_business_basic,instagram_business_content_publish,instagram_business_manage_messages",
+        scope: "instagram_business_basic,instagram_business_content_publish",
         state: state || "nexora_ig_connect",
     });
     return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
