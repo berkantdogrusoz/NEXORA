@@ -68,6 +68,15 @@ export async function POST(request: NextRequest) {
             published_at: new Date().toISOString(),
         });
 
+        // If postId is provided (from Calendar), update autopilot_logs
+        if (body.postId) {
+            await supabase
+                .from("autopilot_logs")
+                .update({ status: "posted", posted_at: new Date().toISOString() })
+                .eq("id", body.postId)
+                .eq("user_id", userId);
+        }
+
         return NextResponse.json({
             success: true,
             mediaId: result.mediaId,

@@ -11,6 +11,7 @@ type ScheduledPost = {
     content: string;
     status: "draft" | "approved" | "posted" | "failed";
     scheduledAt: string;
+    postedAt?: string;
     output: {
         caption?: string;
         hashtags?: string[];
@@ -62,12 +63,16 @@ export default function CalendarPage() {
         });
     }, [weekOffset]);
 
+    const [isConnected, setIsConnected] = useState(false);
+    const [posting, setPosting] = useState(false);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [postsRes, brandsRes] = await Promise.all([
+            const [postsRes, brandsRes, statusRes] = await Promise.all([
                 fetch("/api/calendar"),
                 fetch("/api/autopilot"),
+                fetch("/api/instagram/status"),
             ]);
             if (postsRes.ok) {
                 const data = await postsRes.json();
@@ -76,6 +81,10 @@ export default function CalendarPage() {
             if (brandsRes.ok) {
                 const data = await brandsRes.json();
                 setBrands(data.brands || []);
+            }
+            if (statusRes.ok) {
+                const data = await statusRes.json();
+                setIsConnected(data.connected);
             }
         } catch { /* empty */ }
         finally { setLoading(false); }
@@ -125,6 +134,35 @@ export default function CalendarPage() {
                 setSelectedPost({ ...selectedPost, status });
             }
         } catch { /* empty */ }
+    };
+
+    const handlePostNow = async () => {
+        if (!selectedPost || !selectedPost.output?.imageUrl) return;
+        setPosting(true);
+        setError(null);
+        try {
+            const res = await fetch("/api/instagram/publish", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    image_url: selectedPost.output.imageUrl,
+                    caption: selectedPost.content,
+                    postId: selectedPost.id,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to post");
+
+            setSuccess("Posted to Instagram successfully! 🚀");
+            setPosts(prev => prev.map(p => p.id === selectedPost.id ? { ...p, status: "posted" } : p));
+            setSelectedPost({ ...selectedPost, status: "posted" });
+            setTimeout(() => setSuccess(null), 4000);
+        } catch (e: unknown) {
+            setError(e instanceof Error ? e.message : "Failed to post.");
+        } finally {
+            setPosting(false);
+        }
     };
 
     const weekDates = getWeekDates();
@@ -333,9 +371,33 @@ export default function CalendarPage() {
                                     </button>
                                 )}
                                 {selectedPost.status === "approved" && (
-                                    <button onClick={() => updatePostStatus(selectedPost.id, "draft")} className="btn-secondary text-sm py-2 px-4">
-                                        ↩ Back to Draft
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={handlePostNow}
+                                            disabled={posting || !isConnected}
+                                            className="btn-primary text-sm py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-pink-500 to-violet-600 border-none text-white shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all"
+                                            title={!isConnected ? "Connect Instagram first" : "Post to Instagram"}
+                                        >
+                                            {posting ? (
+                                                <span className="flex items-center gap-2">
+                                                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    Posting...
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-2">
+                                                    🚀 Post Now
+                                                </span>
+                                            )}
+                                        </button>
+                                        <button onClick={() => updatePostStatus(selectedPost.id, "draft")} className="btn-secondary text-sm py-2 px-4">
+                                            ↩ Back to Draft
+                                        </button>
+                                    </>
+                                )}
+                                {selectedPost.status === "posted" && (
+                                    <div className="text-emerald-600 text-sm font-medium flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                                        ✅ Posted on {new Date(selectedPost.postedAt || Date.now()).toLocaleDateString()}
+                                    </div>
                                 )}
                             </div>
                             <button onClick={() => setSelectedPost(null)} className="btn-secondary text-sm py-2 px-4">Close</button>
