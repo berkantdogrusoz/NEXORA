@@ -252,10 +252,10 @@ function ConnectInstagramContent() {
                             }}>
                                 <div style={{ fontSize: "1.2rem" }}>⚠️</div>
                                 <p style={{ margin: 0, fontSize: "0.9rem" }}>
-                                    {error === "no_business_account"
-                                        ? "No Instagram Business account found. Please make sure your account is a Business Account and linked to a Facebook Page."
-                                        : errorDetails
-                                            ? `Error: ${decodeURIComponent(errorDetails)}`
+                                    {errorDetails
+                                        ? decodeURIComponent(errorDetails)
+                                        : error === "no_business_account"
+                                            ? "No Instagram Business account found. Please make sure your account is a Business Account and linked to a Facebook Page."
                                             : "An unexpected error occurred. Please try again."}
                                 </p>
                             </div>

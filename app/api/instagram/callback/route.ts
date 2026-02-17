@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         } catch (e: any) {
             console.error("Could not find Instagram Business Account:", e);
             return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=no_business_account`
+                `${APP_URL}/connect-instagram?error=no_business_account&details=${encodeURIComponent(e.message)}`
             );
         }
 
