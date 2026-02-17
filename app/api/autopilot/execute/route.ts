@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { uploadImageFromUrl } from "@/lib/storage";
 
 const CONTENT_SYSTEM_PROMPT = `You are an expert Instagram content creator. Given a brand's details, generate engaging Instagram content.
 
@@ -105,7 +106,14 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
                         size: "1024x1024",
                         quality: "standard",
                     });
-                    return imgResponse.data?.[0]?.url || null;
+                    const tempUrl = imgResponse.data?.[0]?.url;
+
+                    if (tempUrl) {
+                        // Upload to Supabase to make it permanent
+                        const permanentUrl = await uploadImageFromUrl(tempUrl, "autopilot");
+                        return permanentUrl || tempUrl;
+                    }
+                    return null;
                 } catch {
                     return null;
                 }
