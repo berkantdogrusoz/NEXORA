@@ -21,8 +21,9 @@ function ConnectInstagramContent() {
     const [loading, setLoading] = useState(true);
     const [disconnecting, setDisconnecting] = useState(false);
 
-    const success = searchParams.get("success");
     const error = searchParams.get("error");
+    const errorDetails = searchParams.get("details");
+    const success = searchParams.get("success");
     const username = searchParams.get("username");
 
     useEffect(() => {
@@ -239,6 +240,27 @@ function ConnectInstagramContent() {
                 {/* Disconnected state */}
                 {!loading && !status?.connected && (
                     <div>
+                        {error && (
+                            <div style={{
+                                background: "rgba(239, 68, 68, 0.1)",
+                                border: "1px solid rgba(239, 68, 68, 0.2)",
+                                color: "#ef4444",
+                                padding: "1rem",
+                                borderRadius: 12,
+                                marginBottom: "1.5rem",
+                                display: "flex", alignItems: "center", gap: "0.75rem"
+                            }}>
+                                <div style={{ fontSize: "1.2rem" }}>⚠️</div>
+                                <p style={{ margin: 0, fontSize: "0.9rem" }}>
+                                    {error === "no_business_account"
+                                        ? "No Instagram Business account found. Please make sure your account is a Business Account and linked to a Facebook Page."
+                                        : errorDetails
+                                            ? `Error: ${decodeURIComponent(errorDetails)}`
+                                            : "An unexpected error occurred. Please try again."}
+                                </p>
+                            </div>
+                        )}
+
                         <button
                             onClick={handleConnect}
                             style={{

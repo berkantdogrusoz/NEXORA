@@ -91,10 +91,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(
             `${APP_URL}/connect-instagram?success=true&username=${encodeURIComponent(igAccount.username)}`
         );
-    } catch (err) {
+    } catch (err: any) {
         console.error("Instagram callback error:", err);
         return NextResponse.redirect(
-            `${APP_URL}/connect-instagram?error=unknown`
+            `${APP_URL}/connect-instagram?error=unknown&details=${encodeURIComponent(err.message || "Unknown error")}`
         );
     }
 }
