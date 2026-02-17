@@ -21,10 +21,13 @@ export async function POST(req: NextRequest) {
 
         lemonSqueezySetup({ apiKey: process.env.LEMONSQUEEZY_API_KEY });
 
-        const storeId = process.env.LEMONSQUEEZY_STORE_ID;
+        const storeId = parseInt(process.env.LEMONSQUEEZY_STORE_ID, 10);
+        const variantIdNum = parseInt(variantId, 10);
+
+        console.log("Creating checkout for:", { storeId, variantIdNum });
 
         // Create Checkout
-        const checkout = await createCheckout(storeId, variantId, {
+        const checkout = await createCheckout(storeId, variantIdNum, {
             checkoutOptions: {
                 embed: true, // Use overlay checkout
                 media: false,
@@ -41,6 +44,15 @@ export async function POST(req: NextRequest) {
                 receiptThankYouNote: "Welcome to Nexora Pro!"
             }
         });
+
+        console.log("Checkout response:", checkout);
+
+        if (checkout.error) {
+            console.error("Lemon Squeezy API Error:", checkout.error);
+            return NextResponse.json({ error: checkout.error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ url: checkout.data?.data.attributes.url });
 
         return NextResponse.json({ url: checkout.data?.data.attributes.url });
 
