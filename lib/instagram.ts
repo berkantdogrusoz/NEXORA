@@ -100,7 +100,10 @@ export async function getInstagramBusinessAccount(accessToken: string): Promise<
     const connectedPage = pages.find((p: any) => p.instagram_business_account);
 
     if (!connectedPage) {
-        throw new Error("No Instagram Business Account found linked to your Facebook Pages. Please make sure your Instagram account is switched to Business/Creator and linked to a Facebook Page.");
+        const pageNames = pages.map((p: any) => p.name).join(", ");
+        throw new Error(
+            `Found ${pages.length} Facebook Pages (${pageNames || "none"}). None of them are linked to an Instagram Business Account. Please go to your Facebook Page Settings > Linked Accounts and connect your Instagram.`
+        );
     }
 
     const igAccount = connectedPage.instagram_business_account;
