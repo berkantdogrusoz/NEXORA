@@ -1,52 +1,45 @@
 /**
- * Instagram Business Login API helpers
- * Uses the new Instagram Business Login flow (not Facebook OAuth)
+ * Instagram Graph API helpers (via Facebook Login)
+ * We must use Facebook Login to get access to Instagram Business Accounts
  */
 
-const INSTAGRAM_APP_ID = process.env.INSTAGRAM_APP_ID!;
-const INSTAGRAM_APP_SECRET = process.env.INSTAGRAM_APP_SECRET!;
+const FACEBOOK_APP_ID = process.env.INSTAGRAM_APP_ID!; // Using the same App ID
+const FACEBOOK_APP_SECRET = process.env.INSTAGRAM_APP_SECRET!;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
 
-const GRAPH_API_URL = "https://graph.instagram.com/v21.0";
+const GRAPH_API_URL = "https://graph.facebook.com/v21.0";
 
 // ─── OAuth ───────────────────────────────────────────────
 
 /**
- * Generate Instagram OAuth URL
+ * Generate Facebook OAuth URL (for Instagram access)
  */
 export function getInstagramAuthUrl(state?: string): string {
     const params = new URLSearchParams({
-        enable_fb_login: "0",
-        force_authentication: "1",
-        client_id: INSTAGRAM_APP_ID,
+        client_id: FACEBOOK_APP_ID,
         redirect_uri: `${APP_URL}/api/instagram/callback`,
-        response_type: "code",
-        scope: "instagram_business_basic,instagram_business_content_publish",
+        scope: "instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement,business_management",
         state: state || "nexora_ig_connect",
+        response_type: "code",
     });
-    return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
+    return `https://www.facebook.com/v21.0/dialog/oauth?${params.toString()}`;
 }
 
 /**
- * Exchange authorization code for short-lived access token
+ * Exchange authorization code for user access token
  */
 export async function exchangeCodeForToken(code: string): Promise<{
     access_token: string;
-    user_id: string;
+    expires_in: number;
 }> {
-    const body = new URLSearchParams({
-        client_id: INSTAGRAM_APP_ID,
-        client_secret: INSTAGRAM_APP_SECRET,
-        grant_type: "authorization_code",
+    const params = new URLSearchParams({
+        client_id: FACEBOOK_APP_ID,
+        client_secret: FACEBOOK_APP_SECRET,
         redirect_uri: `${APP_URL}/api/instagram/callback`,
         code,
     });
 
-    const res = await fetch("https://api.instagram.com/oauth/access_token", {
-        method: "POST",
-        body,
-    });
-
+    const res = await fetch(`${GRAPH_API_URL}/oauth/access_token?${params.toString()}`);
     if (!res.ok) {
         const err = await res.json();
         throw new Error(`Token exchange failed: ${JSON.stringify(err)}`);
@@ -59,16 +52,16 @@ export async function exchangeCodeForToken(code: string): Promise<{
  */
 export async function getLongLivedToken(shortLivedToken: string): Promise<{
     access_token: string;
-    token_type: string;
     expires_in: number;
 }> {
     const params = new URLSearchParams({
-        grant_type: "ig_exchange_token",
-        client_secret: INSTAGRAM_APP_SECRET,
-        access_token: shortLivedToken,
+        grant_type: "fb_exchange_token",
+        client_id: FACEBOOK_APP_ID,
+        client_secret: FACEBOOK_APP_SECRET,
+        fb_exchange_token: shortLivedToken,
     });
 
-    const res = await fetch(`${GRAPH_API_URL}/access_token?${params.toString()}`);
+    const res = await fetch(`${GRAPH_API_URL}/oauth/access_token?${params.toString()}`);
     if (!res.ok) {
         const err = await res.json();
         throw new Error(`Long-lived token exchange failed: ${JSON.stringify(err)}`);
@@ -79,22 +72,49 @@ export async function getLongLivedToken(shortLivedToken: string): Promise<{
 // ─── Account Info ────────────────────────────────────────
 
 /**
- * Get Instagram user profile info
+ * Find the connected Instagram Business Account
+ * We iterate through the user's Facebook Pages to find one with an IG Business Account connected
  */
-export async function getInstagramProfile(accessToken: string): Promise<{
-    id: string;
+export async function getInstagramBusinessAccount(accessToken: string): Promise<{
+    id: string; // IG Business User ID
     username: string;
     profile_picture_url?: string;
     name?: string;
+    page_id: string; // Linked FB Page ID
+    page_access_token?: string; // Optional: if we need page-specific token
 }> {
+    // 1. Get User's Pages with instagram_business_account field
     const res = await fetch(
-        `${GRAPH_API_URL}/me?fields=user_id,username,profile_picture_url,name&access_token=${accessToken}`
+        `${GRAPH_API_URL}/me/accounts?fields=id,name,picture,access_token,instagram_business_account{id,username,profile_picture_url,name}&access_token=${accessToken}`
     );
+
     if (!res.ok) {
         const err = await res.json();
-        throw new Error(`Failed to get profile: ${JSON.stringify(err)}`);
+        throw new Error(`Failed to fetch pages: ${JSON.stringify(err)}`);
     }
-    return res.json();
+
+    const data = await res.json();
+    const pages = data.data || [];
+
+    // 2. Find the first page that has an instagram_business_account
+    const connectedPage = pages.find((p: any) => p.instagram_business_account);
+
+    if (!connectedPage) {
+        throw new Error("No Instagram Business Account found linked to your Facebook Pages. Please make sure your Instagram account is switched to Business/Creator and linked to a Facebook Page.");
+    }
+
+    const igAccount = connectedPage.instagram_business_account;
+
+    return {
+        id: igAccount.id,
+        username: igAccount.username,
+        profile_picture_url: igAccount.profile_picture_url,
+        name: igAccount.name,
+        page_id: connectedPage.id,
+        // For some operations, we might prefer the Page Access Token, usually User Token is fine for IG Graph
+        // But let's return it just in case logic needs it later.
+        page_access_token: connectedPage.access_token,
+    };
 }
 
 // ─── Content Publishing ─────────────────────────────────

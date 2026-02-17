@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
     exchangeCodeForToken,
     getLongLivedToken,
-    getInstagramProfile,
+    getInstagramBusinessAccount,
 } from "@/lib/instagram";
 import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Step 1: Exchange code for short-lived token + user_id
+        // Step 1: Exchange code for short-lived user access token
         const tokenResult = await exchangeCodeForToken(code);
 
         // Step 2: Get long-lived token (60 days)
@@ -52,26 +52,27 @@ export async function GET(request: NextRequest) {
             Date.now() + longToken.expires_in * 1000
         ).toISOString();
 
-        // Step 3: Get Instagram profile
-        let username = "";
-        let profilePicture = "";
+        // Step 3: Find connected Instagram Business Account
+        let igAccount;
         try {
-            const profile = await getInstagramProfile(longToken.access_token);
-            username = profile.username || "";
-            profilePicture = profile.profile_picture_url || "";
-        } catch (e) {
-            console.warn("Could not fetch Instagram profile:", e);
+            igAccount = await getInstagramBusinessAccount(longToken.access_token);
+        } catch (e: any) {
+            console.error("Could not find Instagram Business Account:", e);
+            return NextResponse.redirect(
+                `${APP_URL}/connect-instagram?error=no_business_account`
+            );
         }
 
         // Step 4: Save to Supabase (upsert)
+        // We store the User Access Token (long-lived) which has permissions for the Page/IG Account
         const { error: dbError } = await supabase
             .from("instagram_connections")
             .upsert(
                 {
                     user_id: userId,
-                    ig_user_id: tokenResult.user_id,
-                    ig_username: username,
-                    ig_profile_picture: profilePicture,
+                    ig_user_id: igAccount.id,
+                    ig_username: igAccount.username,
+                    ig_profile_picture: igAccount.profile_picture_url || "",
                     access_token: longToken.access_token,
                     token_expires_at: expiresAt,
                     updated_at: new Date().toISOString(),
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
 
         // Success!
         return NextResponse.redirect(
-            `${APP_URL}/connect-instagram?success=true&username=${encodeURIComponent(username)}`
+            `${APP_URL}/connect-instagram?success=true&username=${encodeURIComponent(igAccount.username)}`
         );
     } catch (err) {
         console.error("Instagram callback error:", err);
