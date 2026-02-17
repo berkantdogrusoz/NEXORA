@@ -9,6 +9,8 @@ import { auth } from "@clerk/nextjs/server";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/instagram/callback
  * Handles Instagram OAuth callback:

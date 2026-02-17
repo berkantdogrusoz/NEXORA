@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getInstagramAuthUrl } from "@/lib/instagram";
 import { getAuthUserId } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/instagram/auth
  * Redirects user to Facebook OAuth for Instagram permissions

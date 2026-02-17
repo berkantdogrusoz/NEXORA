@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getAuthUserId } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/instagram/status
  * Returns the user's Instagram connection status
