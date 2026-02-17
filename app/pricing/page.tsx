@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Navbar from "@/app/components/navbar";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CHECK = (
   <svg className="w-4 h-4 text-violet-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,6 +18,46 @@ const CROSS = (
 );
 
 export default function PricingPage() {
+  const [loading, setLoading] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleCheckout = async (plan: "Growth" | "Pro") => {
+    setLoading(plan);
+    try {
+      const variantId = plan === "Growth"
+        ? process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH
+        : process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO;
+
+      if (!variantId) {
+        alert("Pricing configuration missing. Please contact support.");
+        setLoading(null);
+        return;
+      }
+
+      const res = await fetch("/api/lemon/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ variantId }),
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // Use window.location for external redirect
+      } else {
+        if (res.status === 401) {
+          router.push("/sign-up");
+        } else {
+          alert("Checkout failed: " + (data.error || "Unknown error"));
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Something went wrong.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <main className="relative min-h-screen overflow-hidden">
       <div className="orb-bg" aria-hidden="true">
@@ -87,8 +131,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button className="mt-6 w-full btn-primary block text-center">
-              Start Free Trial
+            <button
+              onClick={() => handleCheckout("Growth")}
+              disabled={loading === "Growth"}
+              className="mt-6 w-full btn-primary block text-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === "Growth" ? "Processing..." : "Start Free Trial"}
             </button>
           </div>
 
@@ -115,8 +163,12 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button className="mt-6 w-full btn-secondary block text-center">
-              Start Free Trial
+            <button
+              onClick={() => handleCheckout("Pro")}
+              disabled={loading === "Pro"}
+              className="mt-6 w-full btn-secondary block text-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === "Pro" ? "Processing..." : "Start Free Trial"}
             </button>
           </div>
         </div>
