@@ -214,6 +214,8 @@ export default function Home() {
             <Link href="/calendar" className="hover:text-slate-600 transition-colors">Calendar</Link>
             <Link href="/assistant" className="hover:text-slate-600 transition-colors">Assistant</Link>
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
+            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
           </div>
         </div>
       </footer>

@@ -196,6 +196,8 @@ export default function PricingPage() {
             <Link href="/" className="hover:text-slate-600 transition-colors">Home</Link>
             <Link href="/dashboard" className="hover:text-slate-600 transition-colors">Dashboard</Link>
             <Link href="/calendar" className="hover:text-slate-600 transition-colors">Calendar</Link>
+            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
           </div>
         </div>
       </footer>
