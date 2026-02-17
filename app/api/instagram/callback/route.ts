@@ -48,8 +48,9 @@ export async function GET(request: NextRequest) {
 
         // Step 2: Get long-lived token (60 days)
         const longToken = await getLongLivedToken(tokenResult.access_token);
+        const expiresIn = typeof longToken.expires_in === 'number' ? longToken.expires_in : 5184000; // 60 days fallback
         const expiresAt = new Date(
-            Date.now() + longToken.expires_in * 1000
+            Date.now() + expiresIn * 1000
         ).toISOString();
 
         // Step 3: Find connected Instagram Business Account
