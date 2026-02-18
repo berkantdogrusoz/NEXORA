@@ -109,6 +109,38 @@ export default function CalendarPage() {
         }
     };
 
+    const clearWeek = async () => {
+        if (!confirm("Are you sure you want to delete all drafts for this week?")) return;
+
+        setLoading(true);
+        try {
+            const startDate = weekDates[0].toISOString();
+            const endDate = weekDates[6].toISOString(); // End of the week
+
+            // End date should handle full day, so let's make it end of the day or just use next day logic in backend
+            // To be safe, let's just send the dates as is, backend uses gte/lte which works with ISO strings.
+            // But strict ISO for [6] is 00:00:00. We want to include the whole Sunday.
+            const endOfDay = new Date(weekDates[6]);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const res = await fetch("/api/calendar/clear", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ startDate, endDate: endOfDay.toISOString() }),
+            });
+
+            if (res.ok) {
+                await fetchData();
+            } else {
+                setError("Failed to clear drafts.");
+            }
+        } catch {
+            setError("Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const weekDates = getWeekDates();
     const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
     const currentYear = weekDates[0].getFullYear();
@@ -134,9 +166,21 @@ export default function CalendarPage() {
                         </div>
 
                         <button
+                            onClick={clearWeek}
+                            disabled={loading || posts.filter(p => {
+                                const d = new Date(p.scheduledAt);
+                                return d >= weekDates[0] && d <= weekDates[6] && p.status === "draft";
+                            }).length === 0}
+                            className="px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Clear Drafts
+                        </button>
+
+                        <button
                             onClick={generateWeek}
-                            disabled={generating}
-                            className="btn-primary flex items-center gap-2 shadow-lg shadow-violet-500/20"
+                            disabled={generating || weekOffset > 1} // Limit to current (0) and next week (1)
+                            className={`btn-primary flex items-center gap-2 shadow-lg ${weekOffset > 1 ? "bg-slate-700 cursor-not-allowed" : "shadow-violet-500/20"}`}
+                            title={weekOffset > 1 ? "You can only schedule up to 2 weeks in advance." : "Generate AI content"}
                         >
                             {generating ? (
                                 <>
