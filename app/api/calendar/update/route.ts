@@ -46,6 +46,10 @@ export async function POST(req: Request) {
             dbUpdates.scheduled_at = updates.scheduledAt;
         }
 
+        if (updates.status) {
+            dbUpdates.status = updates.status;
+        }
+
         const { error } = await supabase
             .from("autopilot_logs")
             .update(dbUpdates)

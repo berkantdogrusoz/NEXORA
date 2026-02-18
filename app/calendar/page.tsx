@@ -223,6 +223,36 @@ export default function CalendarPage() {
         }
     };
 
+    const approvePost = async () => {
+        if (!selectedPost) return;
+        setLoading(true);
+        try {
+            const res = await fetch("/api/calendar/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    postId: selectedPost.id,
+                    updates: { status: "approved" }
+                }),
+            });
+
+            if (res.ok) {
+                // Update Local State
+                const updatedPost = { ...selectedPost, status: "approved" } as ScheduledPost;
+                setSelectedPost(updatedPost);
+                setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                // Optional: Close modal or show success message?
+                // For now, just keeping it open so they see the change
+            } else {
+                setError("Failed to approve post.");
+            }
+        } catch {
+            setError("Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
             <Navbar />
@@ -400,12 +430,16 @@ export default function CalendarPage() {
                                         </div>
 
                                         <div className="pt-4 flex gap-3">
-                                            <button className="flex-1 btn-primary py-2.5 text-sm shadow-lg shadow-violet-500/10">
-                                                Approve & Schedule
+                                            <button
+                                                onClick={approvePost}
+                                                disabled={loading || selectedPost.status === "approved" || selectedPost.status === "posted"}
+                                                className="flex-1 btn-primary py-2.5 text-sm shadow-lg shadow-violet-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {selectedPost.status === "approved" ? "Approved ✓" : "Approve & Schedule"}
                                             </button>
                                             {selectedPost.status === "approved" && (
                                                 <button className="px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
-                                                    ed
+                                                    Scheduled
                                                 </button>
                                             )}
                                         </div>
