@@ -45,3 +45,11 @@ canvas {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.text-neon-x {
+  text-shadow: 0 0 2px #fff,
+    0 0 5px #a78bfa,
+    0 0 10px #8b5cf6,
+    0 0 20px #7c3aed,
+    0 0 40px #6d28d9;
+}
