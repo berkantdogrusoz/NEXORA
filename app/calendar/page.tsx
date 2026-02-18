@@ -221,10 +221,6 @@ export default function CalendarPage() {
         }
     };
 
-    const weekDates = getWeekDates();
-    const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
-    const currentYear = weekDates[0].getFullYear();
-
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
             <Navbar />
