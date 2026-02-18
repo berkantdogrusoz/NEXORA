@@ -136,7 +136,7 @@ export default function PricingPage() {
               disabled={loading === "Growth"}
               className="mt-6 w-full btn-primary block text-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading === "Growth" ? "Processing..." : "Start Free Trial"}
+              {loading === "Growth" ? "Processing..." : "Subscribe Now"}
             </button>
           </div>
 
@@ -168,7 +168,7 @@ export default function PricingPage() {
               disabled={loading === "Pro"}
               className="mt-6 w-full btn-secondary block text-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading === "Pro" ? "Processing..." : "Start Free Trial"}
+              {loading === "Pro" ? "Processing..." : "Subscribe Now"}
             </button>
           </div>
         </div>
