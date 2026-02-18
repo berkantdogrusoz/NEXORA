@@ -176,7 +176,7 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             success: true,
             posts: posts.length,
             result,
-            weekStart: nextMonday.toISOString(),
+            weekStart: currentMonday.toISOString(),
         });
     } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Execution failed.";
