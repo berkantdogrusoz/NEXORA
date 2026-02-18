@@ -47,7 +47,7 @@ export default function Navbar() {
 
           <div className="flex flex-col">
             <span className="font-extrabold text-2xl tracking-tight text-white leading-none">
-              Ne<span className="text-neon-x text-violet-500 inline-block animate-pulse">x</span>ora
+              Nexora
             </span>
           </div>
         </Link>
@@ -61,8 +61,8 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isActive
-                    ? "text-white bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                  ? "text-white bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
                   }`}
               >
                 {link.label}
