@@ -13,6 +13,8 @@ export async function GET() {
             .eq("user_id", authResult.userId)
             .order("created_at", { ascending: false });
 
+        console.log("DEBUG /api/autopilot:", { userId: authResult.userId, brandsFound: brands?.length, error: null });
+
         const { data: logs } = await supabase
             .from("autopilot_logs")
             .select("*")
