@@ -14,9 +14,6 @@ const QUICK_ACTIONS = [
     { label: "📸 Generate Instagram post ideas", prompt: "Generate 5 creative Instagram post ideas for my brand this week" },
     { label: "📊 Marketing strategy tips", prompt: "Give me 5 actionable marketing strategy tips to grow my Instagram following" },
     { label: "📝 Write a caption", prompt: "Write an engaging Instagram caption for a product launch announcement" },
-    { label: "🎯 Content calendar plan", prompt: "Create a 7-day Instagram content calendar plan for my brand" },
-    { label: "#️⃣ Hashtag research", prompt: "Research and suggest 20 high-performing Instagram hashtags for my niche" },
-    { label: "📈 Growth tactics", prompt: "What are the best organic growth tactics for Instagram in 2025?" },
 ];
 
 export default function AssistantPage() {
@@ -99,45 +96,43 @@ export default function AssistantPage() {
     };
 
     return (
-        <main className="relative min-h-screen overflow-hidden flex flex-col">
-            <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
+        <main className="relative min-h-screen flex flex-col font-sans">
             <Navbar />
 
-            <div className="relative z-10 flex-1 flex flex-col max-w-4xl mx-auto w-full px-6">
+            <div className="relative z-10 flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-24 pb-4">
                 {/* Header */}
-                <div className="py-6 animate-fade-in-up">
-                    <h1 className="text-2xl font-bold tracking-tight">🤖 AI Marketing Assistant</h1>
-                    <p className="text-sm text-slate-500">Your personal marketing expert. Ask anything about growing your business on Instagram.</p>
+                <div className="mb-6 animate-fade-in-up text-center md:text-left">
+                    <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Marketing Assistant</h1>
+                    <p className="text-sm text-slate-400">Your personal marketing expert. Ask anything.</p>
                 </div>
 
                 {/* Chat Area */}
-                <div className="flex-1 overflow-y-auto pb-4 space-y-4">
+                <div className="flex-1 overflow-y-auto pb-4 space-y-6 pt-4 h-[60vh] md:h-auto no-scrollbar">
                     {initialLoad ? (
-                        <div className="space-y-3">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full skeleton shrink-0" />
-                                    <div className="glass-card p-4 flex-1"><div className="h-4 skeleton w-2/3" /></div>
+                        <div className="space-y-4">
+                            {[1, 2].map(i => (
+                                <div key={i} className="flex gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse shrink-0" />
+                                    <div className="glass-card p-4 flex-1 h-20 animate-pulse bg-white/5 border-white/5" />
                                 </div>
                             ))}
                         </div>
                     ) : messages.length === 0 ? (
-                        <div className="text-center py-12 animate-fade-in-up">
-                            <div className="text-5xl mb-4">🤖</div>
-                            <h3 className="text-lg font-semibold mb-2">Hi! I&apos;m your AI Marketing Assistant</h3>
-                            <p className="text-sm text-slate-400 mb-8 max-w-md mx-auto">
-                                I know your brand and can help you create content, plan strategy, and grow your Instagram. Ask me anything!
-                            </p>
+                        <div className="text-center py-20 animate-fade-in-up">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-3xl shadow-2xl shadow-violet-500/20 mx-auto mb-6">
+                                🤖
+                            </div>
+                            <h3 className="text-xl font-semibold text-white mb-3">How can I help you grow today?</h3>
 
-                            {/* Quick Actions */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-w-xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto mt-8">
                                 {QUICK_ACTIONS.map((action, i) => (
                                     <button
                                         key={i}
                                         onClick={() => sendMessage(action.prompt)}
-                                        className="glass-card p-3 text-xs text-left text-slate-600 hover:text-violet-700 hover:border-violet-200 hover:bg-violet-50/50 transition-all"
+                                        className="glass-card p-4 text-xs text-left text-slate-300 hover:text-white hover:border-violet-500/50 hover:bg-violet-500/10 transition-all group"
                                     >
-                                        {action.label}
+                                        <span className="block mb-1 text-lg group-hover:scale-110 transition-transform origin-left">{action.label.split(" ")[0]}</span>
+                                        {action.label.substring(2)}
                                     </button>
                                 ))}
                             </div>
@@ -145,40 +140,37 @@ export default function AssistantPage() {
                     ) : (
                         <>
                             {messages.map(msg => (
-                                <div key={msg.id} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""} animate-fade-in-up`}>
+                                <div key={msg.id} className={`flex gap-4 ${msg.role === "user" ? "justify-end" : ""} animate-fade-in-up`}>
                                     {msg.role === "assistant" && (
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-violet-500/20">
                                             N
                                         </div>
                                     )}
-                                    <div className={`max-w-[75%] ${msg.role === "user"
-                                        ? "bg-violet-600 text-white rounded-2xl rounded-br-md px-4 py-3"
-                                        : "glass-card px-4 py-3"
+                                    <div className={`max-w-[85%] md:max-w-[70%] ${msg.role === "user"
+                                        ? "bg-violet-600 text-white rounded-2xl rounded-br-sm px-5 py-3 shadow-lg shadow-violet-500/10"
+                                        : "glass-card px-5 py-4 border-white/10 bg-white/5"
                                         }`}>
-                                        <div className={`text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "assistant" ? "text-slate-700" : ""}`}>
+                                        <div className={`text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "assistant" ? "text-slate-200" : ""}`}>
                                             {msg.content}
-                                        </div>
-                                        <div className={`text-[9px] mt-1.5 ${msg.role === "user" ? "text-white/50" : "text-slate-300"}`}>
-                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                         </div>
                                     </div>
                                     {msg.role === "user" && (
-                                        <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold shrink-0">
+                                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 text-xs font-bold shrink-0">
                                             U
                                         </div>
                                     )}
                                 </div>
                             ))}
                             {loading && (
-                                <div className="flex gap-3 animate-fade-in-up">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                <div className="flex gap-4 animate-fade-in-up">
+                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                         N
                                     </div>
-                                    <div className="glass-card px-4 py-3">
+                                    <div className="glass-card px-4 py-3 bg-black/40">
                                         <div className="flex gap-1.5">
-                                            <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                                            <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                                            <div className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "300ms" }} />
                                         </div>
                                     </div>
                                 </div>
@@ -189,8 +181,8 @@ export default function AssistantPage() {
                 </div>
 
                 {/* Input Area */}
-                <div className="sticky bottom-0 py-4 bg-gradient-to-t from-white via-white to-transparent">
-                    <div className="glass-card p-2 flex items-end gap-2">
+                <div className="sticky bottom-6 mt-4">
+                    <div className="glass-card p-2 flex items-end gap-2 bg-black/60 shadow-2xl border-white/10 ring-1 ring-white/5">
                         <textarea
                             ref={inputRef}
                             value={input}
@@ -198,14 +190,20 @@ export default function AssistantPage() {
                             onKeyDown={handleKeyDown}
                             placeholder="Ask about marketing, content ideas, or Instagram growth..."
                             rows={1}
-                            className="flex-1 resize-none bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none p-2 max-h-32"
+                            className="flex-1 resize-none bg-transparent text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none p-3 max-h-32"
                         />
-                        <button onClick={() => sendMessage()} disabled={!input.trim() || loading} className="btn-primary text-sm py-2 px-4 shrink-0 disabled:opacity-40">
-                            {loading ? "..." : "Send →"}
+                        <button
+                            onClick={() => sendMessage()}
+                            disabled={!input.trim() || loading}
+                            className="btn-primary p-2.5 rounded-xl shrink-0 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-transform"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
                         </button>
                     </div>
-                    <p className="text-[9px] text-slate-300 text-center mt-1.5">
-                        Nexora AI knows your brand. Responses are customized for your business.
+                    <p className="text-[10px] text-slate-500 text-center mt-2">
+                        Nexora AI can make mistakes. Check important info.
                     </p>
                 </div>
             </div>

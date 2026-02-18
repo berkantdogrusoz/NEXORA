@@ -23,7 +23,7 @@ export default function AnimatedShaderBackground({
       }
     `;
 
-        // Deep Space Sparkles Shader
+        // Deep Space Sparkles Shader with MOVEMENT
         const fragmentShaderSource = `
       precision highp float;
       uniform vec2 resolution;
@@ -40,28 +40,38 @@ export default function AnimatedShaderBackground({
         // Deep dark background with slight gradient
         vec3 color = mix(vec3(0.0, 0.0, 0.02), vec3(0.02, 0.0, 0.05), uv.y);
         
-        // Stars/Sparkles
-        float t = time * 0.5;
-        for (float i = 0.0; i < 50.0; i++) {
+        // Stars/Sparkles with MOVEMENT
+        float t = time * 0.2; // Speed of movement
+        
+        for (float i = 0.0; i < 60.0; i++) {
             float x = random(vec2(i, 0.0));
             float y = random(vec2(0.0, i));
+
+            // Add drift based on time and index
+            y -= t * (0.05 + 0.05 * random(vec2(i, i))); 
+            
+            // Wrap around screen
+            y = fract(y);
+            
             vec2 pos = vec2(x, y);
             
             // Twinkle effect
-            float size = 0.001 + 0.002 * random(vec2(i, i));
-            float brightness = 0.5 + 0.5 * sin(t + i * 10.0);
+            float size = 0.001 + 0.0025 * random(vec2(i, i * 2.0));
+            float brightness = 0.5 + 0.5 * sin(time * 2.0 + i * 10.0);
             
             float dist = distance(uv, pos);
             if (dist < size) {
-                color += vec3(1.0) * brightness * (1.0 - dist/size);
+                // Add a bit of color to stars (blue/violet tint)
+                vec3 starColor = mix(vec3(1.0), vec3(0.8, 0.8, 1.0), random(vec2(i, x)));
+                color += starColor * brightness * (1.0 - dist/size);
             }
         }
         
-        // Subtle moving nebula/fog
+        // Subtle moving nebula/fog - slightly faster/more visible
         float fog = 0.0;
-        fog += sin(uv.x * 2.0 + t * 0.1) * 0.02;
-        fog += sin(uv.y * 3.0 - t * 0.2) * 0.02;
-        color += vec3(0.1, 0.05, 0.2) * (fog + 0.05);
+        fog += sin(uv.x * 2.5 + t * 0.5) * 0.03;
+        fog += sin(uv.y * 3.5 - t * 0.3) * 0.03;
+        color += vec3(0.15, 0.08, 0.25) * (fog + 0.05);
 
         gl_FragColor = vec4(color, 1.0);
       }

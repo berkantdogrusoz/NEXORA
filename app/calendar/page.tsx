@@ -31,11 +31,12 @@ type Brand = {
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 const STATUS_STYLES: Record<string, string> = {
-    draft: "bg-slate-100 text-slate-500",
-    approved: "bg-emerald-50 text-emerald-600 border border-emerald-200",
-    posted: "bg-blue-50 text-blue-600 border border-blue-200",
-    failed: "bg-red-50 text-red-500 border border-red-200",
+    draft: "bg-slate-500/20 text-slate-300 border border-slate-500/30",
+    approved: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
+    posted: "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+    failed: "bg-red-500/20 text-red-300 border border-red-500/30",
 };
 
 export default function CalendarPage() {
@@ -46,7 +47,6 @@ export default function CalendarPage() {
     const [selectedPost, setSelectedPost] = useState<ScheduledPost | null>(null);
     const [weekOffset, setWeekOffset] = useState(0);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
 
     const getWeekDates = useCallback(() => {
         const now = new Date();
@@ -63,16 +63,12 @@ export default function CalendarPage() {
         });
     }, [weekOffset]);
 
-    const [isConnected, setIsConnected] = useState(false);
-    const [posting, setPosting] = useState(false);
-
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [postsRes, brandsRes, statusRes] = await Promise.all([
+            const [postsRes, brandsRes] = await Promise.all([
                 fetch("/api/calendar"),
                 fetch("/api/autopilot"),
-                fetch("/api/instagram/status"),
             ]);
             if (postsRes.ok) {
                 const data = await postsRes.json();
@@ -81,10 +77,6 @@ export default function CalendarPage() {
             if (brandsRes.ok) {
                 const data = await brandsRes.json();
                 setBrands(data.brands || []);
-            }
-            if (statusRes.ok) {
-                const data = await statusRes.json();
-                setIsConnected(data.connected);
             }
         } catch { /* empty */ }
         finally { setLoading(false); }
@@ -103,308 +95,189 @@ export default function CalendarPage() {
             const res = await fetch("/api/autopilot/execute", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    brandId: brands[0].id,
-                    count: 7,
-                    generateImages: true,
-                }),
+                body: JSON.stringify({ brandId: brands[0].id }),
             });
-            if (!res.ok) {
-                const err = await res.json().catch(() => null);
-                throw new Error(err?.error || "Generation failed.");
+            if (res.ok) {
+                await fetchData();
+            } else {
+                setError("Failed to generate content.");
             }
-            setSuccess("Week generated! 🎉 Content with images ready for review.");
-            setTimeout(() => setSuccess(null), 4000);
-            await fetchData();
-        } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : "Failed.");
-        }
-        finally { setGenerating(false); }
-    };
-
-    const updatePostStatus = async (postId: string, status: "approved" | "draft") => {
-        try {
-            await fetch("/api/calendar", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ postId, status }),
-            });
-            setPosts(prev => prev.map(p => p.id === postId ? { ...p, status } : p));
-            if (selectedPost?.id === postId) {
-                setSelectedPost({ ...selectedPost, status });
-            }
-        } catch { /* empty */ }
-    };
-
-    const handlePostNow = async () => {
-        if (!selectedPost || !selectedPost.output?.imageUrl) return;
-        setPosting(true);
-        setError(null);
-        try {
-            const res = await fetch("/api/instagram/publish", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    image_url: selectedPost.output.imageUrl,
-                    caption: selectedPost.content,
-                    postId: selectedPost.id,
-                }),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to post");
-
-            setSuccess("Posted to Instagram successfully! 🚀");
-            setPosts(prev => prev.map(p => p.id === selectedPost.id ? { ...p, status: "posted" } : p));
-            setSelectedPost({ ...selectedPost, status: "posted" });
-            setTimeout(() => setSuccess(null), 4000);
-        } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : "Failed to post.");
+        } catch {
+            setError("Something went wrong.");
         } finally {
-            setPosting(false);
+            setGenerating(false);
         }
     };
 
     const weekDates = getWeekDates();
-    const isThisWeek = weekOffset === 0;
-    const isNextWeek = weekOffset === 1;
-
-    const weekLabel = isThisWeek ? "This Week" : isNextWeek ? "Next Week" : (() => {
-        const d = weekDates[0];
-        return `${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })} — ${weekDates[6].toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-    })();
+    const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
+    const currentYear = weekDates[0].getFullYear();
 
     return (
-        <main className="relative min-h-screen overflow-hidden">
-            <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
+        <main className="relative min-h-screen text-slate-100 font-sans pb-20">
             <Navbar />
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6 animate-fade-in-up">
+            <div className="pt-24 px-6 max-w-7xl mx-auto">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">📅 Content Calendar</h1>
-                        <p className="text-sm text-slate-500">Plan, preview, and approve your Instagram posts for the week.</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Content Calendar</h1>
+                        <p className="text-sm text-slate-400">Manage and schedule your Instagram posts.</p>
                     </div>
-                    <button onClick={generateWeek} disabled={generating} className="btn-primary text-sm py-2 px-4 disabled:opacity-40">
-                        {generating ? (
-                            <span className="flex items-center gap-2">
-                                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Generating week...
+
+                    <div className="flex items-center gap-3">
+                        <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
+                            <button onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 px-3 hover:bg-white/10 rounded-md text-slate-300 transition">←</button>
+                            <span className="px-4 py-1 text-sm font-medium text-white min-w-[140px] text-center">
+                                {currentMonth} {currentYear}
                             </span>
-                        ) : "✨ Generate This Week"}
-                    </button>
-                </div>
+                            <button onClick={() => setWeekOffset(prev => prev + 1)} className="p-1 px-3 hover:bg-white/10 rounded-md text-slate-300 transition">→</button>
+                        </div>
 
-                {success && <div className="mb-6 p-3 glass-card border-emerald-200 text-emerald-600 text-sm animate-fade-in-up">{success}</div>}
-                {error && <div className="mb-6 p-3 glass-card border-red-200 text-red-500 text-sm animate-fade-in-up">{error}</div>}
-
-                {/* Week Navigation */}
-                <div className="flex items-center justify-between mb-4 animate-fade-in-up stagger-1">
-                    <button onClick={() => setWeekOffset(w => w - 1)} className="btn-secondary text-xs py-1.5 px-3">← Previous</button>
-                    <h2 className="text-sm font-semibold">{weekLabel}</h2>
-                    <button onClick={() => setWeekOffset(w => w + 1)} className="btn-secondary text-xs py-1.5 px-3">Next →</button>
-                </div>
-
-                {/* Calendar Grid */}
-                {loading ? (
-                    <div className="grid grid-cols-7 gap-2">
-                        {Array.from({ length: 7 }).map((_, i) => (
-                            <div key={i} className="glass-card p-3 min-h-[200px]">
-                                <div className="h-4 skeleton w-12 mb-3" />
-                                <div className="h-20 skeleton rounded-lg mb-2" />
-                                <div className="h-3 skeleton w-2/3" />
-                            </div>
-                        ))}
+                        <button
+                            onClick={generateWeek}
+                            disabled={generating}
+                            className="btn-primary flex items-center gap-2 shadow-lg shadow-violet-500/20"
+                        >
+                            {generating ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <span>Generating...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>✨</span>
+                                    <span>Generate Week</span>
+                                </>
+                            )}
+                        </button>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-7 gap-2 animate-fade-in-up stagger-2">
-                        {weekDates.map((date, dayIndex) => {
-                            const dayPosts = posts.filter(p => {
-                                const postDate = new Date(p.scheduledAt);
-                                return postDate.toDateString() === date.toDateString();
-                            });
-                            const isToday = date.toDateString() === new Date().toDateString();
-                            const isPast = date < new Date() && !isToday;
+                </div>
 
-                            return (
-                                <div key={dayIndex} className={`glass-card p-3 min-h-[220px] transition-all ${isToday ? "border-violet-300 ring-1 ring-violet-100" : ""} ${isPast ? "opacity-60" : ""}`}>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div>
-                                            <div className={`text-xs font-semibold ${isToday ? "text-violet-600" : "text-slate-700"}`}>
-                                                {DAY_SHORT[dayIndex]}
-                                            </div>
-                                            <div className="text-[10px] text-slate-400">
-                                                {date.getDate()} {date.toLocaleDateString("en-US", { month: "short" })}
-                                            </div>
-                                        </div>
-                                        {isToday && (
-                                            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-600 font-medium">TODAY</span>
-                                        )}
-                                    </div>
-
-                                    {dayPosts.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center h-[150px] text-center">
-                                            <div className="text-slate-300 text-2xl mb-1">📝</div>
-                                            <p className="text-[10px] text-slate-300">No post</p>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2">
-                                            {dayPosts.map(post => (
-                                                <button key={post.id} onClick={() => setSelectedPost(post)} className="w-full text-left group">
-                                                    {post.output?.imageUrl && (
-                                                        <div className="w-full aspect-square rounded-lg overflow-hidden mb-1.5 border border-black/[0.06]">
-                                                            <img
-                                                                src={post.output.imageUrl}
-                                                                alt="Post"
-                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <p className="text-[10px] text-slate-600 line-clamp-2 leading-relaxed">
-                                                        {post.content?.slice(0, 60)}...
-                                                    </p>
-                                                    <div className="flex items-center justify-between mt-1">
-                                                        <span className={`text-[8px] px-1.5 py-0.5 rounded-full ${STATUS_STYLES[post.status] || ""}`}>
-                                                            {post.status}
-                                                        </span>
-                                                        <span className="text-[8px] text-slate-400">📸</span>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                {error && (
+                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm animate-fade-in-up">
+                        ⚠️ {error}
                     </div>
                 )}
 
-                {/* Stats Bar */}
-                {posts.length > 0 && (
-                    <div className="mt-4 flex items-center gap-4 text-[10px] text-slate-400 animate-fade-in-up stagger-3">
-                        <span>📊 {posts.length} posts this week</span>
-                        <span>✅ {posts.filter(p => p.status === "approved").length} approved</span>
-                        <span>📝 {posts.filter(p => p.status === "draft").length} drafts</span>
-                        <span>🚀 {posts.filter(p => p.status === "posted").length} posted</span>
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-7 gap-4 animate-fade-in-up stagger-1">
+                    {weekDates.map((date, i) => {
+                        const dateStr = date.toISOString().split("T")[0];
+                        const dayPosts = posts.filter(p => p.scheduledAt.startsWith(dateStr));
+                        const isToday = new Date().toISOString().split("T")[0] === dateStr;
+
+                        return (
+                            <div key={i} className={`glass-card min-h-[180px] flex flex-col p-3 ${isToday ? "ring-1 ring-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.2)]" : ""}`}>
+                                <div className="text-center mb-3 pb-2 border-b border-white/5">
+                                    <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">{DAY_SHORT[i]}</div>
+                                    <div className={`text-lg font-bold ${isToday ? "text-violet-400" : "text-slate-300"}`}>
+                                        {date.getDate()}
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 space-y-2">
+                                    {dayPosts.map(post => (
+                                        <div
+                                            key={post.id}
+                                            onClick={() => setSelectedPost(post)}
+                                            className="group cursor-pointer p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all"
+                                        >
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                {post.output?.imageUrl ? (
+                                                    <img src={post.output.imageUrl} alt="" className="w-6 h-6 rounded object-cover ring-1 ring-white/10" />
+                                                ) : (
+                                                    <div className="w-6 h-6 rounded bg-violet-500/20 flex items-center justify-center text-[10px]">📸</div>
+                                                )}
+                                                <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${STATUS_STYLES[post.status]}`}>
+                                                    {post.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed group-hover:text-slate-300 transition-colors">
+                                                {post.output?.caption || post.content}
+                                            </p>
+                                        </div>
+                                    ))}
+                                    {dayPosts.length === 0 && (
+                                        <div className="h-full flex items-center justify-center text-slate-600/50 text-2xl select-none">
+                                            +
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Post Detail Modal */}
+                {selectedPost && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="glass-card max-w-2xl w-full max-h-[90vh] overflow-y-auto outline-none border border-white/20 shadow-2xl">
+                            <div className="p-6">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-white mb-1">Post Details</h3>
+                                        <p className="text-xs text-slate-400">Scheduled for {new Date(selectedPost.scheduledAt).toLocaleDateString()}</p>
+                                    </div>
+                                    <button onClick={() => setSelectedPost(null)} className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white">
+                                        ✕
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div className="aspect-square rounded-xl bg-black/40 border border-white/10 flex items-center justify-center overflow-hidden relative group">
+                                            {selectedPost.output?.imageUrl ? (
+                                                <img src={selectedPost.output.imageUrl} alt="Post" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="text-center p-6">
+                                                    <div className="text-4xl mb-2">🖼️</div>
+                                                    <p className="text-sm text-slate-500">Image generating...</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition">
+                                                Regenerate Image
+                                            </button>
+                                            <button className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition">
+                                                Edit Image
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-medium text-slate-500 mb-1.5 block">Caption</label>
+                                            <textarea
+                                                className="w-full h-32 bg-black/20 border border-white/10 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-violet-500/50 resize-none"
+                                                defaultValue={selectedPost.output?.caption || ""}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs font-medium text-slate-500 mb-1.5 block">Hashtags</label>
+                                            <div className="p-3 bg-black/20 border border-white/10 rounded-xl text-xs text-violet-300 leading-relaxed">
+                                                {(selectedPost.output?.hashtags || []).join(" ")}
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-4 flex gap-3">
+                                            <button className="flex-1 btn-primary py-2.5 text-sm shadow-lg shadow-violet-500/10">
+                                                Approve & Schedule
+                                            </button>
+                                            {selectedPost.status === "approved" && (
+                                                <button className="px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
+                                                    ed
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
-
-            {/* ═══ POST DETAIL MODAL ═══ */}
-            {selectedPost && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setSelectedPost(null)} />
-                    <div className="relative bg-white rounded-2xl shadow-2xl border border-black/[0.06] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-5 border-b border-black/[0.06] flex items-center justify-between">
-                            <div>
-                                <h2 className="text-lg font-semibold flex items-center gap-2">
-                                    📸 Instagram Post
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_STYLES[selectedPost.status] || ""}`}>
-                                        {selectedPost.status}
-                                    </span>
-                                </h2>
-                                <p className="text-xs text-slate-500">
-                                    {selectedPost.scheduledAt ? new Date(selectedPost.scheduledAt).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) : "Unscheduled"}
-                                    {selectedPost.output?.bestTime ? ` at ${selectedPost.output.bestTime}` : ""}
-                                </p>
-                            </div>
-                            <button onClick={() => setSelectedPost(null)} className="text-slate-400 hover:text-slate-600 text-lg">✕</button>
-                        </div>
-
-                        <div className="p-5">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                {/* Image */}
-                                <div>
-                                    {selectedPost.output?.imageUrl ? (
-                                        <div className="aspect-square rounded-xl overflow-hidden border border-black/[0.06] shadow-sm">
-                                            <img src={selectedPost.output.imageUrl} alt="Post visual" className="w-full h-full object-cover" />
-                                        </div>
-                                    ) : (
-                                        <div className="aspect-square rounded-xl bg-slate-100 flex items-center justify-center">
-                                            <div className="text-center">
-                                                <div className="text-4xl mb-2">🖼️</div>
-                                                <p className="text-xs text-slate-400">No image generated</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Caption + Details */}
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">Caption</label>
-                                        <div className="p-3 rounded-xl bg-slate-50 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto">
-                                            {selectedPost.content}
-                                        </div>
-                                    </div>
-
-                                    {selectedPost.output?.hashtags && selectedPost.output.hashtags.length > 0 && (
-                                        <div>
-                                            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Hashtags</label>
-                                            <div className="flex flex-wrap gap-1">
-                                                {selectedPost.output.hashtags.map((tag, i) => (
-                                                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-200">
-                                                        #{tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <div className="pt-2">
-                                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">Posting Time</label>
-                                        <p className="text-sm text-slate-500">
-                                            {selectedPost.output?.dayOfWeek && `${DAY_NAMES[["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"].indexOf(selectedPost.output.dayOfWeek)] || selectedPost.output.dayOfWeek}`}
-                                            {selectedPost.output?.bestTime ? ` at ${selectedPost.output.bestTime}` : ""}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-5 border-t border-black/[0.06] flex items-center justify-between">
-                            <div className="flex gap-2">
-                                {selectedPost.status === "draft" && (
-                                    <button onClick={() => updatePostStatus(selectedPost.id, "approved")} className="btn-primary text-sm py-2 px-4">
-                                        ✅ Approve Post
-                                    </button>
-                                )}
-                                {selectedPost.status === "approved" && (
-                                    <>
-                                        <button
-                                            onClick={handlePostNow}
-                                            disabled={posting || !isConnected}
-                                            className="btn-primary text-sm py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-pink-500 to-violet-600 border-none text-white shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 transition-all"
-                                            title={!isConnected ? "Connect Instagram first" : "Post to Instagram"}
-                                        >
-                                            {posting ? (
-                                                <span className="flex items-center gap-2">
-                                                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                    Posting...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    🚀 Post Now
-                                                </span>
-                                            )}
-                                        </button>
-                                        <button onClick={() => updatePostStatus(selectedPost.id, "draft")} className="btn-secondary text-sm py-2 px-4">
-                                            ↩ Back to Draft
-                                        </button>
-                                    </>
-                                )}
-                                {selectedPost.status === "posted" && (
-                                    <div className="text-emerald-600 text-sm font-medium flex items-center gap-2 px-3 py-2 bg-emerald-50 rounded-lg border border-emerald-100">
-                                        ✅ Posted on {new Date(selectedPost.postedAt || Date.now()).toLocaleDateString()}
-                                    </div>
-                                )}
-                            </div>
-                            <button onClick={() => setSelectedPost(null)} className="btn-secondary text-sm py-2 px-4">Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </main>
     );
 }
