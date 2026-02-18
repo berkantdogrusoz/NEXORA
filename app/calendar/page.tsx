@@ -63,6 +63,10 @@ export default function CalendarPage() {
         });
     }, [weekOffset]);
 
+    const weekDates = getWeekDates();
+    const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
+    const currentYear = weekDates[0].getFullYear();
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -144,9 +148,7 @@ export default function CalendarPage() {
         }
     };
 
-    const weekDates = getWeekDates();
-    const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
-    const currentYear = weekDates[0].getFullYear();
+
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || !e.target.files[0] || !selectedPost) return;
