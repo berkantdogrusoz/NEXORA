@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { updateUserSubscription } from "@/lib/subscription";
 
+export async function GET() {
+    return NextResponse.json({ message: "Webhook endpoint is active. Please use POST for events." }, { status: 200 });
+}
+
 export async function POST(req: NextRequest) {
     try {
+        // ... existing POST logic
         const clone = req.clone();
         const eventType = req.headers.get("X-Event-Name");
         const signature = req.headers.get("X-Signature");
@@ -29,11 +34,7 @@ export async function POST(req: NextRequest) {
         const userId = meta.custom_data?.user_id;
 
         if (!userId) {
-            // Maybe it's an update where we don't have custom_data in meta? 
-            // Lemon Squeezy sends custom_data in all events if it was passed during checkout.
-            // However, if it's missing, we might need to lookup by subscription_id if we already have it.
-            // For MVP, valid checkout MUST have user_id.
-            return NextResponse.json({ message: "No user_id in custom_data" }, { status: 200 }); // Return 200 to acknowledge
+            return NextResponse.json({ message: "No user_id in custom_data" }, { status: 200 });
         }
 
         if (eventType === "subscription_created" || eventType === "subscription_updated" || eventType === "subscription_cancelled" || eventType === "subscription_expired") {
@@ -43,12 +44,6 @@ export async function POST(req: NextRequest) {
             const renewsAt = attributes.renews_at;
             const variantId = attributes.variant_id;
 
-            // Determine plan name based on variant ID (Need to map this in environment or code)
-            // For now, valid plans are stored in DB. We can map IDs later.
-
-            // Map Status
-            // Lemon statuses: on_trial, active, paused, past_due, unpaid, cancelled, expired
-
             const subscriptionData = {
                 lemon_customer_id: attributes.customer_id.toString(),
                 lemon_subscription_id: data.id.toString(),
@@ -56,11 +51,8 @@ export async function POST(req: NextRequest) {
                 status: status,
                 renews_at: renewsAt,
                 ends_at: endsAt,
-                plan_name: "Pro" // Placeholder, we should fetch variant name or map ID
+                plan_name: "Pro"
             };
-
-            // We might want to fetch the variant name from Lemon API if we want accuracy, or hardcode map.
-            // For simple MVP let's assume Pro.
 
             await updateUserSubscription(userId, subscriptionData);
         }
