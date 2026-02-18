@@ -148,6 +148,83 @@ export default function CalendarPage() {
     const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
     const currentYear = weekDates[0].getFullYear();
 
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || !e.target.files[0] || !selectedPost) return;
+
+        const file = e.target.files[0];
+        setLoading(true);
+
+        try {
+            // Upload to Supabase Storage
+            const filename = `custom/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "")}`;
+            const { data, error } = await (await import("@/lib/supabase")).supabase.storage
+                .from("instagram-images")
+                .upload(filename, file);
+
+            if (error) throw error;
+
+            // Get Public URL
+            const { data: urlData } = (await import("@/lib/supabase")).supabase.storage
+                .from("instagram-images")
+                .getPublicUrl(filename);
+
+            const publicUrl = urlData.publicUrl;
+
+            // Update Post in DB
+            const res = await fetch("/api/calendar/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    postId: selectedPost.id,
+                    updates: { output: { imageUrl: publicUrl } }
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to update post");
+
+            // Update Local State
+            const updatedPost = { ...selectedPost, output: { ...selectedPost.output, imageUrl: publicUrl } };
+            setSelectedPost(updatedPost);
+            setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+
+        } catch (err) {
+            console.error("Upload failed", err);
+            setError("Failed to upload image.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const regenerateImage = async () => {
+        if (!selectedPost) return;
+        setLoading(true);
+        try {
+            const res = await fetch("/api/calendar/regenerate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ postId: selectedPost.id }),
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                // Update Local State
+                const updatedPost = { ...selectedPost, output: { ...selectedPost.output, imageUrl: data.imageUrl } };
+                setSelectedPost(updatedPost);
+                setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+            } else {
+                setError("Failed to regenerate image.");
+            }
+        } catch {
+            setError("Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const weekDates = getWeekDates();
+    const currentMonth = weekDates[0].toLocaleString("default", { month: "long" });
+    const currentYear = weekDates[0].getFullYear();
+
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
             <Navbar />
@@ -281,13 +358,29 @@ export default function CalendarPage() {
                                                     <p className="text-sm text-slate-500">Image generating...</p>
                                                 </div>
                                             )}
+                                            {/* Hidden File Input */}
+                                            <input
+                                                type="file"
+                                                id="imageUpload"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                            />
                                         </div>
                                         <div className="flex gap-2">
-                                            <button className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition">
-                                                Regenerate Image
+                                            <button
+                                                onClick={regenerateImage}
+                                                disabled={loading}
+                                                className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition disabled:opacity-50"
+                                            >
+                                                {loading ? "Processing..." : "Regenerate Image"}
                                             </button>
-                                            <button className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition">
-                                                Edit Image
+                                            <button
+                                                onClick={() => document.getElementById('imageUpload')?.click()}
+                                                disabled={loading}
+                                                className="flex-1 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium text-slate-300 hover:bg-white/10 transition disabled:opacity-50"
+                                            >
+                                                {loading ? "Uploading..." : "Upload Selection"}
                                             </button>
                                         </div>
                                     </div>

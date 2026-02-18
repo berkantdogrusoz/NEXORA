@@ -140,10 +140,12 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
                 try {
                     const imgResponse = await client.images.generate({
                         model: "dall-e-3",
-                        prompt: `Instagram post image: ${post.imagePrompt}. Style: modern, clean, visually striking, professional social media. Square 1080x1080.`,
+                        prompt: `Professional high-end advertising photography for Instagram. ${post.imagePrompt}. 
+Style: Award-winning product photography, Adobe Photoshop composite, ultra-realistic, 8k resolution, cinematic lighting, commercial look. 
+NO TEXT, NO LOGOS. Clean, modern, premium aesthetic suitable for a top-tier brand.`,
                         n: 1,
                         size: "1024x1024",
-                        quality: "standard",
+                        quality: "hd", // Upgrade to HD for better details
                     });
                     const tempUrl = imgResponse.data?.[0]?.url;
 
