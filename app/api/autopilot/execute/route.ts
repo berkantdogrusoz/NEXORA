@@ -61,15 +61,47 @@ export async function POST(req: Request) {
         }
 
         const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const weekOffset = body.weekOffset || 0;
 
-        const postsToGenerate = body.count || brand.schedule?.postsPerWeek || 7;
+        // Calculate Schedule Range
+        const now = new Date();
+        let startDate: Date;
+        let daysToGenerate: number;
+
+        if (weekOffset === 0) {
+            // Current Week: Start from TODAY to avoid past days
+            startDate = new Date(now);
+            startDate.setHours(0, 0, 0, 0);
+
+            // Calculate days remaining until Sunday (0=Sun, 1=Mon... 6=Sat)
+            // Fix: In JS getDay(), Sunday is 0. We want Monday-Sunday cycle.
+            // Let's standardise: Mon=0 ... Sun=6
+            const currentDayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+            const daysRemaining = 7 - currentDayIndex;
+
+            daysToGenerate = daysRemaining;
+        } else {
+            // Next Week (or future): Start from next Monday
+            const dayOfWeek = now.getDay(); // 0(Sun) - 6(Sat)
+            const daysToMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() + daysToMonday + (weekOffset - 1) * 7);
+            startDate.setHours(0, 0, 0, 0);
+
+            daysToGenerate = 7;
+        }
+
+        // Just in case
+        if (daysToGenerate < 1) daysToGenerate = 1;
+
         const userMessage = `Create a weekly Instagram content plan for:
 Brand: ${brand.name}
 Industry: ${brand.niche}
 Target Audience: ${brand.audience}
 Tone: ${brand.tone}
 
-Generate ${postsToGenerate} Instagram posts, one for each day of the week. 
+Generate exactly ${daysToGenerate} Instagram posts.
+These posts will be scheduled sequentially starting from ${startDate.toLocaleDateString('en-US', { weekday: 'long' })}.
 Make each post unique — mix educational, entertaining, promotional, and engagement content.
 Include detailed image prompts that would create stunning Instagram visuals.`;
 
@@ -91,9 +123,16 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
         try { result = JSON.parse(text); }
         catch { return NextResponse.json({ error: "Invalid JSON from AI." }, { status: 500 }); }
 
-        const posts = result.posts || [];
+        let posts = result.posts || [];
 
-        // Generate DALL-E images for each post (in parallel, max 3 at a time)
+        // Safety: Ensure we have enough posts, loop if necessary
+        if (posts.length < daysToGenerate) {
+            // If AI returned fewer posts, duplicate nicely or accept partial
+            // Let's just adhere to what is returned
+            daysToGenerate = posts.length;
+        }
+
+        // Generate DALL-E images (unchanged logic)
         const generateImage = body.generateImages !== false;
         if (generateImage) {
             const imagePromises = posts.map(async (post: { imagePrompt?: string }) => {
@@ -109,7 +148,6 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
                     const tempUrl = imgResponse.data?.[0]?.url;
 
                     if (tempUrl) {
-                        // Upload to Supabase to make it permanent
                         const permanentUrl = await uploadImageFromUrl(tempUrl, "autopilot");
                         return permanentUrl || tempUrl;
                     }
@@ -125,45 +163,26 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             });
         }
 
-        // Calculate post dates (Start from THIS Monday to be visible in current calendar week)
-        const now = new Date();
-        const dayOfWeek = now.getDay(); // 0 (Sun) - 6 (Sat)
-        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
-        const currentMonday = new Date(now);
-        currentMonday.setDate(now.getDate() + daysToMonday);
-        currentMonday.setHours(0, 0, 0, 0);
-
-        const dayMap: Record<string, number> = {
-            monday: 0, tuesday: 1, wednesday: 2, thursday: 3,
-            friday: 4, saturday: 5, sunday: 6,
-        };
-
-        // Save each post as a log entry with scheduled date
+        // SEQUENTIAL SCHEDULING (Fixes "Missing Days" and "Past Days")
+        // We ignore 'dayOfWeek' from AI and assign strictly by index
         const logEntries = posts.map((post: {
             type?: string;
             platform?: string;
             caption?: string;
-            dayOfWeek?: string;
             bestTime?: string;
             imageUrl?: string | null;
+            hashtags?: string[];
+            imagePrompt?: string;
         }, index: number) => {
-            // Robust day parsing: normalize to lowercase, handle partial matches
-            let dayKey = post.dayOfWeek?.toLowerCase().trim() || "";
+            const scheduledDate = new Date(startDate);
+            scheduledDate.setDate(startDate.getDate() + index);
 
-            // Fallback: If day is invalid or missing, assign based on index (0=Mon, 6=Sun)
-            if (!dayMap.hasOwnProperty(dayKey)) {
-                const days = Object.keys(dayMap);
-                dayKey = days[index % 7];
-            }
-
-            const dayOffset = dayMap[dayKey] || 0;
-            const scheduledDate = new Date(currentMonday);
-            scheduledDate.setDate(currentMonday.getDate() + dayOffset);
-
-            // Parse bestTime like "09:00"
+            // Parse bestTime
             const timeParts = (post.bestTime || "12:00").split(":");
             scheduledDate.setHours(parseInt(timeParts[0]) || 12, parseInt(timeParts[1]) || 0);
+
+            // Backfill dayOfWeek for UI consistency if needed
+            const dayName = scheduledDate.toLocaleDateString('en-US', { weekday: 'long' });
 
             return {
                 user_id: authResult.userId,
@@ -173,7 +192,10 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
                 content: post.caption || "",
                 status: "draft",
                 scheduled_at: scheduledDate.toISOString(),
-                output: post,
+                output: {
+                    ...post,
+                    dayOfWeek: dayName.toLowerCase() // Ensure UI sees correct day
+                },
             };
         });
 
@@ -185,7 +207,7 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             success: true,
             posts: posts.length,
             result,
-            weekStart: currentMonday.toISOString(),
+            weekStart: startDate.toISOString(),
         });
     } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Execution failed.";

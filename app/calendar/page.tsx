@@ -95,7 +95,10 @@ export default function CalendarPage() {
             const res = await fetch("/api/autopilot/execute", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ brandId: brands[0].id }),
+                body: JSON.stringify({
+                    brandId: brands[0].id,
+                    weekOffset: weekOffset
+                }),
             });
             if (res.ok) {
                 await fetchData();
