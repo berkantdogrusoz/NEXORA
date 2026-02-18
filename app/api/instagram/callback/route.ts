@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
         if (error) {
             console.error("Instagram OAuth error:", error);
             return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=oauth_denied`
+                `${APP_URL}/store?error=oauth_denied`
             );
         }
 
         if (!code) {
             return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=no_code`
+                `${APP_URL}/store?error=no_code`
             );
         }
 
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         } catch (e: any) {
             console.error("Could not find Instagram Business Account:", e);
             return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=no_business_account&details=${encodeURIComponent(e.message)}`
+                `${APP_URL}/store?error=no_business_account&details=${encodeURIComponent(e.message)}`
             );
         }
 
@@ -84,18 +84,18 @@ export async function GET(request: NextRequest) {
         if (dbError) {
             console.error("Failed to save Instagram connection:", dbError);
             return NextResponse.redirect(
-                `${APP_URL}/connect-instagram?error=db_error`
+                `${APP_URL}/store?error=db_error`
             );
         }
 
         // Success!
         return NextResponse.redirect(
-            `${APP_URL}/connect-instagram?success=true&username=${encodeURIComponent(igAccount.username)}`
+            `${APP_URL}/store?success=true&username=${encodeURIComponent(igAccount.username)}`
         );
     } catch (err: any) {
         console.error("Instagram callback error:", err);
         return NextResponse.redirect(
-            `${APP_URL}/connect-instagram?error=unknown&details=${encodeURIComponent(err.message || "Unknown error")}`
+            `${APP_URL}/store?error=unknown&details=${encodeURIComponent(err.message || "Unknown error")}`
         );
     }
 }
