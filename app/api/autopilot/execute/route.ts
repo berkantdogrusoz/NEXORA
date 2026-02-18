@@ -147,8 +147,17 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             dayOfWeek?: string;
             bestTime?: string;
             imageUrl?: string | null;
-        }) => {
-            const dayOffset = dayMap[post.dayOfWeek?.toLowerCase() || "monday"] || 0;
+        }, index: number) => {
+            // Robust day parsing: normalize to lowercase, handle partial matches
+            let dayKey = post.dayOfWeek?.toLowerCase().trim() || "";
+
+            // Fallback: If day is invalid or missing, assign based on index (0=Mon, 6=Sun)
+            if (!dayMap.hasOwnProperty(dayKey)) {
+                const days = Object.keys(dayMap);
+                dayKey = days[index % 7];
+            }
+
+            const dayOffset = dayMap[dayKey] || 0;
             const scheduledDate = new Date(currentMonday);
             scheduledDate.setDate(currentMonday.getDate() + dayOffset);
 
