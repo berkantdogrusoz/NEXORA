@@ -125,13 +125,14 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             });
         }
 
-        // Calculate post dates (starting from next Monday)
+        // Calculate post dates (Start from THIS Monday to be visible in current calendar week)
         const now = new Date();
-        const dayOfWeek = now.getDay();
-        const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-        const nextMonday = new Date(now);
-        nextMonday.setDate(now.getDate() + daysUntilMonday);
-        nextMonday.setHours(0, 0, 0, 0);
+        const dayOfWeek = now.getDay(); // 0 (Sun) - 6 (Sat)
+        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+        const currentMonday = new Date(now);
+        currentMonday.setDate(now.getDate() + daysToMonday);
+        currentMonday.setHours(0, 0, 0, 0);
 
         const dayMap: Record<string, number> = {
             monday: 0, tuesday: 1, wednesday: 2, thursday: 3,
@@ -147,9 +148,9 @@ Include detailed image prompts that would create stunning Instagram visuals.`;
             bestTime?: string;
             imageUrl?: string | null;
         }) => {
-            const dayOffset = dayMap[post.dayOfWeek || "monday"] || 0;
-            const scheduledDate = new Date(nextMonday);
-            scheduledDate.setDate(nextMonday.getDate() + dayOffset);
+            const dayOffset = dayMap[post.dayOfWeek?.toLowerCase() || "monday"] || 0;
+            const scheduledDate = new Date(currentMonday);
+            scheduledDate.setDate(currentMonday.getDate() + dayOffset);
 
             // Parse bestTime like "09:00"
             const timeParts = (post.bestTime || "12:00").split(":");
