@@ -23,26 +23,49 @@ export default function AnimatedShaderBackground({
       }
     `;
 
+        // Deep Space Sparkles Shader
         const fragmentShaderSource = `
       precision highp float;
       uniform vec2 resolution;
       uniform float time;
 
+      // Random function
+      float random(vec2 st) {
+          return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+      }
+
       void main() {
         vec2 uv = gl_FragCoord.xy / resolution.xy;
-        float color = 0.0;
         
-        color += sin(uv.x * 10.0 + time) * 0.5 + 0.5;
-        color += sin(uv.y * 10.0 + time) * 0.5 + 0.5;
+        // Deep dark background with slight gradient
+        vec3 color = mix(vec3(0.0, 0.0, 0.02), vec3(0.02, 0.0, 0.05), uv.y);
         
-        gl_FragColor = vec4(color * 0.5, 0.0, color, 1.0);
+        // Stars/Sparkles
+        float t = time * 0.5;
+        for (float i = 0.0; i < 50.0; i++) {
+            float x = random(vec2(i, 0.0));
+            float y = random(vec2(0.0, i));
+            vec2 pos = vec2(x, y);
+            
+            // Twinkle effect
+            float size = 0.001 + 0.002 * random(vec2(i, i));
+            float brightness = 0.5 + 0.5 * sin(t + i * 10.0);
+            
+            float dist = distance(uv, pos);
+            if (dist < size) {
+                color += vec3(1.0) * brightness * (1.0 - dist/size);
+            }
+        }
+        
+        // Subtle moving nebula/fog
+        float fog = 0.0;
+        fog += sin(uv.x * 2.0 + t * 0.1) * 0.02;
+        fog += sin(uv.y * 3.0 - t * 0.2) * 0.02;
+        color += vec3(0.1, 0.05, 0.2) * (fog + 0.05);
+
+        gl_FragColor = vec4(color, 1.0);
       }
     `;
-
-        // Simple shader setup (placeholder for complex shader)
-        // For production, we'd use a more complex shader logic here to match the "sparkles" effect
-        // But since I don't have the exact sophisticated shader code from the link handy, 
-        // I am implementing a cool, dark, purple-ish animated background.
 
         const compileShader = (source: string, type: number) => {
             const shader = gl.createShader(type);
@@ -114,5 +137,5 @@ export default function AnimatedShaderBackground({
         };
     }, []);
 
-    return <canvas ref={canvasRef} className={`fixed inset-0 z-[-1] ${className}`} />;
+    return <canvas ref={canvasRef} className={`fixed inset-0 z-[-1] pointer-events-none ${className}`} />;
 }

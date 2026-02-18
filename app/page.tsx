@@ -1,11 +1,9 @@
 import Link from "next/link";
 import Navbar from "./components/navbar";
-import AnimatedShaderBackground from "./components/ui/animated-shader-background";
 
 export default function Home() {
   return (
     <main className="relative min-h-screen text-slate-100 overflow-hidden font-sans">
-      <AnimatedShaderBackground />
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
 

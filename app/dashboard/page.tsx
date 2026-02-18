@@ -52,132 +52,128 @@ export default function DashboardPage() {
     const msgsPercent = Math.min((msgsUsed / msgsMax) * 100, 100);
 
     return (
-        <main className="relative min-h-screen overflow-hidden">
-            <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
+        <main className="relative min-h-screen font-sans pb-20">
             <Navbar />
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
+            <div className="pt-24 px-6 max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8 animate-fade-in-up">
-                    <h1 className="text-2xl font-bold tracking-tight">Welcome back 👋</h1>
-                    <p className="text-sm text-slate-500">Here&apos;s what&apos;s happening with your Instagram marketing.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Welcome back 👋</h1>
+                    <p className="text-sm text-slate-400">Here's what's happening with your Instagram marketing.</p>
                 </div>
 
                 {loading ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="glass-card p-5"><div className="h-8 skeleton w-16 mb-2" /><div className="h-4 skeleton w-24" /></div>
+                            <div key={i} className="glass-card p-5 h-32 flex flex-col justify-center animate-pulse">
+                                <div className="h-8 bg-white/10 rounded w-12 mb-2" />
+                                <div className="h-4 bg-white/5 rounded w-20" />
+                            </div>
                         ))}
                     </div>
                 ) : (
                     <>
                         {/* ═══ STATS CARDS ═══ */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 animate-fade-in-up stagger-1">
-                            <div className="glass-card p-5">
-                                <div className="text-2xl mb-1">📸</div>
-                                <div className="text-2xl font-bold">{stats?.weekPosts || 0}</div>
-                                <div className="text-xs text-slate-400">Posts this week</div>
+                            <div className="glass-card p-6">
+                                <div className="text-2xl mb-2">📸</div>
+                                <div className="text-3xl font-bold text-white">{stats?.weekPosts || 0}</div>
+                                <div className="text-xs text-slate-400 mt-1">Posts this week</div>
                             </div>
-                            <div className="glass-card p-5">
-                                <div className="text-2xl mb-1">✅</div>
-                                <div className="text-2xl font-bold">{stats?.weekApproved || 0}</div>
-                                <div className="text-xs text-slate-400">Approved</div>
+                            <div className="glass-card p-6">
+                                <div className="text-2xl mb-2">✅</div>
+                                <div className="text-3xl font-bold text-white">{stats?.weekApproved || 0}</div>
+                                <div className="text-xs text-slate-400 mt-1">Approved</div>
                             </div>
-                            <div className="glass-card p-5">
-                                <div className="text-2xl mb-1">🚀</div>
-                                <div className="text-2xl font-bold">{stats?.weekPosted || 0}</div>
-                                <div className="text-xs text-slate-400">Posted</div>
+                            <div className="glass-card p-6">
+                                <div className="text-2xl mb-2">🚀</div>
+                                <div className="text-3xl font-bold text-white">{stats?.weekPosted || 0}</div>
+                                <div className="text-xs text-slate-400 mt-1">Posted</div>
                             </div>
-                            <div className="glass-card p-5">
-                                <div className="text-2xl mb-1">🤖</div>
-                                <div className="text-2xl font-bold">{stats?.totalPosts || 0}</div>
-                                <div className="text-xs text-slate-400">All-time posts</div>
+                            <div className="glass-card p-6">
+                                <div className="text-2xl mb-2">🤖</div>
+                                <div className="text-3xl font-bold text-white">{stats?.totalPosts || 0}</div>
+                                <div className="text-xs text-slate-400 mt-1">All-time posts</div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                             {/* ═══ USAGE METER ═══ */}
-                            <div className="glass-card p-5 animate-fade-in-up stagger-2">
-                                <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                                    📊 Usage
-                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">{PLAN.name} Plan</span>
+                            <div className="glass-card p-6 animate-fade-in-up stagger-2">
+                                <h3 className="text-sm font-semibold text-slate-200 mb-6 flex items-center justify-between">
+                                    <span>📊 Usage</span>
+                                    <span className="text-[10px] px-2 py-1 rounded-full bg-white/10 text-slate-300 border border-white/5">{PLAN.name} Plan</span>
                                 </h3>
 
                                 {/* Posts meter */}
-                                <div className="mb-4">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="text-xs text-slate-500">Posts this week</span>
-                                        <span className="text-xs font-medium">{postsUsed}/{postsMax}</span>
+                                <div className="mb-6">
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-xs text-slate-400">Posts this week</span>
+                                        <span className="text-xs font-medium text-slate-200">{postsUsed}/{postsMax}</span>
                                     </div>
-                                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div className={`h-full rounded-full transition-all duration-500 ${postsPercent >= 100 ? "bg-red-400" : postsPercent >= 70 ? "bg-amber-400" : "bg-violet-500"}`}
+                                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div className={`h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(139,92,246,0.3)] ${postsPercent >= 100 ? "bg-red-500" : postsPercent >= 70 ? "bg-amber-500" : "bg-violet-500"}`}
                                             style={{ width: `${postsPercent}%` }} />
                                     </div>
                                     {postsPercent >= 100 && (
-                                        <p className="text-[10px] text-red-400 mt-1">Limit reached! Upgrade to Growth for 7 posts/week →</p>
+                                        <p className="text-[10px] text-red-400 mt-2 flex items-center gap-1">
+                                            <span>⚠️</span> Limit reached! Upgrade to Growth
+                                        </p>
                                     )}
                                 </div>
 
                                 {/* Messages meter */}
                                 <div>
-                                    <div className="flex justify-between mb-1">
-                                        <span className="text-xs text-slate-500">AI messages today</span>
-                                        <span className="text-xs font-medium">{msgsUsed}/{msgsMax}</span>
+                                    <div className="flex justify-between mb-2">
+                                        <span className="text-xs text-slate-400">AI messages today</span>
+                                        <span className="text-xs font-medium text-slate-200">{msgsUsed}/{msgsMax}</span>
                                     </div>
-                                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div className={`h-full rounded-full transition-all duration-500 ${msgsPercent >= 100 ? "bg-red-400" : msgsPercent >= 70 ? "bg-amber-400" : "bg-emerald-500"}`}
+                                    <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div className={`h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] ${msgsPercent >= 100 ? "bg-red-500" : msgsPercent >= 70 ? "bg-amber-500" : "bg-emerald-500"}`}
                                             style={{ width: `${msgsPercent}%` }} />
                                     </div>
                                 </div>
 
-                                <Link href="/pricing" className="mt-4 block text-xs text-center text-violet-600 hover:text-violet-700 font-medium">
-                                    Upgrade for more →
+                                <Link href="/pricing" className="mt-6 block w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-center text-xs font-medium text-slate-300 transition-all">
+                                    Upgrade Plan
                                 </Link>
                             </div>
 
                             {/* ═══ QUICK ACTIONS ═══ */}
-                            <div className="glass-card p-5 animate-fade-in-up stagger-3">
-                                <h3 className="text-sm font-semibold mb-4">⚡ Quick Actions</h3>
-                                <div className="space-y-2">
+                            <div className="glass-card p-6 animate-fade-in-up stagger-3">
+                                <h3 className="text-sm font-semibold text-slate-200 mb-4">⚡ Quick Actions</h3>
+                                <div className="space-y-3">
                                     {(stats?.totalBrands || 0) === 0 ? (
-                                        <Link href="/autopilot" className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-violet-50 to-blue-50 border border-violet-200 hover:border-violet-300 transition-all group">
+                                        <Link href="/autopilot" className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-violet-500/20 to-blue-500/20 border border-violet-500/30 hover:border-violet-400 transition-all group">
                                             <span className="text-lg">🎯</span>
                                             <div>
-                                                <div className="text-sm font-medium text-violet-700">Set Up Your Brand</div>
+                                                <div className="text-sm font-medium text-violet-200 group-hover:text-white transition-colors">Set Up Your Brand</div>
                                                 <div className="text-[10px] text-violet-400">First step — tell Nexora about your business</div>
                                             </div>
                                         </Link>
                                     ) : (
-                                        <Link href="/calendar" className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-violet-50 border border-transparent hover:border-violet-200 transition-all">
+                                        <Link href="/calendar" className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group">
                                             <span className="text-lg">✨</span>
                                             <div>
-                                                <div className="text-sm font-medium">Generate This Week</div>
+                                                <div className="text-sm font-medium text-slate-200 group-hover:text-white">Generate This Week</div>
                                                 <div className="text-[10px] text-slate-400">Create 7 posts with AI images</div>
                                             </div>
                                         </Link>
                                     )}
 
-                                    <Link href="/calendar" className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-violet-50 border border-transparent hover:border-violet-200 transition-all">
+                                    <Link href="/calendar" className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group">
                                         <span className="text-lg">📅</span>
                                         <div>
-                                            <div className="text-sm font-medium">Open Calendar</div>
+                                            <div className="text-sm font-medium text-slate-200 group-hover:text-white">Open Calendar</div>
                                             <div className="text-[10px] text-slate-400">Review and approve posts</div>
                                         </div>
                                     </Link>
 
-                                    <Link href="/assistant" className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-violet-50 border border-transparent hover:border-violet-200 transition-all">
+                                    <Link href="/assistant" className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group">
                                         <span className="text-lg">🤖</span>
                                         <div>
-                                            <div className="text-sm font-medium">Chat with AI</div>
+                                            <div className="text-sm font-medium text-slate-200 group-hover:text-white">Chat with AI</div>
                                             <div className="text-[10px] text-slate-400">Get marketing advice</div>
-                                        </div>
-                                    </Link>
-
-                                    <Link href="/store" className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-violet-50 border border-transparent hover:border-violet-200 transition-all">
-                                        <span className="text-lg">🔗</span>
-                                        <div>
-                                            <div className="text-sm font-medium">Connect Instagram</div>
-                                            <div className="text-[10px] text-slate-400">Enable auto-posting</div>
                                         </div>
                                     </Link>
                                 </div>
@@ -186,37 +182,34 @@ export default function DashboardPage() {
                             {/* ═══ STREAK & BRAND ═══ */}
                             <div className="space-y-4 animate-fade-in-up stagger-4">
                                 {/* Streak */}
-                                <div className="glass-card p-5">
-                                    <h3 className="text-sm font-semibold mb-3">🔥 Streak</h3>
-                                    <div className="flex items-end gap-1">
+                                <div className="glass-card p-6">
+                                    <h3 className="text-sm font-semibold text-slate-200 mb-4">🔥 Streak</h3>
+                                    <div className="flex items-end gap-1 mb-2">
                                         {["M", "T", "W", "T", "F", "S", "S"].map((day, i) => {
                                             const hasPost = (data?.recentActivity || []).length > i;
                                             return (
                                                 <div key={i} className="flex flex-col items-center gap-1 flex-1">
-                                                    <div className={`w-full h-8 rounded-lg ${hasPost ? "bg-gradient-to-t from-violet-500 to-violet-400" : "bg-slate-100"}`} />
-                                                    <span className="text-[9px] text-slate-400">{day}</span>
+                                                    <div className={`w-full h-10 rounded-lg transition-all ${hasPost ? "bg-gradient-to-t from-violet-600 to-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.3)]" : "bg-white/5"}`} />
+                                                    <span className="text-[9px] text-slate-500">{day}</span>
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                    <p className="text-[10px] text-slate-400 mt-2 text-center">
-                                        Approve posts daily to keep your streak! 🎯
-                                    </p>
                                 </div>
 
                                 {/* Current Brand */}
-                                <div className="glass-card p-5">
-                                    <h3 className="text-sm font-semibold mb-2">🏪 Your Brand</h3>
+                                <div className="glass-card p-6">
+                                    <h3 className="text-sm font-semibold text-slate-200 mb-3">🏪 Your Brand</h3>
                                     {data?.brands && data.brands.length > 0 ? (
                                         <div>
-                                            <div className="text-sm font-bold text-violet-700">{data.brands[0].name}</div>
+                                            <div className="text-sm font-bold text-white mb-0.5">{data.brands[0].name}</div>
                                             <div className="text-[10px] text-slate-400">{data.brands[0].niche}</div>
-                                            <Link href="/autopilot" className="text-[10px] text-violet-500 hover:text-violet-700 mt-1 inline-block">Edit brand →</Link>
+                                            <Link href="/autopilot" className="text-[10px] text-violet-400 hover:text-violet-300 mt-2 inline-block transition-colors">Edit brand →</Link>
                                         </div>
                                     ) : (
                                         <div className="text-center py-2">
                                             <p className="text-xs text-slate-400 mb-2">No brand yet</p>
-                                            <Link href="/autopilot" className="text-xs text-violet-600 font-medium">Create Brand →</Link>
+                                            <Link href="/autopilot" className="text-xs text-violet-400 hover:text-violet-300 font-medium">Create Brand →</Link>
                                         </div>
                                     )}
                                 </div>
@@ -224,38 +217,38 @@ export default function DashboardPage() {
                         </div>
 
                         {/* ═══ RECENT ACTIVITY ═══ */}
-                        <div className="glass-card p-5 animate-fade-in-up stagger-5">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-semibold">📋 Recent Activity</h3>
-                                <Link href="/calendar" className="text-xs text-violet-600 hover:text-violet-700">View Calendar →</Link>
+                        <div className="glass-card p-6 animate-fade-in-up stagger-5">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-sm font-semibold text-slate-200">📋 Recent Activity</h3>
+                                <Link href="/calendar" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">View Calendar →</Link>
                             </div>
                             {(!data?.recentActivity || data.recentActivity.length === 0) ? (
-                                <div className="text-center py-8">
-                                    <div className="text-4xl mb-2">📝</div>
+                                <div className="text-center py-10">
+                                    <div className="text-4xl mb-3 opacity-50">📝</div>
                                     <p className="text-sm text-slate-400">No activity yet. Generate your first week of content!</p>
-                                    <Link href="/calendar" className="mt-3 inline-block btn-primary text-sm py-2 px-4">
+                                    <Link href="/calendar" className="mt-4 inline-block btn-primary text-sm py-2 px-4 shadow-lg shadow-violet-500/20">
                                         ✨ Generate Content
                                     </Link>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
                                     {data.recentActivity.map(item => (
-                                        <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                        <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/5">
                                             {item.output?.imageUrl ? (
-                                                <img src={item.output.imageUrl} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                                                <img src={item.output.imageUrl} alt="" className="w-10 h-10 rounded-lg object-cover ring-1 ring-white/10" />
                                             ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center text-lg">📸</div>
+                                                <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center text-lg text-violet-300 ring-1 ring-white/10">📸</div>
                                             )}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs text-slate-600 truncate">{item.content?.slice(0, 80)}</p>
-                                                <p className="text-[10px] text-slate-400">
+                                                <p className="text-sm text-slate-200 truncate">{item.content?.slice(0, 80)}</p>
+                                                <p className="text-[10px] text-slate-500">
                                                     {new Date(item.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                                                 </p>
                                             </div>
-                                            <span className={`text-[9px] px-2 py-0.5 rounded-full shrink-0 ${item.status === "approved" ? "bg-emerald-50 text-emerald-600" :
-                                                    item.status === "posted" ? "bg-blue-50 text-blue-600" :
-                                                        item.status === "failed" ? "bg-red-50 text-red-500" :
-                                                            "bg-slate-100 text-slate-500"
+                                            <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium border ${item.status === "approved" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                                                    item.status === "posted" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                                                        item.status === "failed" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                                            "bg-slate-500/10 text-slate-400 border-slate-500/20"
                                                 }`}>
                                                 {item.status}
                                             </span>

@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import AnimatedShaderBackground from "./components/ui/animated-shader-background";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,8 +22,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={inter.variable}>
-        <body className="font-sans bg-[#fafafa] text-[#0f172a] antialiased">
-          {children}
+        <body className="font-sans bg-black text-slate-100 antialiased min-h-screen relative selection:bg-violet-500/30">
+          <AnimatedShaderBackground />
+          <div className="relative z-10">
+            {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>
