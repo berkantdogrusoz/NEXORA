@@ -35,9 +35,9 @@ export async function POST(req: Request) {
 
         const imgResponse = await client.images.generate({
             model: "dall-e-3",
-            prompt: `Professional high-end advertising photography for Instagram. ${currentPrompt}. 
-Style: Award-winning product photography, Adobe Photoshop composite, ultra-realistic, 8k resolution, cinematic lighting, commercial look. 
-NO TEXT, NO LOGOS, NO ICONS. Clean, modern, premium aesthetic suitable for a top-tier brand.`,
+            prompt: `Professional high-end advertising photography, award-winning shot. ${currentPrompt}. 
+Style: Commercial fashion photography, cinematic lighting, ultra-realistic, 8k resolution, shot on Hasselblad, sharp focus, depth of field. 
+NO TEXT, NO LOGOS, NO ICONS, NO CARTOON. Clean, modern, premium aesthetic.`,
             n: 1,
             size: "1024x1024",
             quality: "hd",
