@@ -265,7 +265,11 @@ export default function CalendarPage() {
             const res = await fetch("/api/instagram/publish", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ postId: selectedPost.id }), // API handles Auth
+                body: JSON.stringify({
+                    image_url: selectedPost.output?.imageUrl,
+                    caption: selectedPost.output?.caption,
+                    postId: selectedPost.id
+                }),
             });
 
             const data = await res.json();
