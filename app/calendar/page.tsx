@@ -424,7 +424,9 @@ export default function CalendarPage() {
                                             ) : (
                                                 <div className="text-center p-6">
                                                     <div className="text-4xl mb-2">🖼️</div>
-                                                    <p className="text-sm text-slate-500">Image generating...</p>
+                                                    <p className="text-sm text-slate-500">
+                                                        {loading ? "Image generating..." : "No image available. Click Regenerate."}
+                                                    </p>
                                                 </div>
                                             )}
                                             {/* Hidden File Input */}
