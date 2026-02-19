@@ -215,9 +215,15 @@ export async function publishToInstagram(
     // Wait for processing
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
-    const status = await checkContainerStatus(containerId, accessToken);
-    if (status.status_code && status.status_code !== "FINISHED") {
+    // Poll for status (max 5 retries)
+    let attempts = 0;
+    while (attempts < 5) {
+        const status = await checkContainerStatus(containerId, accessToken);
+        if (status.status_code === "FINISHED") break;
+        if (status.status_code === "ERROR") throw new Error("Media container failed processing");
+
         await new Promise((resolve) => setTimeout(resolve, 5000));
+        attempts++;
     }
 
     const mediaId = await publishMedia(igUserId, containerId, accessToken);

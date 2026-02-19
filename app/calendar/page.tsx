@@ -253,6 +253,43 @@ export default function CalendarPage() {
         }
     };
 
+    const publishNow = async () => {
+        if (!selectedPost) return;
+
+        // Confirmation
+        if (!confirm("Are you sure you want to post this to Instagram immediately?")) return;
+
+        setLoading(true);
+
+        try {
+            const res = await fetch("/api/instagram/publish", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ postId: selectedPost.id }), // API handles Auth
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                // Update Local State
+                const updatedPost = { ...selectedPost, status: "posted" } as ScheduledPost;
+                setSelectedPost(updatedPost);
+                setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
+                alert("Successfully posted to Instagram! 🚀");
+            } else {
+                console.error("Publish Error:", data);
+                setError(data.error || "Failed to publish post.");
+                alert(`Error: ${data.error || "Failed to publish."}`);
+            }
+        } catch (e: any) {
+            console.error("Publish execution error:", e);
+            setError("Network error or server failure.");
+            alert("Something went wrong while publishing.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
             <Navbar />
@@ -437,6 +474,15 @@ export default function CalendarPage() {
                                             >
                                                 {selectedPost.status === "approved" ? "Approved ✓" : "Approve & Schedule"}
                                             </button>
+
+                                            <button
+                                                onClick={publishNow}
+                                                disabled={loading || selectedPost.status === "posted"}
+                                                className="px-4 py-2.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 hover:bg-pink-500/20 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loading ? "Processing..." : "Post Now 🚀"}
+                                            </button>
+
                                             {selectedPost.status === "approved" && (
                                                 <button className="px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
                                                     Scheduled
