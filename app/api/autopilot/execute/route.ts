@@ -215,7 +215,13 @@ NO TEXT, NO LOGOS, NO ICONS, NO CARTOON. Clean, modern, premium aesthetic.`,
             weekStart: startDate.toISOString(),
         });
     } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "Execution failed.";
+        let msg = e instanceof Error ? e.message : "Execution failed.";
+
+        // Handle common OpenAI billing error
+        if (msg.includes("Billing hard limit has been reached")) {
+            msg = "OpenAI API bakiyeniz bitmiş (Hard Limit). Lütfen platform.openai.com üzerinden kredi yükleyin.";
+        }
+
         return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
