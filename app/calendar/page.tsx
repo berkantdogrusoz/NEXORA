@@ -107,7 +107,8 @@ export default function CalendarPage() {
             if (res.ok) {
                 await fetchData();
             } else {
-                setError("Failed to generate content.");
+                const errorData = await res.json();
+                setError(errorData.error || "Failed to generate content.");
             }
         } catch {
             setError("Something went wrong.");
