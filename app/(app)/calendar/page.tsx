@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 type ScheduledPost = {
     id: string;
@@ -298,9 +297,7 @@ export default function CalendarPage() {
 
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
-            <Navbar />
-
-            <div className="pt-24 px-6 max-w-7xl mx-auto">
+            <div className="pt-10 px-6 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Content Calendar</h1>

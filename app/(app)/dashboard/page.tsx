@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/app/components/navbar";
+
 
 type DashboardData = {
     stats: {
@@ -62,9 +62,7 @@ export default function DashboardPage() {
 
     return (
         <main className="relative min-h-screen font-sans pb-20 text-slate-100">
-            <Navbar />
-
-            <div className="pt-24 px-6 max-w-7xl mx-auto">
+            <div className="pt-10 px-6 max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8 animate-fade-in-up">
                     <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Welcome back 👋</h1>
@@ -280,9 +278,9 @@ export default function DashboardPage() {
                                                 </p>
                                             </div>
                                             <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${item.status === "approved" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                                    item.status === "posted" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
-                                                        item.status === "failed" ? "bg-red-500/10 text-red-400 border-red-500/20" :
-                                                            "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                                                item.status === "posted" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                                                    item.status === "failed" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                                        "bg-slate-500/10 text-slate-400 border-slate-500/20"
                                                 }`}>
                                                 {item.status}
                                             </span>

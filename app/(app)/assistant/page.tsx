@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 type Message = {
     id: string;
@@ -97,9 +97,7 @@ export default function AssistantPage() {
 
     return (
         <main className="relative min-h-screen flex flex-col font-sans">
-            <Navbar />
-
-            <div className="relative z-10 flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-24 pb-4">
+            <div className="relative z-10 flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-10 pb-4">
                 {/* Header */}
                 <div className="mb-6 animate-fade-in-up text-center md:text-left">
                     <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Marketing Assistant</h1>

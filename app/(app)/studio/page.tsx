@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 export default function StudioPage() {
     const [prompt, setPrompt] = useState("");
@@ -65,9 +65,7 @@ export default function StudioPage() {
             {/* Background Gradient */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-black to-black pointer-events-none" />
 
-            <Navbar />
-
-            <div className="pt-32 px-6 max-w-6xl mx-auto relative z-10">
+            <div className="pt-10 px-8 max-w-7xl mx-auto relative z-10">
                 <div className="text-center mb-12">
                     <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-pink-400 mb-4">
                         AI Creative Studio
