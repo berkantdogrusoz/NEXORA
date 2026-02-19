@@ -214,7 +214,8 @@ export default function CalendarPage() {
                 setSelectedPost(updatedPost);
                 setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
             } else {
-                setError("Failed to regenerate image.");
+                const errorData = await res.json();
+                setError(errorData.error || "Failed to regenerate image.");
             }
         } catch {
             setError("Something went wrong.");

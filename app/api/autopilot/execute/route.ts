@@ -4,7 +4,7 @@ import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { uploadImageFromUrl } from "@/lib/storage";
 
-export const maxDuration = 60; // Allow 60 seconds for AI + Uploads
+export const maxDuration = 300; // Allow 5 minutes for AI + Uploads
 
 const CONTENT_SYSTEM_PROMPT = `You are an expert Instagram content creator. Given a brand's details, generate engaging Instagram content.
 

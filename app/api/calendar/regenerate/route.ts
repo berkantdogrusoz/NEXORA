@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import OpenAI from "openai";
 import { uploadImageFromUrl } from "@/lib/storage";
 
-export const maxDuration = 60; // Allow longer timeout for image generation
+export const maxDuration = 300; // Allow 5 minutes for heavy HD generation
 
 export async function POST(req: Request) {
     try {
