@@ -24,8 +24,12 @@ canvas {
     @apply bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl transition-all duration-300 hover:bg-black/50 hover:border-white/20;
   }
 
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-lg border border-white/5 rounded-xl;
+  }
+
   .btn-primary {
-    @apply relative inline-flex items-center justify-center px-6 py-2.5 overflow-hidden font-medium text-white transition-all bg-violet-600 rounded-xl hover:bg-violet-700 hover:scale-105 hover:shadow-lg hover:shadow-violet-500/25 active:scale-95;
+    @apply relative inline-flex items-center justify-center px-6 py-2.5 overflow-hidden font-medium text-white transition-all bg-violet-600 rounded-xl hover:bg-violet-700 hover:scale-105 hover:shadow-lg hover:shadow-violet-500/25 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-secondary {
@@ -34,6 +38,10 @@ canvas {
 
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-blue-400 font-bold;
+  }
+
+  .neon-glow {
+    @apply shadow-[0_0_20px_rgba(139, 92, 246, 0.3)];
   }
 }
 

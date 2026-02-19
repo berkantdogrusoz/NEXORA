@@ -1,15 +1,11 @@
 import Link from "next/link";
-import Navbar from "@/app/components/navbar";
 
 export default function Home() {
   return (
     <div className="relative min-h-screen text-white overflow-hidden selection:bg-violet-500/30">
-      {/* Background with Gradient Mesh */}
-      <div className="fixed inset-0 bg-black z-[-1]" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-900/40 via-black to-black z-[-1]" />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      <section className="relative pt-20 pb-20 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-violet-300 mb-8 animate-fade-in-up">
             <span className="relative flex h-2 w-2">
@@ -59,7 +55,6 @@ export default function Home() {
               className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
               poster="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
             >
-              {/* Fallback pattern if video not available, or use a sample from public URL */}
               <source src="https://cdn.coverr.co/videos/coverr-futuristic-city-4k-5264/1080p.mp4" type="video/mp4" />
             </video>
 

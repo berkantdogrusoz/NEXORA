@@ -1,0 +1,10 @@
+﻿app/(app)/calendar/page.tsx(42,31): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(43,33): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(44,35): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(45,41): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(46,45): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(47,41): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(48,31): error TS2304: Cannot find name 'useState'.
+app/(app)/calendar/page.tsx(50,26): error TS2304: Cannot find name 'useCallback'.
+app/(app)/calendar/page.tsx(69,23): error TS2304: Cannot find name 'useCallback'.
+app/(app)/calendar/page.tsx(88,5): error TS2304: Cannot find name 'useEffect'.

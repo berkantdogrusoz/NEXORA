@@ -61,9 +61,8 @@ export default function StudioPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black text-white relative overflow-hidden font-sans">
-            {/* Background Gradient */}
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-900/20 via-black to-black pointer-events-none" />
+        <div className="min-h-screen text-white relative overflow-hidden font-sans">
+
 
             <div className="pt-10 px-8 max-w-7xl mx-auto relative z-10">
                 <div className="text-center mb-12">
@@ -166,6 +165,6 @@ export default function StudioPage() {
 
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

@@ -1,6 +1,10 @@
 "use client";
 
 
+import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
+
+
 
 type ScheduledPost = {
     id: string;
@@ -376,7 +380,14 @@ export default function CalendarPage() {
                                         >
                                             <div className="flex items-center gap-2 mb-1.5">
                                                 {post.output?.imageUrl ? (
-                                                    <img src={post.output.imageUrl} alt="" className="w-6 h-6 rounded object-cover ring-1 ring-white/10" />
+                                                    <div className="relative w-6 h-6 rounded overflow-hidden ring-1 ring-white/10">
+                                                        <Image
+                                                            src={post.output.imageUrl}
+                                                            alt="Post thumbnail"
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
                                                 ) : (
                                                     <div className="w-6 h-6 rounded bg-violet-500/20 flex items-center justify-center text-[10px]">📸</div>
                                                 )}
@@ -419,7 +430,12 @@ export default function CalendarPage() {
                                     <div className="space-y-4">
                                         <div className="aspect-square rounded-xl bg-black/40 border border-white/10 flex items-center justify-center overflow-hidden relative group">
                                             {selectedPost.output?.imageUrl ? (
-                                                <img src={selectedPost.output.imageUrl} alt="Post" className="w-full h-full object-cover" />
+                                                <Image
+                                                    src={selectedPost.output.imageUrl}
+                                                    alt="Post"
+                                                    fill
+                                                    className="object-cover"
+                                                />
                                             ) : (
                                                 <div className="text-center p-6">
                                                     <div className="text-4xl mb-2">🖼️</div>
