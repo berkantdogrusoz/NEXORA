@@ -151,7 +151,7 @@ NO TEXT, NO LOGOS. Clean, modern, premium aesthetic suitable for a top-tier bran
 
                     if (tempUrl) {
                         const permanentUrl = await uploadImageFromUrl(tempUrl, "autopilot");
-                        return permanentUrl || tempUrl;
+                        return permanentUrl; // NEVER fall back to tempUrl, it expires!
                     }
                     return null;
                 } catch {
