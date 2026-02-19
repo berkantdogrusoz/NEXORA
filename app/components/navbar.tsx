@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/studio", label: "Studio" }, // New Main Hub
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calendar", label: "Calendar" },
   { href: "/assistant", label: "Assistant" },
@@ -88,6 +89,9 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
+              <Link href="/studio" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                Studio
+              </Link>
               <SignInButton mode="modal">
                 <button className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                   Log in
