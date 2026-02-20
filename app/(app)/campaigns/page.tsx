@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 type CampaignPlatform = "instagram" | "google-ads";
 type CampaignContent = { id: string; generatedAt: number; platform: CampaignPlatform; output: Record<string, unknown>; };
@@ -178,9 +178,6 @@ export default function CampaignsPage() {
 
     return (
         <main className="relative min-h-screen overflow-hidden">
-            <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
-            <Navbar />
-
             <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 animate-fade-in-up">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 type Agent = { id: string; name: string; description: string; systemPrompt: string; userPromptTemplate: string; outputSchema: string; createdAt: number; builtIn: boolean; };
 type FormData = { name: string; description: string; systemPrompt: string; userPromptTemplate: string; };
@@ -107,9 +107,6 @@ export default function AgentsPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
-      <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
-      <Navbar />
-
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 animate-fade-in-up">

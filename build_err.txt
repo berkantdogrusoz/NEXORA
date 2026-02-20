@@ -1,0 +1,26 @@
+  ▲ Next.js 14.2.25
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+eN [Error]: Missing credentials. Please pass an `apiKey`, or set the `OPENAI_API_KEY` environment variable.
+    at new nv (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\chunks\5221.js:8:48191)
+    at 1797 (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\app\api\image\generate\route.js:1:939)
+    at t (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\webpack-runtime.js:1:127)
+    at r (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\app\api\image\generate\route.js:1:2544)
+    at C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\app\api\image\generate\route.js:1:2582
+    at t.X (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\webpack-runtime.js:1:1191)
+    at C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\app\api\image\generate\route.js:1:2557
+    at Object.<anonymous> (C:\Users\berka\OneDrive\Masaüstü\NEXORA\.next\server\app\api\image\generate\route.js:1:2609)
+    at Module._compile (node:internal/modules/cjs/loader:1804:14)
+    at Object..js (node:internal/modules/cjs/loader:1936:10)
+
+> Build error occurred
+Error: Failed to collect page data for /api/image/generate
+    at C:\Users\berka\OneDrive\Masaüstü\NEXORA\node_modules\next\dist\build\utils.js:1269:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  type: 'Error'
+}

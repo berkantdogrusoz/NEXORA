@@ -1,4 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 // Public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
@@ -12,13 +14,24 @@ const isPublicRoute = createRouteMatcher([
     "/terms(.*)",
 ]);
 
-const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_placeholder_for_build";
+const hasClerkKeys =
+    !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+    !!process.env.CLERK_SECRET_KEY;
 
-export default clerkMiddleware(async (auth, req) => {
-    if (!isPublicRoute(req)) {
-        await auth.protect();
-    }
-}, { publishableKey });
+// When Clerk keys are missing (build-time or missing env), skip auth entirely
+function noopMiddleware(_req: NextRequest) {
+    return NextResponse.next();
+}
+
+const clerkHandler = hasClerkKeys
+    ? clerkMiddleware(async (auth, req) => {
+        if (!isPublicRoute(req)) {
+            await auth.protect();
+        }
+    })
+    : noopMiddleware;
+
+export default clerkHandler;
 
 export const config = {
     matcher: [

@@ -11,16 +11,35 @@ const RATE_LIMIT_MAX_REQUESTS = 10;     // 10 requests per minute
  * Get the authenticated userId or return an error response
  */
 export async function getAuthUserId(): Promise<{ userId: string } | { error: NextResponse }> {
-    const { userId } = await auth();
-    if (!userId) {
+    // Build-time safety: check if secret key exists before calling auth()
+    if (!process.env.CLERK_SECRET_KEY) {
         return {
             error: NextResponse.json(
-                { error: "Unauthorized. Please sign in." },
+                { error: "Unauthorized. Secret key missing." },
                 { status: 401 }
             ),
         };
     }
-    return { userId };
+
+    try {
+        const { userId } = await auth();
+        if (!userId) {
+            return {
+                error: NextResponse.json(
+                    { error: "Unauthorized. Please sign in." },
+                    { status: 401 }
+                ),
+            };
+        }
+        return { userId };
+    } catch (e) {
+        return {
+            error: NextResponse.json(
+                { error: "Authentication failed." },
+                { status: 401 }
+            ),
+        };
+    }
 }
 
 /**

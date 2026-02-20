@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 
 type Stats = {
     totalCampaigns: number;
@@ -59,9 +59,6 @@ export default function AnalyticsPage() {
 
     return (
         <main className="relative min-h-screen overflow-hidden">
-            <div className="orb-bg" aria-hidden="true"><div className="orb orb-1" /><div className="orb orb-2" /><div className="orb orb-3" /></div>
-            <Navbar />
-
             <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
                 <div className="animate-fade-in-up mb-8">
                     <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
@@ -85,10 +82,10 @@ export default function AnalyticsPage() {
                                         <span className="text-[10px] uppercase tracking-widest text-slate-400">{s.label}</span>
                                     </div>
                                     <div className={`text-2xl font-bold ${s.color === "violet" ? "text-violet-600" :
-                                            s.color === "blue" ? "text-blue-600" :
-                                                s.color === "emerald" ? "text-emerald-600" :
-                                                    s.color === "pink" ? "text-pink-500" :
-                                                        "text-amber-500"
+                                        s.color === "blue" ? "text-blue-600" :
+                                            s.color === "emerald" ? "text-emerald-600" :
+                                                s.color === "pink" ? "text-pink-500" :
+                                                    "text-amber-500"
                                         }`}>{s.value}</div>
                                 </div>
                             ))}

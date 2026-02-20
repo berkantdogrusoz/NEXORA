@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/app/components/navbar";
+
 import Link from "next/link";
 
 type Brand = {
@@ -133,9 +133,7 @@ export default function AutopilotPage() {
 
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
-            <Navbar />
-
-            <div className="pt-24 px-6 max-w-7xl mx-auto">
+            <div className="pt-10 px-6 max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
                     <div>
@@ -237,8 +235,8 @@ export default function AutopilotPage() {
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h3 className="font-bold text-lg text-white">{brand.name}</h3>
                                                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${brand.status === "active" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
-                                                        brand.status === "paused" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
-                                                            "bg-slate-500/20 text-slate-400 border border-slate-500/30"
+                                                    brand.status === "paused" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                                                        "bg-slate-500/20 text-slate-400 border border-slate-500/30"
                                                     }`}>
                                                     {brand.status === "active" ? "Running" : brand.status === "paused" ? "Paused" : "Setup"}
                                                 </span>
@@ -264,8 +262,8 @@ export default function AutopilotPage() {
                                             <button
                                                 onClick={() => toggleBrandStatus(brand.id, brand.status === "active" ? "paused" : "active")}
                                                 className={`px-4 py-2 rounded-xl border text-xs font-bold transition-colors ${brand.status === "active"
-                                                        ? "bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20"
-                                                        : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
+                                                    ? "bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20"
+                                                    : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"
                                                     }`}
                                             >
                                                 {brand.status === "active" ? "⏸ Pause" : "▶ Resume"}
@@ -291,9 +289,9 @@ export default function AutopilotPage() {
                                 {logs.slice().reverse().map(log => (
                                     <div key={log.id} className="glass-card p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner ${log.status === "posted" ? "bg-emerald-500/20 text-emerald-400" :
-                                                log.status === "generated" ? "bg-blue-500/20 text-blue-400" :
-                                                    log.status === "scheduled" ? "bg-amber-500/20 text-amber-400" :
-                                                        "bg-red-500/20 text-red-400"
+                                            log.status === "generated" ? "bg-blue-500/20 text-blue-400" :
+                                                log.status === "scheduled" ? "bg-amber-500/20 text-amber-400" :
+                                                    "bg-red-500/20 text-red-400"
                                             }`}>
                                             {log.type === "post" ? "📝" : log.type === "image" ? "🖼️" : log.type === "story" ? "📱" : "📣"}
                                         </div>
@@ -302,9 +300,9 @@ export default function AutopilotPage() {
                                             <p className="text-xs text-slate-500 mt-0.5">Instagram · {new Date(log.createdAt).toLocaleString()}</p>
                                         </div>
                                         <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${log.status === "posted" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
-                                                log.status === "generated" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
-                                                    log.status === "scheduled" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
-                                                        "bg-red-500/10 text-red-400 border border-red-500/20"
+                                            log.status === "generated" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
+                                                log.status === "scheduled" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                                                    "bg-red-500/10 text-red-400 border border-red-500/20"
                                             }`}>{log.status}</span>
                                     </div>
                                 ))}

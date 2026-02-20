@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, Suspense } from "react";
-import Navbar from "@/app/components/navbar";
+
 import { useSearchParams } from "next/navigation";
 
 // Only Instagram Platform
@@ -54,7 +54,7 @@ function StoreContent() {
     };
 
     return (
-        <div className="pt-32 px-6 max-w-4xl mx-auto">
+        <div className="pt-10 px-6 max-w-4xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
                 <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-4">
                     Connect Your Instagram
@@ -134,8 +134,7 @@ function StoreContent() {
 export default function StorePage() {
     return (
         <main className="relative min-h-screen text-slate-100 font-sans pb-20">
-            <Navbar />
-            <Suspense fallback={<div className="pt-32 text-center text-slate-500">Loading...</div>}>
+            <Suspense fallback={<div className="pt-10 text-center text-slate-500">Loading...</div>}>
                 <StoreContent />
             </Suspense>
         </main>
