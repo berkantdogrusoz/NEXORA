@@ -18,65 +18,65 @@ const CROSS = (
 
 const PLANS = [
   {
-    name: "Free",
-    price: "₺0",
-    period: "/ay",
-    subtitle: "Keşfetmek için",
+    name: "Starter",
+    price: "$0",
+    period: "/mo",
+    subtitle: "For exploring",
     highlight: false,
     badge: null,
     features: [
-      { text: "15 AI kredi / ay", has: true },
-      { text: "GPT-4o Mini (Sohbet)", has: true },
-      { text: "Zeroscope (Standart Video)", has: true },
-      { text: "DALL-E 3 (Görsel Üretim)", has: true },
-      { text: "Temel İçerik Takvimi", has: true },
-      { text: "GPT-4o / Gemini (Pro Modeller)", has: false },
+      { text: "15 AI credits / month", has: true },
+      { text: "GPT-4o Mini (Chat)", has: true },
+      { text: "Zeroscope (Standard Video)", has: true },
+      { text: "DALL-E 3 (Image Generation)", has: true },
+      { text: "Basic Content Calendar", has: true },
+      { text: "GPT-4o / Gemini (Pro Models)", has: false },
       { text: "Cinematic HD Video", has: false },
-      { text: "Öncelikli Kuyruk", has: false },
+      { text: "Priority Queue", has: false },
     ],
-    cta: "Ücretsiz Başla",
+    cta: "Get Started Free",
     ctaStyle: "border",
     checkoutPlan: null,
   },
   {
     name: "Nexora",
-    price: "₺830",
-    period: "/ay",
-    subtitle: "İçerik üreticileri için",
+    price: "$29",
+    period: "/mo",
+    subtitle: "For content creators",
     highlight: true,
-    badge: "En Popüler",
+    badge: "Most Popular",
     features: [
-      { text: "200 AI kredi / ay", has: true },
+      { text: "200 AI credits / month", has: true },
       { text: "GPT-4o + Gemini 1.5 Pro", has: true },
-      { text: "Tüm Video Modelleri (HD dahil)", has: true },
-      { text: "DALL-E 3 (Sınırsız stil)", has: true },
-      { text: "Tam İçerik Takvimi", has: true },
-      { text: "Instagram Otomatik Paylaşım", has: true },
-      { text: "Öncelikli AI Kuyruğu", has: true },
-      { text: "E-posta Destek", has: true },
+      { text: "All Video Models (HD included)", has: true },
+      { text: "DALL-E 3 (Unlimited styles)", has: true },
+      { text: "Full Content Calendar", has: true },
+      { text: "Instagram Auto-Post", has: true },
+      { text: "Priority AI Queue", has: true },
+      { text: "Email Support", has: true },
     ],
-    cta: "Nexora'ya Geç",
+    cta: "Subscribe to Nexora",
     ctaStyle: "gradient",
     checkoutPlan: "Growth" as const,
   },
   {
     name: "Pro",
-    price: "₺1.749",
-    period: "/ay",
-    subtitle: "Ajanslar ve markalar için",
+    price: "$59",
+    period: "/mo",
+    subtitle: "For agencies & brands",
     highlight: false,
     badge: null,
     features: [
-      { text: "1000 AI kredi / ay", has: true },
-      { text: "Tüm AI Modelleri (Sınırsız)", has: true },
-      { text: "Cinematic Video (En yüksek kalite)", has: true },
-      { text: "Premium DALL-E nesiller", has: true },
-      { text: "Gelişmiş Analitik", has: true },
-      { text: "Çoklu Marka Yönetimi", has: true },
-      { text: "API Erişimi", has: true },
-      { text: "Öncelikli Destek (7/24)", has: true },
+      { text: "1,000 AI credits / month", has: true },
+      { text: "All AI Models (Unlimited)", has: true },
+      { text: "Cinematic Video (Highest quality)", has: true },
+      { text: "Premium DALL-E generations", has: true },
+      { text: "Advanced Analytics", has: true },
+      { text: "Multi-Brand Management", has: true },
+      { text: "API Access", has: true },
+      { text: "Priority Support (24/7)", has: true },
     ],
-    cta: "Pro'ya Yükselt",
+    cta: "Upgrade to Pro",
     ctaStyle: "border",
     checkoutPlan: "Pro" as const,
   },
@@ -94,7 +94,7 @@ export default function PricingPage() {
         : process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO;
 
       if (!variantId) {
-        alert("Fiyatlandırma yapılandırması eksik. Lütfen destek ile iletişime geçin.");
+        alert("Pricing configuration missing. Please contact support.");
         setLoading(null);
         return;
       }
@@ -112,11 +112,11 @@ export default function PricingPage() {
         if (res.status === 401) {
           router.push("/sign-up");
         } else {
-          alert("Ödeme başlatılamadı: " + (data.error || "Bilinmeyen hata"));
+          alert("Checkout failed: " + (data.error || "Unknown error"));
         }
       }
     } catch {
-      alert("Bir şeyler ters gitti.");
+      alert("Something went wrong.");
     } finally {
       setLoading(null);
     }
@@ -130,13 +130,13 @@ export default function PricingPage() {
 
       <div className="relative pt-36 px-6 max-w-7xl mx-auto text-center">
         <p className="text-xs font-semibold text-violet-400 uppercase tracking-widest mb-4">
-          Fiyatlandırma
+          Pricing
         </p>
         <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 mb-5">
-          AI Gücü, Şeffaf Fiyat
+          Simple, Transparent Pricing
         </h1>
         <p className="text-lg text-slate-400 max-w-xl mx-auto mb-16">
-          Ücretsiz başla, büyüdükçe yükselt. Gizli ücret yok.
+          Start for free. Upgrade when you&apos;re ready to scale. No hidden fees.
         </p>
 
         {/* Plan Cards */}
@@ -158,7 +158,6 @@ export default function PricingPage() {
                 </div>
               )}
 
-              {/* Top gradient line for highlighted plan */}
               {plan.highlight && (
                 <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-t-2xl" />
               )}
@@ -203,7 +202,7 @@ export default function PricingPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      İşleniyor...
+                      Processing...
                     </span>
                   ) : plan.cta}
                 </button>
@@ -218,22 +217,22 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* FAQ / Trust Section */}
+        {/* FAQ */}
         <div className="mt-20 max-w-2xl mx-auto text-center">
-          <h3 className="text-xl font-bold text-white mb-6">Sıkça Sorulan Sorular</h3>
+          <h3 className="text-xl font-bold text-white mb-6">Frequently Asked Questions</h3>
           <div className="space-y-4 text-left">
             {[
               {
-                q: "Kredi nedir?",
-                a: "Her AI üretimi belirli kredi harcar. Örneğin: 1 görsel = 5 kredi, 1 video = 12.5 kredi, 1 sohbet mesajı = 0.5 kredi."
+                q: "What are credits?",
+                a: "Each AI generation uses credits. For example: 1 image = 5 credits, 1 video = 12.5 credits, 1 chat message = 0.5 credits."
               },
               {
-                q: "İstediğim zaman iptal edebilir miyim?",
-                a: "Evet, aboneliğinizi dilediğiniz zaman iptal edebilirsiniz. Dönem sonuna kadar erişiminiz devam eder."
+                q: "Can I cancel anytime?",
+                a: "Yes, you can cancel your subscription at any time. Your access continues until the end of the billing period."
               },
               {
-                q: "Hangi AI modelleri kullanılıyor?",
-                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (sohbet), DALL-E 3 (görsel), Zeroscope & Cinematic HD (video) kullanılmaktadır."
+                q: "Which AI models are used?",
+                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3 (images), Zeroscope & Cinematic HD (video)."
               },
             ].map((faq, i) => (
               <div key={i} className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
