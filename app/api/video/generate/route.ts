@@ -53,9 +53,17 @@ export async function POST(req: Request) {
 
         const output = await replicate.run(model as any, { input });
 
-        // IMPORTANT FIX: Replicate sometimes returns an array of strings, sometimes a direct string URL
-        // If it's a string "https://...", output[0] would just be the letter "h"!
-        const finalUrl = Array.isArray(output) ? output[0] : output;
+        // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
+        let finalUrl = Array.isArray(output) ? output[0] : output;
+
+        // If Replicate SDK gives us a FileOutput stream, extract the URL
+        if (typeof finalUrl === "object" && finalUrl !== null) {
+            if (typeof finalUrl.url === "function") {
+                finalUrl = finalUrl.url();
+            } else if (typeof finalUrl.url === "string") {
+                finalUrl = finalUrl.url;
+            }
+        }
 
         if (!finalUrl || typeof finalUrl !== "string") {
             throw new Error(`Invalid output from Replicate: ${JSON.stringify(output)}`);
