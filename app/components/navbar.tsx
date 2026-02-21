@@ -7,9 +7,8 @@ import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/studio", label: "Studio" }, // New Main Hub
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/calendar", label: "Calendar" },
+  { href: "/studio", label: "Video Studio" },
+  { href: "/generate", label: "Image Gen" },
   { href: "/assistant", label: "Assistant" },
   { href: "/pricing", label: "Pricing" },
 ];
