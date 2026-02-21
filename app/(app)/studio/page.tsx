@@ -171,7 +171,7 @@ export default function StudioPage() {
                                     />
                                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                                         <a
-                                            href={videoUrl}
+                                            href={`/api/download?url=${encodeURIComponent(videoUrl)}`}
                                             download
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -251,8 +251,8 @@ export default function StudioPage() {
                                             key={m.id}
                                             onClick={() => setModel(m.id)}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
-                                                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
-                                                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                                                ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                                                : "text-slate-400 hover:text-white hover:bg-white/5"
                                                 }`}
                                         >
                                             {m.label}

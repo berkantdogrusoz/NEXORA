@@ -42,24 +42,49 @@ export async function POST(req: NextRequest) {
             const status = attributes.status;
             const endsAt = attributes.ends_at;
             const renewsAt = attributes.renews_at;
-            const variantId = attributes.variant_id;
+            const variantId = attributes.variant_id.toString();
+
+            // Determine plan name and credit amount based on variant ID
+            let planName = "Free";
+            let newCredits = 15;
+
+            if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
+                planName = "Growth";
+                newCredits = 200;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO) {
+                planName = "Pro";
+                newCredits = 1000;
+            }
 
             const subscriptionData = {
                 lemon_customer_id: attributes.customer_id.toString(),
                 lemon_subscription_id: data.id.toString(),
-                lemon_variant_id: variantId.toString(),
+                lemon_variant_id: variantId,
                 status: status,
                 renews_at: renewsAt,
                 ends_at: endsAt,
-                plan_name: "Pro"
+                plan_name: planName
             };
 
             await updateUserSubscription(userId, subscriptionData);
+
+            // Give them credits if it's a new or active subscription
+            if (status === "active" || status === "past_due") {
+                const { createSupabaseServer } = await import("@/lib/supabase");
+                const supabase = createSupabaseServer();
+
+                await supabase
+                    .from("user_credits")
+                    .upsert(
+                        { user_id: userId, credits: newCredits, updated_at: new Date().toISOString() },
+                        { onConflict: "user_id" }
+                    );
+            }
         }
 
         return NextResponse.json({ message: "Webhook received" }, { status: 200 });
     } catch (error) {
         console.error("Webhook error:", error);
-        return NextResponse.json({ message: "Webhook failed" }, { status: 500 });
+        return NextResponse.json({ message: "Webhook failed", error: String(error) }, { status: 500 });
     }
 }
