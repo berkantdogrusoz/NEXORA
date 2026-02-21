@@ -17,19 +17,19 @@ export async function GET() {
             .single();
 
         if (error && error.code === "PGRST116") {
-            // User not found, initialize with 50 credits
+            // User not found, initialize with 15 credits (Tiered system: Free starts small)
             const { data: newData, error: initError } = await supabase
                 .from("user_credits")
-                .insert([{ user_id: authResult.userId, credits: 50 }])
+                .insert([{ user_id: authResult.userId, credits: 15 }])
                 .select("credits")
                 .single();
 
             if (initError) throw initError;
-            return NextResponse.json({ credits: newData.credits });
+            return NextResponse.json({ credits: Number(newData.credits) });
         }
 
         if (error) throw error;
-        return NextResponse.json({ credits: data.credits });
+        return NextResponse.json({ credits: Number(data.credits) });
 
     } catch (error: any) {
         console.error("Credits GET error:", error);
@@ -59,19 +59,20 @@ export async function POST(req: Request) {
 
         if (error) throw error;
 
-        if (data.credits < amount) {
+        if (Number(data.credits) < amount) {
             return NextResponse.json({ error: "Insufficient credits", code: "INSUFFICIENT_CREDITS" }, { status: 402 });
         }
 
         // Update balance
+        const remaining = Number(data.credits) - amount;
         const { error: updateError } = await supabase
             .from("user_credits")
-            .update({ credits: data.credits - amount, updated_at: new Date().toISOString() })
+            .update({ credits: remaining, updated_at: new Date().toISOString() })
             .eq("user_id", authResult.userId);
 
         if (updateError) throw updateError;
 
-        return NextResponse.json({ success: true, remaining: data.credits - amount });
+        return NextResponse.json({ success: true, remaining });
 
     } catch (error: any) {
         console.error("Credits POST error:", error);

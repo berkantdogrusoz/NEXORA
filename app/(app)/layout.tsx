@@ -134,13 +134,13 @@ export default function AppLayout({
                                 Credits
                             </span>
                             <span className="text-xs font-bold text-white">
-                                {credits ?? "..."} <span className="text-slate-500 font-normal">/ 50</span>
+                                {credits ?? "..."} <span className="text-slate-500 font-normal">/ {(credits ?? 0) > 50 ? 500 : 15}</span>
                             </span>
                         </div>
                         <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full transition-all duration-1000"
-                                style={{ width: `${((credits ?? 0) / 50) * 100}%` }}
+                                style={{ width: `${((credits ?? 0) / ((credits ?? 0) > 50 ? 500 : 15)) * 100}%` }}
                             />
                         </div>
                     </div>
@@ -169,7 +169,9 @@ export default function AppLayout({
                             <span className="text-xs font-medium text-slate-300 truncate">
                                 My Workspace
                             </span>
-                            <span className="text-[10px] text-slate-500">Free Plan</span>
+                            <span className={`text-[10px] font-bold ${(credits ?? 0) > 50 ? "text-amber-400" : "text-slate-500"}`}>
+                                {(credits ?? 0) > 50 ? "PRO Plan" : "FREE Plan"}
+                            </span>
                         </div>
                     </div>
                 </div>

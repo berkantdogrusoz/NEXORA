@@ -54,12 +54,10 @@ export async function POST(req: Request) {
         const rateError = checkRateLimit(authResult.userId, "assistant");
         if (rateError) return rateError;
 
-        if (!process.env.OPENAI_API_KEY) {
-            return NextResponse.json({ error: "OPENAI_API_KEY missing." }, { status: 500 });
-        }
-
         const body = await req.json().catch(() => null);
-        if (!body?.message) {
+        const { message, model = "gpt-4o-mini" } = body || {};
+
+        if (!message) {
             return NextResponse.json({ error: "Message required." }, { status: 400 });
         }
 
@@ -68,7 +66,7 @@ export async function POST(req: Request) {
             .from("autopilot_brands")
             .select("name, niche, audience, tone")
             .eq("user_id", authResult.userId)
-            .limit(3);
+            .limit(1);
 
         let brandContext = "";
         if (brands && brands.length > 0) {
@@ -76,7 +74,9 @@ export async function POST(req: Request) {
             brandContext = `\n\nUser's brand info:\n- Business: ${b.name}\n- Industry: ${b.niche}\n- Target Audience: ${b.audience}\n- Brand Tone: ${b.tone}\n\nCustomize your advice for this specific business.`;
         }
 
-        // Fetch recent conversation (last 10 messages for context)
+        const fullSystemPrompt = ASSISTANT_SYSTEM_PROMPT + brandContext;
+
+        // Fetch recent conversation
         const { data: recentMsgs } = await supabase
             .from("assistant_messages")
             .select("role, content")
@@ -92,24 +92,52 @@ export async function POST(req: Request) {
         await supabase.from("assistant_messages").insert({
             user_id: authResult.userId,
             role: "user",
-            content: body.message,
+            content: message,
         });
 
-        const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        let reply = "";
 
-        const response = await client.responses.create({
-            model: "gpt-4.1-mini",
-            input: [
-                { role: "system", content: ASSISTANT_SYSTEM_PROMPT + brandContext },
-                ...conversationHistory.map(m => ({
-                    role: m.role as "user" | "assistant",
-                    content: m.content,
-                })),
-                { role: "user", content: body.message },
-            ],
-        });
+        if (model.includes("gpt")) {
+            if (!process.env.OPENAI_API_KEY) {
+                return NextResponse.json({ error: "OPENAI_API_KEY missing." }, { status: 500 });
+            }
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            const response = await openai.chat.completions.create({
+                model: model,
+                messages: [
+                    { role: "system", content: fullSystemPrompt },
+                    ...conversationHistory.map(m => ({
+                        role: m.role as "user" | "assistant",
+                        content: m.content,
+                    })),
+                    { role: "user", content: message },
+                ],
+            });
+            reply = response.choices[0].message?.content || "";
+        } else if (model.includes("gemini")) {
+            const { GoogleGenerativeAI } = await import("@google/generative-ai");
+            if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+                return NextResponse.json({ error: "GOOGLE_GENERATIVE_AI_API_KEY missing." }, { status: 500 });
+            }
+            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+            const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-        const reply = response.output_text?.trim() || "Sorry, I couldn't generate a response.";
+            const chat = geminiModel.startChat({
+                history: [
+                    { role: "user", parts: [{ text: fullSystemPrompt + "\n\nUnderstood?" }] },
+                    { role: "model", parts: [{ text: "Yes, I am Nexora AI. How can I help?" }] },
+                    ...conversationHistory.map(m => ({
+                        role: m.role === "user" ? "user" : "model",
+                        parts: [{ text: m.content }],
+                    })),
+                ],
+            });
+
+            const result = await chat.sendMessage(message);
+            reply = result.response.text();
+        }
+
+        if (!reply) throw new Error("AI failed to reply.");
 
         // Save assistant message
         await supabase.from("assistant_messages").insert({
@@ -120,6 +148,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ reply });
     } catch (e: unknown) {
+        console.error("Assistant Error:", e);
         const msg = e instanceof Error ? e.message : "Assistant failed.";
         return NextResponse.json({ error: msg }, { status: 500 });
     }

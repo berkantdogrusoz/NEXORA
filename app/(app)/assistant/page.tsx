@@ -19,6 +19,7 @@ const QUICK_ACTIONS = [
 export default function AssistantPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
+    const [model, setModel] = useState("gpt-4o-mini");
     const [loading, setLoading] = useState(false);
     const [initialLoad, setInitialLoad] = useState(true);
     const chatEndRef = useRef<HTMLDivElement>(null);
@@ -62,7 +63,7 @@ export default function AssistantPage() {
             const res = await fetch("/api/assistant", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: msg }),
+                body: JSON.stringify({ message: msg, model }),
             });
 
             if (!res.ok) throw new Error("Failed");
@@ -99,9 +100,36 @@ export default function AssistantPage() {
         <main className="relative min-h-screen flex flex-col font-sans">
             <div className="relative z-10 flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 pt-10 pb-4">
                 {/* Header */}
-                <div className="mb-6 animate-fade-in-up text-center md:text-left">
-                    <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Marketing Assistant</h1>
-                    <p className="text-sm text-slate-400">Your personal marketing expert. Ask anything.</p>
+                <div className="mb-6 animate-fade-in-up flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div className="text-center md:text-left">
+                        <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Marketing Assistant</h1>
+                        <p className="text-sm text-slate-400">Your personal marketing expert. Ask anything.</p>
+                    </div>
+
+                    {/* Model Selector */}
+                    <div className="flex bg-white/5 rounded-xl p-1 border border-white/10 self-center md:self-auto">
+                        {[
+                            { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false },
+                            { id: "gpt-4o", label: "GPT-4o", pro: true },
+                            { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true },
+                        ].map((m) => (
+                            <button
+                                key={m.id}
+                                onClick={() => setModel(m.id)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
+                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                                    }`}
+                            >
+                                {m.label}
+                                {m.pro && (
+                                    <span className="text-[8px] px-1 py-0.5 rounded-sm bg-amber-500/20 text-amber-500 border border-amber-500/20">
+                                        PRO
+                                    </span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Chat Area */}

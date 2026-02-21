@@ -15,6 +15,7 @@ const DURATIONS = [
 
 export default function StudioPage() {
     const [prompt, setPrompt] = useState("");
+    const [model, setModel] = useState("zeroscope");
     const [generating, setGenerating] = useState(false);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -31,11 +32,12 @@ export default function StudioPage() {
         setError(null);
 
         try {
-            // 1. Deduct credits first
+            // 1. Deduct credits first (Tiered pricing)
+            const creditCost = model === "zeroscope" ? 12.5 : 25;
             const creditRes = await fetch("/api/credits", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: 12.5 }),
+                body: JSON.stringify({ amount: creditCost }),
             });
 
             if (!creditRes.ok) {
@@ -239,6 +241,30 @@ export default function StudioPage() {
                                     }}
                                 />
 
+                                {/* Model Selector */}
+                                <div className="flex bg-white/5 rounded-xl p-1 border border-white/10 mb-4 inline-flex">
+                                    {[
+                                        { id: "zeroscope", label: "Standard (SD)", pro: false, cost: 12.5 },
+                                        { id: "luma", label: "Cinematic (HD)", pro: true, cost: 25 },
+                                    ].map((m) => (
+                                        <button
+                                            key={m.id}
+                                            onClick={() => setModel(m.id)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
+                                                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                                                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                                                }`}
+                                        >
+                                            {m.label}
+                                            {m.pro && (
+                                                <span className="text-[8px] px-1 py-0.5 rounded-sm bg-amber-500/20 text-amber-500 border border-amber-500/20">
+                                                    PRO
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+
                                 {/* Controls Row */}
                                 <div className="flex items-center justify-between flex-wrap gap-3">
                                     <div className="flex items-center gap-2 flex-wrap">
@@ -302,7 +328,9 @@ export default function StudioPage() {
                                         ) : (
                                             <>
                                                 Generate
-                                                <span className="text-xs opacity-70">↵ 12.5</span>
+                                                <span className="text-xs opacity-70">
+                                                    ↵ {model === "zeroscope" ? 12.5 : 25}
+                                                </span>
                                             </>
                                         )}
                                     </button>
