@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/app/components/navbar";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -125,7 +124,6 @@ export default function PricingPage() {
 
   return (
     <main className="relative min-h-screen text-slate-100 bg-black pb-20">
-      <Navbar />
 
       {/* Ambient glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
