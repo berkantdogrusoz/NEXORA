@@ -59,7 +59,8 @@ export async function POST(req: Request) {
         // If Replicate SDK gives us a FileOutput stream, extract the URL
         if (typeof finalUrl === "object" && finalUrl !== null) {
             if (typeof finalUrl.url === "function") {
-                finalUrl = finalUrl.url();
+                // Ensure we convert the URL object to a string!
+                finalUrl = finalUrl.url().toString();
             } else if (typeof finalUrl.url === "string") {
                 finalUrl = finalUrl.url;
             }
