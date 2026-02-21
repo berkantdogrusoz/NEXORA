@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, model: modelId = "zeroscope" } = body;
+        const { prompt, model: modelId = "zeroscope", aspectRatio = "16:9", duration = "4s" } = body;
 
         if (!prompt) {
             return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -24,34 +24,50 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Replicate API Token missing" }, { status: 500 });
         }
 
-        // Model Mapping
-        // Zeroscope (Standard/Free) vs Stable Video Diffusion (Cinematic/Pro)
-        let model = "anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
-        let input: any = {
-            prompt: prompt,
-            num_frames: 24,
-            width: 1024,
-            height: 576,
-            fps: 24
-        };
-
-        if (modelId === "luma") {
-            // High-end cinematic model on Replicate
-            model = "stability-ai/stable-video-diffusion:3f045761ed782710301a30247c92f2ea521f2066fc343604b60944645e2a5d94";
-            input = {
-                video_length: "25_frames_with_svd_xt",
-                sizing_strategy: "maintain_aspect_ratio"
-            };
-            // Note: SVD-XT usually needs an image input, but some wrappers on Replicate take text.
-            // For a pure text-to-video Pro experience, we'd use something like:
-            // model = "lucataco/luma-dream-machine"; // if supported. 
-            // Let's stick to a robust Pro alternative or stick with Zeroscope with higher settings for now if unsure.
-            // Actually, let's use a better text-to-video model for "Pro":
-            model = "nateraw/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
-            input = { prompt, num_frames: 48, width: 1024, height: 576, fps: 24 }; // Double frames for Pro
+        // 1. Translate prompt to English for better model adherence
+        let englishPrompt = prompt;
+        try {
+            const { default: OpenAI } = await import("openai");
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            const translation = await openai.chat.completions.create({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: "You are a prompt translator. Translate the following video generation prompt to English. Only return the english translation, nothing else. Enhance it slightly for cinematic quality if it's very brief." },
+                    { role: "user", content: prompt }
+                ]
+            });
+            englishPrompt = translation.choices[0].message.content || prompt;
+        } catch (e) {
+            console.error("Translation skipped, using original prompt:", e);
         }
 
-        const output = await replicate.run(model as any, { input });
+        // 2. Model Mapping
+        let modelString = "";
+        let input: any = {};
+
+        if (modelId === "luma") {
+            // PRO MODEL: minimax/video-01 (Very high cinematic quality, 5-6s default)
+            modelString = "minimax/video-01";
+            input = {
+                prompt: englishPrompt,
+                prompt_optimizer: true
+            };
+        } else {
+            // STANDARD MODEL: haiper-ai/haiper-video-2 (Supports duration 4/8 and aspect ratios)
+            modelString = "haiper-ai/haiper-video-2";
+
+            // Map duration "4s" -> 4, "8s" -> 8
+            const durationInt = duration === "8s" ? 8 : 4;
+
+            input = {
+                prompt: englishPrompt,
+                duration: durationInt,
+                aspect_ratio: aspectRatio, // "16:9", "9:16", "1:1"
+                resolution: 720 // default good resolution for standard
+            };
+        }
+
+        const output = await replicate.run(modelString as any, { input });
 
         // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
         let finalUrl = Array.isArray(output) ? output[0] : output;

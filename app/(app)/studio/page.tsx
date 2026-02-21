@@ -55,7 +55,13 @@ export default function StudioPage() {
             const res = await fetch("/api/video/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({
+                    prompt,
+                    model,
+                    aspectRatio,
+                    quality,
+                    duration
+                }),
             });
 
             const data = await res.json();
