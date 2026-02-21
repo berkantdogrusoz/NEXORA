@@ -53,17 +53,18 @@ export async function POST(req: Request) {
                 prompt_optimizer: true
             };
         } else {
-            // STANDARD MODEL: haiper-ai/haiper-video-2 (Supports duration 4/8 and aspect ratios)
-            modelString = "haiper-ai/haiper-video-2";
+            // STANDARD MODEL: Zeroscope with extended duration
+            modelString = "nateraw/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
 
-            // Map duration "4s" -> 4, "8s" -> 8
-            const durationInt = duration === "8s" ? 8 : 4;
+            // Map duration "4s" / "8s" to 48 or 72 frames (Zeroscope v2 xl works best up to 3s)
+            const numFrames = duration === "8s" ? 72 : 48; // 2 or 3 seconds
 
             input = {
                 prompt: englishPrompt,
-                duration: durationInt,
-                aspect_ratio: aspectRatio, // "16:9", "9:16", "1:1"
-                resolution: 720 // default good resolution for standard
+                num_frames: numFrames,
+                width: 1024,
+                height: 576,
+                fps: 24
             };
         }
 
