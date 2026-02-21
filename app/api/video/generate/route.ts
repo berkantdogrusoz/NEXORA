@@ -53,8 +53,15 @@ export async function POST(req: Request) {
 
         const output = await replicate.run(model as any, { input });
 
-        // Replicate returns an array of output URLs (usually one video)
-        return NextResponse.json({ success: true, videoUrl: output[0] });
+        // IMPORTANT FIX: Replicate sometimes returns an array of strings, sometimes a direct string URL
+        // If it's a string "https://...", output[0] would just be the letter "h"!
+        const finalUrl = Array.isArray(output) ? output[0] : output;
+
+        if (!finalUrl || typeof finalUrl !== "string") {
+            throw new Error(`Invalid output from Replicate: ${JSON.stringify(output)}`);
+        }
+
+        return NextResponse.json({ success: true, videoUrl: finalUrl });
 
     } catch (error: any) {
         console.error("Video generation error:", error);
