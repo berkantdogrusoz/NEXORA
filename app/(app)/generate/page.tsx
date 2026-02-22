@@ -19,8 +19,10 @@ const SIZES = [
 ];
 
 const IMAGE_MODELS = [
-  { id: "dall-e-2", name: "DALL-E 2", tier: "Standard", cost: 5 },
-  { id: "dall-e-3", name: "DALL-E 3", tier: "Pro", cost: 15 },
+  { id: "dall-e-2", name: "DALL-E 2 (Fast)", tier: "Standard", cost: 5 },
+  { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 8 },
+  { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 15 },
+  { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 20 },
 ];
 
 export default function GeneratePage() {

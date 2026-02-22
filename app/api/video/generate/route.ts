@@ -43,7 +43,7 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        const cost = modelId === "luma" ? 25 : 12.5;
+        const cost = modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
 
         // Block Pro models for Free users
         if (modelId === "luma" && planName === "Free") {
@@ -104,6 +104,14 @@ export async function POST(req: Request) {
                 prompt: englishPrompt,
                 aspect_ratio: aspectRatio,
             };
+        } else if (modelId === "zeroscope") {
+            // STANDARD: Zeroscope V2
+            modelString = "anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
+            input = { prompt: englishPrompt };
+        } else if (modelId === "damo") {
+            // STANDARD: DAMO (Fast/Cheap)
+            modelString = "cjwbw/damo-text-to-video:1e205ea73084bd17a0a3b43396e49ba0d6bc2e754e9283b2df49fad2dcf95755";
+            input = { prompt: englishPrompt };
         } else {
             // STANDARD MODEL: Minimax Video-01
             modelString = "minimax/video-01";

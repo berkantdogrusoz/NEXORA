@@ -15,6 +15,8 @@ const DURATIONS = [
 ];
 
 const VIDEO_MODELS = [
+    { id: "damo", name: "DAMO Text-to-Video", tier: "Standard", cost: 5 },
+    { id: "zeroscope", name: "Zeroscope V2 (HD)", tier: "Standard", cost: 8 },
     { id: "minimax", name: "Minimax Video-01", tier: "Standard", cost: 12.5 },
     { id: "luma", name: "Luma Dream Machine Ray", tier: "Pro", cost: 25 },
 ];
