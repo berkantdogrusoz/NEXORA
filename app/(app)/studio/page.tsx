@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCredits } from "@/app/providers/credit-provider";
 
 const ASPECT_RATIOS = [
     { label: "16:9", value: "16:9" },
@@ -13,9 +14,16 @@ const DURATIONS = [
     { label: "8s", value: "8" },
 ];
 
+const VIDEO_MODELS = [
+    { id: "minimax", name: "Minimax Video-01", tier: "Standard", cost: 12.5 },
+    { id: "luma", name: "Luma Dream Machine Ray", tier: "Pro", cost: 25 },
+];
+
 export default function StudioPage() {
+    const { credits, deductCredits, refundCredits, planName } = useCredits();
+
     const [prompt, setPrompt] = useState("");
-    const [model, setModel] = useState("zeroscope");
+    const [model, setModel] = useState("minimax");
     const [generating, setGenerating] = useState(false);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -26,32 +34,29 @@ export default function StudioPage() {
         { url: string; prompt: string; createdAt: number }[]
     >([]);
 
+    const selectedModelConfig = VIDEO_MODELS.find(m => m.id === model) || VIDEO_MODELS[0];
+
     const generateVideo = async () => {
         if (!prompt) return;
+
+        // Block Pro models if user is on Free plan
+        if (selectedModelConfig.tier === "Pro" && planName === "Free") {
+            setError("You need a Premium plan to use Luma Dream Machine Ray.");
+            return;
+        }
+
+        if (credits !== null && credits < selectedModelConfig.cost) {
+            setError("Insufficient credits. Please upgrade your plan.");
+            return;
+        }
+
         setGenerating(true);
         setError(null);
 
+        // Instantly deduct credits from UI
+        deductCredits(selectedModelConfig.cost);
+
         try {
-            // 1. Deduct credits first (Tiered pricing)
-            const creditCost = model === "zeroscope" ? 12.5 : 25;
-            const creditRes = await fetch("/api/credits", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: creditCost }),
-            });
-
-            if (!creditRes.ok) {
-                const creditData = await creditRes.json();
-                if (creditData.code === "INSUFFICIENT_CREDITS") {
-                    setError("Insufficient credits. Please upgrade your plan.");
-                } else {
-                    setError(creditData.error || "Failed to process credits.");
-                }
-                setGenerating(false);
-                return;
-            }
-
-            // 2. Generate video
             const res = await fetch("/api/video/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -74,9 +79,11 @@ export default function StudioPage() {
                 ]);
             } else {
                 setError(data.error || "Failed to generate video.");
+                refundCredits(selectedModelConfig.cost); // refund on error
             }
         } catch {
             setError("Something went wrong.");
+            refundCredits(selectedModelConfig.cost); // refund on error
         } finally {
             setGenerating(false);
         }
@@ -247,28 +254,28 @@ export default function StudioPage() {
                                     }}
                                 />
 
-                                {/* Model Selector */}
-                                <div className="flex bg-white/5 rounded-xl p-1 border border-white/10 mb-4 inline-flex">
-                                    {[
-                                        { id: "zeroscope", label: "Standard (SD)", pro: false, cost: 12.5 },
-                                        { id: "luma", label: "Cinematic (HD)", pro: true, cost: 25 },
-                                    ].map((m) => (
-                                        <button
-                                            key={m.id}
-                                            onClick={() => setModel(m.id)}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
-                                                ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
-                                                : "text-slate-400 hover:text-white hover:bg-white/5"
-                                                }`}
-                                        >
-                                            {m.label}
-                                            {m.pro && (
-                                                <span className="text-[8px] px-1 py-0.5 rounded-sm bg-amber-500/20 text-amber-500 border border-amber-500/20">
-                                                    PRO
-                                                </span>
-                                            )}
-                                        </button>
-                                    ))}
+                                {/* Model Dropdown and Config Row */}
+                                <div className="flex items-center gap-3 mb-4 flex-wrap">
+                                    <select
+                                        value={model}
+                                        onChange={(e) => setModel(e.target.value)}
+                                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                                    >
+                                        {VIDEO_MODELS.map((m) => (
+                                            <option key={m.id} value={m.id} className="bg-black text-white">
+                                                {m.name} ({m.tier})
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                                        {selectedModelConfig.tier === "Pro" && (
+                                            <span className="px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-500 border border-amber-500/20 font-medium">
+                                                PRO
+                                            </span>
+                                        )}
+                                        <span>Cost: {selectedModelConfig.cost} credits</span>
+                                    </div>
                                 </div>
 
                                 {/* Controls Row */}
@@ -335,7 +342,7 @@ export default function StudioPage() {
                                             <>
                                                 Generate
                                                 <span className="text-xs opacity-70">
-                                                    ↵ {model === "zeroscope" ? 12.5 : 25}
+                                                    ⚡ {selectedModelConfig.cost}
                                                 </span>
                                             </>
                                         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useCredits } from "@/app/providers/credit-provider";
 
 const STYLES = [
   { label: "Photographic", value: "photographic" },
@@ -17,8 +18,16 @@ const SIZES = [
   { label: "9:16", value: "1024x1792" },
 ];
 
+const IMAGE_MODELS = [
+  { id: "dall-e-2", name: "DALL-E 2", tier: "Standard", cost: 5 },
+  { id: "dall-e-3", name: "DALL-E 3", tier: "Pro", cost: 15 },
+];
+
 export default function GeneratePage() {
+  const { credits, deductCredits, refundCredits, planName } = useCredits();
+
   const [prompt, setPrompt] = useState("");
+  const [model, setModel] = useState("dall-e-2");
   const [style, setStyle] = useState("photographic");
   const [size, setSize] = useState("1024x1024");
   const [generating, setGenerating] = useState(false);
@@ -28,37 +37,34 @@ export default function GeneratePage() {
     { url: string; prompt: string }[]
   >([]);
 
+  const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
+
   const generateImage = async () => {
     if (!prompt) return;
+
+    if (selectedModelConfig.tier === "Pro" && planName === "Free") {
+      setError("You need a Premium plan to use DALL-E 3 high-quality generation.");
+      return;
+    }
+
+    if (credits !== null && credits < selectedModelConfig.cost) {
+      setError("Insufficient credits. Please upgrade your plan.");
+      return;
+    }
+
     setGenerating(true);
     setError(null);
 
+    // Instantly deduct from UI
+    deductCredits(selectedModelConfig.cost);
+
     try {
-      // 1. Deduct credits first
-      const creditRes = await fetch("/api/credits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 5 }),
-      });
-
-      if (!creditRes.ok) {
-        const creditData = await creditRes.json();
-        if (creditData.code === "INSUFFICIENT_CREDITS") {
-          setError("Insufficient credits. Please upgrade your plan.");
-        } else {
-          setError(creditData.error || "Failed to process credits.");
-        }
-        setGenerating(false);
-        return;
-      }
-
-      // 2. Generate image
       const fullPrompt = `${style === "photographic" ? "Professional high-end advertising photography, " : style === "cinematic" ? "Cinematic scene, award-winning cinematography, " : style === "illustration" ? "Beautiful artistic illustration, " : style === "3d-render" ? "Stunning 3D render, photorealistic, " : style === "minimal" ? "Minimalist clean design, " : "Abstract artistic, "}${prompt}. High quality, 8k resolution, sharp focus.`;
 
       const res = await fetch("/api/image/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt, size }),
+        body: JSON.stringify({ prompt: fullPrompt, size, model }),
       });
 
       const data = await res.json();
@@ -68,9 +74,11 @@ export default function GeneratePage() {
         setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev]);
       } else {
         setError(data.error || "Failed to generate image.");
+        refundCredits(selectedModelConfig.cost);
       }
     } catch {
       setError("Something went wrong.");
+      refundCredits(selectedModelConfig.cost);
     } finally {
       setGenerating(false);
     }
@@ -100,7 +108,7 @@ export default function GeneratePage() {
             Image Generation
           </h1>
           <p className="text-sm text-slate-500">
-            Create stunning images with DALL-E 3
+            Create stunning images with DALL-E models
           </p>
         </div>
 
@@ -216,6 +224,30 @@ export default function GeneratePage() {
                   }}
                 />
 
+                {/* Model Dropdown and Config Row */}
+                <div className="flex items-center gap-3 mb-4 flex-wrap">
+                  <select
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                  >
+                    {IMAGE_MODELS.map((m) => (
+                      <option key={m.id} value={m.id} className="bg-black text-white">
+                        {m.name} ({m.tier})
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                    {selectedModelConfig.tier === "Pro" && (
+                      <span className="px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-500 border border-amber-500/20 font-medium">
+                        PRO
+                      </span>
+                    )}
+                    <span>Cost: {selectedModelConfig.cost} credits</span>
+                  </div>
+                </div>
+
                 {/* Style Chips */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {STYLES.map((s) => (
@@ -264,7 +296,9 @@ export default function GeneratePage() {
                     ) : (
                       <>
                         Generate
-                        <span className="text-xs opacity-70">↵ 5</span>
+                        <span className="text-xs opacity-70">
+                          ⚡ {selectedModelConfig.cost}
+                        </span>
                       </>
                     )}
                   </button>

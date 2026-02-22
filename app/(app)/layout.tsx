@@ -16,34 +16,24 @@ const menuItems = [
     { href: "/store", label: "Store", icon: "🛒", color: "text-cyan-400" },
 ];
 
-export default function AppLayout({
+import { useCredits, CreditProvider } from "@/app/providers/credit-provider";
+
+export default function AppLayoutWrapper({ children }: { children: React.ReactNode }) {
+    return (
+        <CreditProvider>
+            <AppLayout>{children}</AppLayout>
+        </CreditProvider>
+    );
+}
+
+function AppLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [credits, setCredits] = useState<number | null>(null);
-    const [maxCredits, setMaxCredits] = useState<number>(15);
-    const [planName, setPlanName] = useState<string>("Free");
-
-    const fetchCredits = async () => {
-        try {
-            const res = await fetch("/api/credits");
-            if (res.ok) {
-                const data = await res.json();
-                setCredits(data.credits);
-                if (data.maxCredits) setMaxCredits(data.maxCredits);
-                if (data.planName) setPlanName(data.planName);
-            }
-        } catch {
-            // fallback to placeholder or keep null
-        }
-    };
-
-    useEffect(() => {
-        fetchCredits();
-    }, []);
+    const { credits, maxCredits, planName } = useCredits();
 
     return (
         <div className="flex min-h-screen bg-black text-white font-sans">
@@ -133,19 +123,13 @@ export default function AppLayout({
                 {/* Credits + Upgrade */}
                 <div className="p-3 space-y-3 border-t border-white/[0.06]">
                     <div className="bg-white/[0.04] rounded-xl p-3.5 border border-white/[0.06]">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between">
                             <span className="text-xs font-medium text-slate-300">
                                 Credits
                             </span>
-                            <span className="text-xs font-bold text-white">
-                                {credits ?? "..."} <span className="text-slate-500 font-normal">/ {maxCredits}</span>
+                            <span className="text-sm font-bold text-white bg-white/10 px-2 py-0.5 rounded-md border border-white/5">
+                                {credits ?? "..."}
                             </span>
-                        </div>
-                        <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full transition-all duration-1000"
-                                style={{ width: `${Math.min(((credits ?? 0) / maxCredits) * 100, 100)}%` }}
-                            />
                         </div>
                     </div>
 
