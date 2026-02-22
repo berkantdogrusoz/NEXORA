@@ -47,11 +47,16 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+    let creditDeducted = false;
+    let deductedCost = 0;
+    let userId = "";
+
     try {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
+        userId = authResult.userId;
 
-        const rateError = checkRateLimit(authResult.userId, "assistant");
+        const rateError = checkRateLimit(userId, "assistant");
         if (rateError) return rateError;
 
         const body = await req.json().catch(() => null);
@@ -61,11 +66,61 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Message required." }, { status: 400 });
         }
 
+        const validModels = ["gpt-4o-mini", "gpt-4o", "gemini-1.5-pro"];
+        const finalModel = validModels.includes(model) ? model : "gpt-4o-mini";
+        const isProModel = finalModel !== "gpt-4o-mini";
+        const cost = isProModel ? 2.0 : 0.5;
+
+        // Check user plan and credits
+        const { createSupabaseServer } = await import("@/lib/supabase");
+        const serverSupabase = createSupabaseServer();
+        const { data: subData } = await serverSupabase
+            .from("user_subscriptions")
+            .select("plan_name, status")
+            .eq("user_id", userId)
+            .single();
+
+        let planName = "Free";
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+            planName = subData.plan_name;
+        }
+
+        // Block Pro models for Free users
+        if (isProModel && planName === "Free") {
+            return NextResponse.json({ error: "You need a Premium plan to use GPT-4o or Gemini 1.5 Pro." }, { status: 403 });
+        }
+
+        // Check balance
+        const { data: creditData } = await serverSupabase
+            .from("user_credits")
+            .select("credits")
+            .eq("user_id", userId)
+            .single();
+
+        const currentCredits = Number(creditData?.credits || 0);
+
+        if (!creditData || currentCredits < cost) {
+            return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
+        }
+
+        // Deduct
+        const { error: deductError } = await serverSupabase
+            .from("user_credits")
+            .update({ credits: currentCredits - cost })
+            .eq("user_id", userId);
+
+        if (deductError) {
+            return NextResponse.json({ error: "Failed to process credits" }, { status: 500 });
+        }
+
+        creditDeducted = true;
+        deductedCost = cost;
+
         // Fetch user's brand context
-        const { data: brands } = await supabase
+        const { data: brands } = await serverSupabase
             .from("autopilot_brands")
             .select("name, niche, audience, tone")
-            .eq("user_id", authResult.userId)
+            .eq("user_id", userId)
             .limit(1);
 
         let brandContext = "";
@@ -77,10 +132,10 @@ export async function POST(req: Request) {
         const fullSystemPrompt = ASSISTANT_SYSTEM_PROMPT + brandContext;
 
         // Fetch recent conversation
-        const { data: recentMsgs } = await supabase
+        const { data: recentMsgs } = await serverSupabase
             .from("assistant_messages")
             .select("role, content")
-            .eq("user_id", authResult.userId)
+            .eq("user_id", userId)
             .order("created_at", { ascending: false })
             .limit(10);
 
@@ -89,32 +144,32 @@ export async function POST(req: Request) {
             .map(m => ({ role: m.role as "user" | "assistant", content: m.content }));
 
         // Save user message
-        await supabase.from("assistant_messages").insert({
-            user_id: authResult.userId,
+        await serverSupabase.from("assistant_messages").insert({
+            user_id: userId,
             role: "user",
             content: message,
         });
 
         let reply = "";
 
-        if (model.includes("gpt")) {
+        if (finalModel.includes("gpt")) {
             if (!process.env.OPENAI_API_KEY) {
                 return NextResponse.json({ error: "OPENAI_API_KEY missing." }, { status: 500 });
             }
             const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
             const response = await openai.chat.completions.create({
-                model: model,
+                model: finalModel,
                 messages: [
                     { role: "system", content: fullSystemPrompt },
                     ...conversationHistory.map(m => ({
-                        role: m.role as "user" | "assistant",
+                        role: m.role as "user" | "system",
                         content: m.content,
                     })),
                     { role: "user", content: message },
                 ],
             });
             reply = response.choices[0].message?.content || "";
-        } else if (model.includes("gemini")) {
+        } else if (finalModel.includes("gemini")) {
             const { GoogleGenerativeAI } = await import("@google/generative-ai");
             if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
                 return NextResponse.json({ error: "GOOGLE_GENERATIVE_AI_API_KEY missing." }, { status: 500 });
@@ -140,8 +195,8 @@ export async function POST(req: Request) {
         if (!reply) throw new Error("AI failed to reply.");
 
         // Save assistant message
-        await supabase.from("assistant_messages").insert({
-            user_id: authResult.userId,
+        await serverSupabase.from("assistant_messages").insert({
+            user_id: userId,
             role: "assistant",
             content: reply,
         });
@@ -149,6 +204,29 @@ export async function POST(req: Request) {
         return NextResponse.json({ reply });
     } catch (e: unknown) {
         console.error("Assistant Error:", e);
+
+        if (creditDeducted && userId) {
+            try {
+                const { createSupabaseServer } = await import("@/lib/supabase");
+                const serverSupabase = createSupabaseServer();
+
+                const { data: currentCreditData } = await serverSupabase
+                    .from("user_credits")
+                    .select("credits")
+                    .eq("user_id", userId)
+                    .single();
+
+                if (currentCreditData) {
+                    await serverSupabase
+                        .from("user_credits")
+                        .update({ credits: Number(currentCreditData.credits) + deductedCost })
+                        .eq("user_id", userId);
+                }
+            } catch (refundError) {
+                console.error("Failed to refund credits after assistant error:", refundError);
+            }
+        }
+
         const msg = e instanceof Error ? e.message : "Assistant failed.";
         return NextResponse.json({ error: msg }, { status: 500 });
     }

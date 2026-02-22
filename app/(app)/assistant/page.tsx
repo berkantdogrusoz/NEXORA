@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
+import { useCredits } from "@/app/providers/credit-provider";
 
 type Message = {
     id: string;
@@ -16,7 +16,15 @@ const QUICK_ACTIONS = [
     { label: "📝 Write a caption", prompt: "Write an engaging Instagram caption for a product launch announcement" },
 ];
 
+const ASSISTANT_MODELS = [
+    { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false, cost: 0.5 },
+    { id: "gpt-4o", label: "GPT-4o", pro: true, cost: 2.0 },
+    { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true, cost: 2.0 },
+];
+
 export default function AssistantPage() {
+    const { credits, deductCredits, refundCredits, planName } = useCredits();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [model, setModel] = useState("gpt-4o-mini");
@@ -48,6 +56,30 @@ export default function AssistantPage() {
         const msg = text || input.trim();
         if (!msg || loading) return;
 
+        const selectedModelConfig = ASSISTANT_MODELS.find(m => m.id === model) || ASSISTANT_MODELS[0];
+
+        if (selectedModelConfig.pro && planName === "Free") {
+            const errorMsg: Message = {
+                id: `e-${Date.now()}`,
+                role: "assistant",
+                content: "⚠️ You need a Premium plan to use GPT-4o or Gemini 1.5 Pro.",
+                timestamp: Date.now(),
+            };
+            setMessages(prev => [...prev, errorMsg]);
+            return;
+        }
+
+        if (credits !== null && credits < selectedModelConfig.cost) {
+            const errorMsg: Message = {
+                id: `e-${Date.now()}`,
+                role: "assistant",
+                content: "⚠️ Insufficient credits. Please upgrade your plan.",
+                timestamp: Date.now(),
+            };
+            setMessages(prev => [...prev, errorMsg]);
+            return;
+        }
+
         const userMsg: Message = {
             id: `u-${Date.now()}`,
             role: "user",
@@ -58,6 +90,7 @@ export default function AssistantPage() {
         setMessages(prev => [...prev, userMsg]);
         setInput("");
         setLoading(true);
+        deductCredits(selectedModelConfig.cost);
 
         try {
             const res = await fetch("/api/assistant", {
@@ -78,6 +111,7 @@ export default function AssistantPage() {
 
             setMessages(prev => [...prev, assistantMsg]);
         } catch {
+            refundCredits(ASSISTANT_MODELS.find(m => m.id === model)?.cost || 0.5);
             const errorMsg: Message = {
                 id: `e-${Date.now()}`,
                 role: "assistant",
@@ -108,17 +142,13 @@ export default function AssistantPage() {
 
                     {/* Model Selector */}
                     <div className="flex bg-white/5 rounded-xl p-1 border border-white/10 self-center md:self-auto">
-                        {[
-                            { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false },
-                            { id: "gpt-4o", label: "GPT-4o", pro: true },
-                            { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true },
-                        ].map((m) => (
+                        {ASSISTANT_MODELS.map((m) => (
                             <button
                                 key={m.id}
                                 onClick={() => setModel(m.id)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
-                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
-                                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                                    : "text-slate-400 hover:text-white hover:bg-white/5"
                                     }`}
                             >
                                 {m.label}
