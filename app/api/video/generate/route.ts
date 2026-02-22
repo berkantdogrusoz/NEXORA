@@ -46,28 +46,23 @@ export async function POST(req: Request) {
         let input: any = {};
 
         if (modelId === "luma") {
-            // PRO MODEL: minimax/video-01 (Very high cinematic quality, 5-6s default)
+            // PRO MODEL: Luma Ray (Cinematic 5s)
+            modelString = "luma/ray";
+            input = {
+                prompt: englishPrompt,
+                aspect_ratio: aspectRatio,
+            };
+        } else {
+            // STANDARD MODEL: Minimax Video-01
+            // Minimax is extremely high quality, fast, and relatively cheap.
             modelString = "minimax/video-01";
             input = {
                 prompt: englishPrompt,
                 prompt_optimizer: true
             };
-        } else {
-            // STANDARD MODEL: Zeroscope with extended duration
-            modelString = "nateraw/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
-
-            // Map duration "4s" / "8s" to 48 or 72 frames (Zeroscope v2 xl works best up to 3s)
-            const numFrames = duration === "8s" ? 72 : 48; // 2 or 3 seconds
-
-            input = {
-                prompt: englishPrompt,
-                num_frames: numFrames,
-                width: 1024,
-                height: 576,
-                fps: 24
-            };
         }
 
+        console.log(`Generating video using ${modelString} with prompt: ${englishPrompt}`);
         const output = await replicate.run(modelString as any, { input });
 
         // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
