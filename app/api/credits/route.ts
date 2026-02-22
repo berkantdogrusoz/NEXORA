@@ -10,11 +10,30 @@ export async function GET() {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
 
+        // Fetch current credits
         const { data, error } = await supabase
             .from("user_credits")
             .select("credits")
             .eq("user_id", authResult.userId)
             .single();
+
+        // Also fetch active subscription to determine max limits
+        const { data: subData } = await supabase
+            .from("user_subscriptions")
+            .select("plan_name, status")
+            .eq("user_id", authResult.userId)
+            .single();
+
+        let planName = "Free";
+        // Ensure the subscription is active before applying higher limits
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+            planName = subData.plan_name;
+        }
+
+        let maxCredits = 15;
+        if (planName === "Growth") maxCredits = 200;
+        else if (planName === "Pro") maxCredits = 1000;
+        else if (planName === "Elite") maxCredits = 5000;
 
         if (error && error.code === "PGRST116") {
             // User not found, initialize with 15 credits (Tiered system: Free starts small)
@@ -25,11 +44,20 @@ export async function GET() {
                 .single();
 
             if (initError) throw initError;
-            return NextResponse.json({ credits: Number(newData.credits) });
+            return NextResponse.json({
+                credits: Number(newData.credits),
+                maxCredits,
+                planName
+            });
         }
 
         if (error) throw error;
-        return NextResponse.json({ credits: Number(data.credits) });
+
+        return NextResponse.json({
+            credits: Number(data.credits),
+            maxCredits,
+            planName
+        });
 
     } catch (error: any) {
         console.error("Credits GET error:", error);
