@@ -4,32 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-/* ─── Animated Typing Words ─── */
-const WORDS = ["Videos", "Images", "Content", "Brands", "Ads"];
 
-function AnimatedWord() {
-  const [index, setIndex] = useState(0);
-  const [show, setShow] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShow(false);
-      setTimeout(() => {
-        setIndex((p) => (p + 1) % WORDS.length);
-        setShow(true);
-      }, 350);
-    }, 2400);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <span
-      className={`inline-block transition-all duration-300 ease-out ${show ? "opacity-100 translate-y-0 blur-0" : "opacity-0 -translate-y-3 blur-sm"}`}
-    >
-      {WORDS[index]}
-    </span>
-  );
-}
 
 /* ─── Showcase Images (Unsplash) ─── */
 const SHOWCASE = [
@@ -135,14 +110,9 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-7">
-            <span className="text-white">Create </span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400">
-              <AnimatedWord />
-            </span>
-            <br />
-            <span className="text-white/40 text-3xl md:text-5xl lg:text-6xl font-bold">
-              with AI — Instantly
+          <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-black tracking-tighter leading-none mb-7">
+            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
+              Nexora
             </span>
           </h1>
 
