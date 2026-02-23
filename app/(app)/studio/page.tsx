@@ -9,11 +9,18 @@ const ASPECT_RATIOS = [
     { label: "1:1", value: "1:1" },
 ];
 
+const DURATIONS = [
+    { label: "5s", value: "5" },
+    { label: "10s", value: "10" },
+];
+
 const VIDEO_MODELS = [
     { id: "damo", name: "DAMO Text-to-Video", tier: "Standard", cost: 5 },
     { id: "zeroscope", name: "Zeroscope V2 (HD)", tier: "Standard", cost: 8 },
     { id: "minimax", name: "Minimax Video-01", tier: "Standard", cost: 12.5 },
     { id: "luma", name: "Luma Dream Machine Ray", tier: "Pro", cost: 25 },
+    { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 35 },
+    { id: "runway-gwm", name: "Runway GWM-1", tier: "Pro", cost: 45 },
 ];
 
 export default function StudioPage() {
@@ -25,6 +32,7 @@ export default function StudioPage() {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [aspectRatio, setAspectRatio] = useState("16:9");
+    const [duration, setDuration] = useState("5");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
     const [history, setHistory] = useState<
         { url: string; prompt: string; createdAt: number }[]
@@ -37,7 +45,7 @@ export default function StudioPage() {
 
         // Block Pro models if user is on Free plan
         if (selectedModelConfig.tier === "Pro" && planName === "Free") {
-            setError("You need a Premium plan to use Luma Dream Machine Ray.");
+            setError(`You need a Premium plan to use ${selectedModelConfig.name}.`);
             return;
         }
 
@@ -60,7 +68,8 @@ export default function StudioPage() {
                     prompt,
                     model,
                     aspectRatio,
-                    quality
+                    quality,
+                    duration
                 }),
             });
 
@@ -307,7 +316,21 @@ export default function StudioPage() {
                                             🎯 {quality.toUpperCase()}
                                         </button>
 
-
+                                        {/* Duration */}
+                                        <div className="flex items-center bg-white/[0.04] rounded-lg border border-white/[0.06] overflow-hidden">
+                                            {DURATIONS.map((d) => (
+                                                <button
+                                                    key={d.value}
+                                                    onClick={() => setDuration(d.value)}
+                                                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${duration === d.value
+                                                        ? "bg-white/10 text-white"
+                                                        : "text-slate-500 hover:text-slate-300"
+                                                        }`}
+                                                >
+                                                    ⏱ {d.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {/* Generate Button */}
@@ -336,6 +359,6 @@ export default function StudioPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

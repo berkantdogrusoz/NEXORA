@@ -43,11 +43,11 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        const cost = modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
+        const cost = modelId === "runway-gwm" ? 45 : modelId === "runway-gen4" ? 35 : modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
 
         // Block Pro models for Free users
-        if (modelId === "luma" && planName === "Free") {
-            return NextResponse.json({ error: "You need a Premium plan to use Luma Dream Machine Ray." }, { status: 403 });
+        if ((modelId === "luma" || modelId.startsWith("runway")) && planName === "Free") {
+            return NextResponse.json({ error: "You need a Premium plan to use Luma or Runway models." }, { status: 403 });
         }
 
         // Check balance
@@ -97,7 +97,21 @@ export async function POST(req: Request) {
         let modelString = "";
         let input: any = {};
 
-        if (modelId === "luma") {
+        if (modelId === "runway-gwm") {
+            // PRO MODEL: Runway GWM-1 Equivalent
+            modelString = "minimax/video-01";
+            input = {
+                prompt: `(Extremely high fidelity, real-world physics, complex world simulation interaction) ${englishPrompt} (Length: ${duration} seconds, Ratio: ${aspectRatio})`,
+                prompt_optimizer: true
+            };
+        } else if (modelId === "runway-gen4") {
+            // PRO MODEL: Runway Gen-4.5 Equivalent
+            modelString = "luma/ray";
+            input = {
+                prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity, perfect adherence) ${englishPrompt}`,
+                aspect_ratio: aspectRatio,
+            };
+        } else if (modelId === "luma") {
             // PRO MODEL: Luma Ray (Cinematic 5s)
             modelString = "luma/ray";
             input = {

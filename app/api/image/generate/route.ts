@@ -32,9 +32,9 @@ export async function POST(req: Request) {
         const finalSize = validSizes.includes(size) ? size : "1024x1024";
 
         // Validate Model & Cost
-        const validModels = ["dall-e-2", "dall-e-3"];
+        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro"];
         const finalModel = validModels.includes(modelId) ? modelId : "dall-e-2";
-        const cost = finalModel === "dall-e-3" ? 15 : 5;
+        const cost = finalModel === "dall-e-3" ? 15 : finalModel === "flux-pro" ? 20 : finalModel === "flux-schnell" ? 8 : 5;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();
@@ -50,8 +50,8 @@ export async function POST(req: Request) {
         }
 
         // Block Pro models for Free users
-        if (finalModel === "dall-e-3" && planName === "Free") {
-            return NextResponse.json({ error: "You need a Premium plan to use DALL-E 3 high-quality generation." }, { status: 403 });
+        if ((finalModel === "dall-e-3" || finalModel === "flux-pro") && planName === "Free") {
+            return NextResponse.json({ error: "You need a Premium plan to use DALL-E 3 or FLUX 1.1 Pro." }, { status: 403 });
         }
 
         // Check balance
@@ -80,19 +80,57 @@ export async function POST(req: Request) {
         creditDeducted = true;
         deductedCost = cost;
 
-        // Call OpenAI
-        const response = await client.images.generate({
-            model: finalModel, // "dall-e-2" | "dall-e-3"
-            prompt,
-            n: 1,
-            size: finalSize as "1024x1024" | "1792x1024" | "1024x1792",
-            quality: finalModel === "dall-e-3" ? "hd" : "standard", // dal-e-2 doesn't support "hd"
-        });
+        let imageUrl = "";
 
-        const imageUrl = response.data[0]?.url;
+        if (finalModel.startsWith("dall-e")) {
+            // OpenAI Generation
+            let openaiSize = finalSize;
+            if (finalModel === "dall-e-2") {
+                // DALL-E 2 only supports 1024x1024, 512x512, 256x256
+                openaiSize = "1024x1024";
+            }
+
+            const response = await client.images.generate({
+                model: finalModel, // "dall-e-2" | "dall-e-3"
+                prompt,
+                n: 1,
+                size: openaiSize as "1024x1024" | "1792x1024" | "1024x1792",
+                quality: finalModel === "dall-e-3" ? "hd" : "standard",
+            });
+            imageUrl = response.data[0]?.url || "";
+        } else {
+            // Replicate FLUX Generation
+            const { replicate } = await import("@/lib/replicate");
+
+            // Map 1024x1792 to "9:16", 1792x1024 to "16:9", 1024x1024 to "1:1"
+            let aspect_ratio = "1:1";
+            if (finalSize === "1024x1792") aspect_ratio = "9:16";
+            if (finalSize === "1792x1024") aspect_ratio = "16:9";
+
+            const modelString = finalModel === "flux-pro"
+                ? "black-forest-labs/flux-1.1-pro"
+                : "black-forest-labs/flux-schnell";
+
+            const output = await replicate.run(modelString as any, {
+                input: {
+                    prompt,
+                    aspect_ratio,
+                    output_format: "webp",
+                    output_quality: 90
+                }
+            });
+
+            // Replicate FLUX usually returns an array of URLs or a single URL stream
+            let finalUrl = Array.isArray(output) ? output[0] : output;
+            if (typeof finalUrl === "object" && finalUrl !== null) {
+                if (typeof finalUrl.url === "function") finalUrl = finalUrl.url().toString();
+                else if (typeof finalUrl.url === "string") finalUrl = finalUrl.url;
+            }
+            imageUrl = typeof finalUrl === "string" ? finalUrl : "";
+        }
 
         if (!imageUrl) {
-            throw new Error("No image generated");
+            throw new Error("No image generated or URL missing from response");
         }
 
         // Upload to Supabase for permanent storage
@@ -101,7 +139,7 @@ export async function POST(req: Request) {
             const permanentUrl = await uploadImageFromUrl(imageUrl);
             return NextResponse.json({ imageUrl: permanentUrl });
         } catch {
-            // Fallback to OpenAI URL if storage fails
+            // Fallback to direct URL if storage fails
             return NextResponse.json({ imageUrl });
         }
     } catch (error: any) {
@@ -111,8 +149,6 @@ export async function POST(req: Request) {
         if (creditDeducted && userId) {
             try {
                 const supabase = createSupabaseServer();
-
-                // Fetch latest credits just to be perfectly safe before refunding
                 const { data: currentCreditData } = await supabase
                     .from("user_credits")
                     .select("credits")
@@ -139,7 +175,7 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json(
-            { error: error?.message || "Failed to generate image" },
+            { error: error?.message || "Failed to generate image. Please try again." },
             { status: 500 }
         );
     }

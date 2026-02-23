@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
             // Determine plan name and credit amount based on variant ID
             let planName = "Free";
-            let newCredits = 15;
+            let newCredits = 100;
 
             if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
                 planName = "Growth";

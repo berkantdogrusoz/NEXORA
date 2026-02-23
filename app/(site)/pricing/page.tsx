@@ -25,7 +25,7 @@ const PLANS = [
     highlight: false,
     badge: null,
     features: [
-      { text: "15 AI credits / month", has: true },
+      { text: "100 AI credits (One-time)", has: true },
       { text: "GPT-4o Mini (Chat)", has: true },
       { text: "Zeroscope (Standard Video)", has: true },
       { text: "DALL-E 3 (Image Generation)", has: true },
