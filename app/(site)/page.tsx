@@ -96,8 +96,25 @@ export default function Home() {
       <div className="absolute top-[600px] right-[-200px] w-[500px] h-[500px] bg-fuchsia-700/8 rounded-full blur-[120px] pointer-events-none" />
 
       {/* ═══════ HERO ═══════ */}
-      <section className="relative pt-32 pb-16 px-6">
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
+      <section className="relative pt-40 pb-24 px-6 overflow-hidden min-h-[85vh] flex flex-col items-center justify-center">
+        {/* Background Video Banner */}
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-30 mix-blend-screen"
+          >
+            {/* High quality cyberpunk/neon aesthetic video from a royalty free source as placeholder to represent Seedance capabilities */}
+            <source src="https://videos.pexels.com/video-files/3129595/3129595-uhd_3840_2160_30fps.mp4" type="video/mp4" />
+          </video>
+          {/* Gradients to fade video out into the dark theme smoothly */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto text-center mt-[-50px]">
           {/* Status */}
           <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs mb-10">
             <span className="relative flex h-2 w-2">

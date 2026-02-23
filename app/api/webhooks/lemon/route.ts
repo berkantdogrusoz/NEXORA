@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
             if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
                 planName = "Growth";
-                newCredits = 200;
+                newCredits = 500;
             } else if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO) {
                 planName = "Pro";
                 newCredits = 1000;

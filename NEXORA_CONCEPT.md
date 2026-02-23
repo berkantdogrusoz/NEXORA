@@ -23,7 +23,7 @@ Nexora is a **Prototipal-style AI Creative Studio** — a SaaS platform where us
 ### 1. AI Video Studio (`/studio`) ✅
 - **Dynamic Dropdown Models**: 
   - Standard: DAMO (5 credits), Zeroscope V2 HD (8 credits), Minimax Video-01 (12.5 credits)
-  - Premium: Luma Dream Machine Ray (25 credits)
+  - Premium: Luma Dream Machine Ray (25 credits), Runway Gen-4.5 (35 credits), Runway GWM-1 (45 credits)
 - **Instant Credit Tracking**: UI deducts credits immediately, backend verifies, refunds on failure.
 - Controls for aspect ratio, quality, and duration.
 - "Send to Calendar" to schedule posting.
@@ -55,7 +55,7 @@ Nexora is a **Prototipal-style AI Creative Studio** — a SaaS platform where us
 
 | Plan | Price | Credits/Month | Features |
 |------|-------|---------------|----------|
-| Free | $0 | 15 (One-time) | Standard Video/Image models, GPT-4o-Mini |
+| Free | $0 | 100 (One-time) | Standard Video/Image models, GPT-4o-Mini |
 | Growth | $29/mo | 200 | All Models, Priority Queues, DALL-E 3, Auto-Post |
 | Pro | $59/mo | 1000 | Unlimited Scale, Multi-Brand, Agency Use |
 

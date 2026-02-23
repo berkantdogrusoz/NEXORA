@@ -18,6 +18,7 @@ const VIDEO_MODELS = [
     { id: "damo", name: "DAMO Text-to-Video", tier: "Standard", cost: 5 },
     { id: "zeroscope", name: "Zeroscope V2 (HD)", tier: "Standard", cost: 8 },
     { id: "minimax", name: "Minimax Video-01", tier: "Standard", cost: 12.5 },
+    { id: "seedance-2", name: "Seedance 2.0 (Cinematic)", tier: "Pro", cost: 50 },
     { id: "luma", name: "Luma Dream Machine Ray", tier: "Pro", cost: 25 },
     { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 35 },
     { id: "runway-gwm", name: "Runway GWM-1", tier: "Pro", cost: 45 },

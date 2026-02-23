@@ -46,7 +46,7 @@ const PLANS = [
     highlight: true,
     badge: "Most Popular",
     features: [
-      { text: "200 AI credits / month", has: true },
+      { text: "500 AI credits / month", has: true },
       { text: "GPT-4o + Gemini 1.5 Pro", has: true },
       { text: "All Video Models (HD included)", has: true },
       { text: "DALL-E 3 (Unlimited styles)", has: true },

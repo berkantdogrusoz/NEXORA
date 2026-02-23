@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { replicate } from "@/lib/replicate";
+import * as fal from "@fal-ai/serverless-client";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
 
@@ -43,11 +44,11 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        const cost = modelId === "runway-gwm" ? 45 : modelId === "runway-gen4" ? 35 : modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
+        const cost = modelId === "runway-gwm" ? 45 : modelId === "runway-gen4" ? 35 : modelId === "seedance-2" ? 50 : modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
 
         // Block Pro models for Free users
-        if ((modelId === "luma" || modelId.startsWith("runway")) && planName === "Free") {
-            return NextResponse.json({ error: "You need a Premium plan to use Luma or Runway models." }, { status: 403 });
+        if ((modelId === "luma" || modelId === "seedance-2" || modelId.startsWith("runway")) && planName === "Free") {
+            return NextResponse.json({ error: "You need a Premium plan to use Pro models." }, { status: 403 });
         }
 
         // Check balance
@@ -135,24 +136,47 @@ export async function POST(req: Request) {
             };
         }
 
-        console.log(`Generating video using ${modelString} with prompt: ${englishPrompt}`);
-        const output = await replicate.run(modelString as any, { input });
+        let finalUrl: any = "";
 
-        // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
-        let finalUrl = Array.isArray(output) ? output[0] : output;
+        if (modelId === "seedance-2") {
+            console.log(`Generating video using fal.ai Seedance with prompt: ${englishPrompt}`);
+            const result: any = await fal.subscribe("fal-ai/seedance", {
+                input: {
+                    prompt: englishPrompt,
+                },
+                logs: true,
+                onQueueUpdate: (update) => {
+                    if (update.status === "IN_PROGRESS") {
+                        update.logs.map((log: any) => log.message).forEach(console.log);
+                    }
+                },
+            });
 
-        // If Replicate SDK gives us a FileOutput stream, extract the URL
-        if (typeof finalUrl === "object" && finalUrl !== null) {
-            if (typeof finalUrl.url === "function") {
-                // Ensure we convert the URL object to a string!
-                finalUrl = finalUrl.url().toString();
-            } else if (typeof finalUrl.url === "string") {
-                finalUrl = finalUrl.url;
+            if (result && result.video && result.video.url && typeof result.video.url === "string") {
+                finalUrl = result.video.url;
+            } else {
+                throw new Error("Invalid output from fal.ai");
+            }
+        } else {
+            console.log(`Generating video using ${modelString} with prompt: ${englishPrompt}`);
+            const output = await replicate.run(modelString as any, { input });
+
+            // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
+            finalUrl = Array.isArray(output) ? output[0] : output;
+
+            // If Replicate SDK gives us a FileOutput stream, extract the URL
+            if (typeof finalUrl === "object" && finalUrl !== null) {
+                if (typeof finalUrl.url === "function") {
+                    // Ensure we convert the URL object to a string!
+                    finalUrl = finalUrl.url().toString();
+                } else if (typeof finalUrl.url === "string") {
+                    finalUrl = finalUrl.url;
+                }
             }
         }
 
         if (!finalUrl || typeof finalUrl !== "string") {
-            throw new Error(`Invalid output from Replicate: ${JSON.stringify(output)}`);
+            throw new Error(`Invalid output from provider`);
         }
 
         return NextResponse.json({ success: true, videoUrl: finalUrl });

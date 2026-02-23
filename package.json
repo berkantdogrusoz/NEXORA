@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.4",
+    "@fal-ai/serverless-client": "^0.15.0",
     "@google/generative-ai": "^0.24.1",
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
     "@supabase/supabase-js": "^2.95.3",
