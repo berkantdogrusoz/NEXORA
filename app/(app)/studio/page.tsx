@@ -9,11 +9,6 @@ const ASPECT_RATIOS = [
     { label: "1:1", value: "1:1" },
 ];
 
-const DURATIONS = [
-    { label: "4s", value: "4" },
-    { label: "8s", value: "8" },
-];
-
 const VIDEO_MODELS = [
     { id: "damo", name: "DAMO Text-to-Video", tier: "Standard", cost: 5 },
     { id: "zeroscope", name: "Zeroscope V2 (HD)", tier: "Standard", cost: 8 },
@@ -30,7 +25,6 @@ export default function StudioPage() {
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [aspectRatio, setAspectRatio] = useState("16:9");
-    const [duration, setDuration] = useState("4");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
     const [history, setHistory] = useState<
         { url: string; prompt: string; createdAt: number }[]
@@ -66,8 +60,7 @@ export default function StudioPage() {
                     prompt,
                     model,
                     aspectRatio,
-                    quality,
-                    duration
+                    quality
                 }),
             });
 
@@ -181,8 +174,10 @@ export default function StudioPage() {
                                         src={videoUrl}
                                         controls
                                         autoPlay
+                                        muted
+                                        playsInline
                                         loop
-                                        className="w-full aspect-video object-cover"
+                                        className="w-full aspect-video object-cover bg-black"
                                     />
                                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                                         <a
@@ -312,21 +307,7 @@ export default function StudioPage() {
                                             🎯 {quality.toUpperCase()}
                                         </button>
 
-                                        {/* Duration */}
-                                        <div className="flex items-center bg-white/[0.04] rounded-lg border border-white/[0.06] overflow-hidden">
-                                            {DURATIONS.map((d) => (
-                                                <button
-                                                    key={d.value}
-                                                    onClick={() => setDuration(d.value)}
-                                                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${duration === d.value
-                                                        ? "bg-white/10 text-white"
-                                                        : "text-slate-500 hover:text-slate-300"
-                                                        }`}
-                                                >
-                                                    ⏱ {d.label}
-                                                </button>
-                                            ))}
-                                        </div>
+
                                     </div>
 
                                     {/* Generate Button */}

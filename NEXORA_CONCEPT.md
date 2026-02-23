@@ -7,7 +7,7 @@ Nexora is a **Prototipal-style AI Creative Studio** — a SaaS platform where us
 - **Dark Mode Only** — Pure black (#000) background, glass-morphism cards, violet/pink accent colors
 - **Prototipal-inspired UI** — Sidebar navigation for the app, clean top navbar for marketing pages
 - **Premium Feel** — Subtle animations, gradient borders, neon glow effects, backdrop blur
-- **Minimalist** — No clutter. Every element has a purpose.
+- **Minimalist** — Clean typography, explicitly stating costs and models dynamically.
 
 ## 🏗️ Architecture
 - **Framework**: Next.js 14 (App Router)
@@ -15,105 +15,60 @@ Nexora is a **Prototipal-style AI Creative Studio** — a SaaS platform where us
 - **Database**: Supabase (PostgreSQL)
 - **Storage**: Supabase Storage (for generated images/videos)
 - **Styling**: Tailwind CSS + Custom CSS (dark theme)
+- **Payments**: Lemon Squeezy (Webhooks integrated)
 - **Deployment**: Vercel
 
-### Route Groups
-| Group | Purpose | Navigation |
-|-------|---------|-----------|
-| `(site)` | Marketing pages (Landing, Pricing, Privacy, Terms, Auth) | Top Navbar |
-| `(app)` | Application pages (Studio, Calendar, Dashboard, etc.) | Left Sidebar |
+## ✨ Core Features (Built & Working)
 
-## ✨ Core Features
+### 1. AI Video Studio (`/studio`) ✅
+- **Dynamic Dropdown Models**: 
+  - Standard: DAMO (5 credits), Zeroscope V2 HD (8 credits), Minimax Video-01 (12.5 credits)
+  - Premium: Luma Dream Machine Ray (25 credits)
+- **Instant Credit Tracking**: UI deducts credits immediately, backend verifies, refunds on failure.
+- Controls for aspect ratio, quality, and duration.
+- "Send to Calendar" to schedule posting.
 
-### 1. AI Video Studio (`/studio`)
-- **Text-to-Video**: User enters a prompt → AI generates a video (Replicate API / Stable Video Diffusion)
-- Model selection, aspect ratio (16:9, 9:16, 1:1), HD toggle, duration (4s/8s)
-- Generated video gallery on the left panel
-- "Send to Calendar" to schedule posting
-- **Credit Cost**: Each generation costs credits
-
-### 2. AI Image Generation (`/generate`)
-- **Text-to-Image**: DALL-E 3 powered image generation
+### 2. AI Image Generation (`/generate`) ✅
+- **Multi-Model Support**: 
+  - Standard: DALL-E 2 (5 credits), FLUX Schnell (8 credits)
+  - Premium: DALL-E 3 (15 credits), FLUX 1.1 Pro (20 credits)
 - Style presets (Photographic, Cinematic, Illustration, etc.)
-- Size options (1024x1024, 1792x1024, 1024x1792)
-- Download or send to Calendar
+- Strict UI and Backend validation preventing Free users from accessing Premium.
 
-### 3. Content Calendar (`/calendar`)
-- Weekly grid view showing all scheduled posts
-- Generate a full week of AI content with one click (Autopilot)
-- Approve, edit, regenerate, or upload custom images
-- "Post Now" button to instantly publish to Instagram
-- Status tracking: Draft → Approved → Posted
+### 3. AI Marketing Assistant (`/assistant`) ✅
+- Chat-based AI that acts as a professional marketing agency.
+- **Model Options**: GPT-4o Mini (0.5 credits), GPT-4o (2.0 credits, Premium), Gemini 1.5 Pro (2.0 credits, Premium).
+- Aware of user's saved brand tone/settings.
 
-### 4. AI Marketing Assistant (`/assistant`)
-- Chat-based AI that acts as a professional marketing agency
-- Quick action buttons for common tasks
-- Brand-aware responses based on user's brand settings
+### 4. Content Calendar & Integration (`/calendar`, `/store`) 🚧
+- Calendar UI is built, tracking Draft → Approved → Posted.
+- "Send to Calendar" features are wired.
+- Instagram Graph API connection is set up and working via OAuth.
+- **Pending**: Auto-posting logic to directly push Calendar items to Instagram.
 
-### 5. Dashboard (`/dashboard`)
-- Usage stats (posts this week, approved, posted)
-- Credit usage meter
-- Quick action links
-- Weekly streak tracker
-- Recent activity feed
-- "Connect Instagram" banner if not connected
+### 5. Monetization & Global Credit Engine ✅
+- Strict global React context (`useCredits`) combined with highly secure Supabase Backend validations.
+- Initializing Free users with 15 credits.
+- Lemon Squeezy Webhook fully implemented to automatically renew credits (Growth: 200, Pro: 1000) upon successful monthly payment.
 
-### 6. Autopilot / Settings (`/autopilot`)
-- Brand configuration (name, niche, tone, target audience)
-- Instagram connection management
-- One-click content generation for the entire week
+## 💰 Monetization Tiers
 
-### 7. Instagram Integration (`/store`)
-- OAuth connection to Instagram Business accounts
-- Auto-posting via Instagram Graph API
-- Image + Video upload support
-
-## 💰 Monetization — Credit System
 | Plan | Price | Credits/Month | Features |
 |------|-------|---------------|----------|
-| Free | $0 | 50 | 3 posts/week, basic AI |
-| Pro | $19/mo | 500 | Unlimited posts, HD video, priority |
-| Business | $49/mo | 2000 | Team access, API access, analytics |
+| Free | $0 | 15 (One-time) | Standard Video/Image models, GPT-4o-Mini |
+| Growth | $29/mo | 200 | All Models, Priority Queues, DALL-E 3, Auto-Post |
+| Pro | $59/mo | 1000 | Unlimited Scale, Multi-Brand, Agency Use |
 
-**Credit Costs:**
-- Video generation: 12.5 credits
-- Image generation: 5 credits
-- AI chat message: 1 credit
-- Autopilot (7 posts): 50 credits
+## 🔑 Environment Variables Included
+- Clerk (Auth)
+- OpenAI (GPT & DALL-E)
+- Replicate (Video & FLUX)
+- Google Gemini (Assistant)
+- Supabase (DB/Storage)
+- Instagram Graph API
+- Lemon Squeezy (Payments & Webhooks)
 
-## 🔗 API Integrations
-| Service | Purpose | Status |
-|---------|---------|--------|
-| OpenAI (GPT-4) | Content generation, chat assistant | ✅ Active |
-| OpenAI (DALL-E 3) | Image generation | ✅ Active |
-| Replicate | Video generation (Stable Video Diffusion) | ✅ Active |
-| Supabase | Database + Storage | ✅ Active |
-| Clerk | Authentication | ✅ Active |
-| Instagram Graph API | Auto-posting | ✅ Active |
-| Lemon Squeezy / Stripe | Payments | 🔜 Pending |
-
-## 🔑 Environment Variables Required
-```
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-OPENAI_API_KEY=
-REPLICATE_API_TOKEN=
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-INSTAGRAM_APP_ID=
-INSTAGRAM_APP_SECRET=
-NEXT_PUBLIC_APP_URL=
-```
-
-## 📱 Target Audience
-- Solo content creators
-- Small business owners
-- Social media managers
-- Marketing agencies
-
-## 🎯 Competitors / Inspiration
-- **Prototipal** (UI/UX inspiration — dark theme, AI tools)
-- **Buffer / Later** (scheduling)
-- **Canva** (design tools)
-- **Runway ML** (AI video)
+## 🔜 What's Next (Pending Tasks)
+1. **Instagram Auto-Posting**: Actually firing the final POST request to Instagram Graph API from the Calendar queue.
+2. **Dashboard Analytics**: Expanding the `/dashboard` to show beautiful graphical charts using `recharts` for credits used, posts scheduled, and AI tokens consumed.
+3. **Autopilot Generator**: Creating the feature where a user clicks one button, and the AI schedules an entire 7-day content calendar based on their brand voice automatically.
