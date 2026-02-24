@@ -45,14 +45,21 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        console.log("Checkout response:", checkout);
+        console.log("Checkout response:", JSON.stringify(checkout, null, 2));
 
         if (checkout.error) {
             console.error("Lemon Squeezy API Error:", checkout.error);
             return NextResponse.json({ error: checkout.error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ url: checkout.data?.data.attributes.url });
+        const checkoutUrl = checkout.data?.data?.attributes?.url;
+
+        if (!checkoutUrl) {
+            console.error("No checkout URL found in response");
+            return NextResponse.json({ error: "Failed to generate checkout link" }, { status: 500 });
+        }
+
+        return NextResponse.json({ url: checkoutUrl });
 
     } catch (error) {
         console.error("Checkout creation failed:", error);
