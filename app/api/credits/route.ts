@@ -32,9 +32,8 @@ export async function GET() {
         }
 
         let maxCredits = 100;
-        if (planName === "Growth") maxCredits = 200;
+        if (planName === "Growth") maxCredits = 500;
         else if (planName === "Pro") maxCredits = 1000;
-        else if (planName === "Elite") maxCredits = 5000;
 
         if (error && error.code === "PGRST116") {
             // User not found, initialize with 100 credits (Tiered system: Free starts small)

@@ -7,75 +7,49 @@ export async function GET() {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
 
-        // Fetch brands
-        const { data: brands } = await supabase
-            .from("autopilot_brands")
-            .select("*")
-            .eq("user_id", authResult.userId);
-
-        // Fetch this week's posts
-        const now = new Date();
-        const dayOfWeek = now.getDay();
-        const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        const monday = new Date(now);
-        monday.setDate(now.getDate() + daysToMonday);
-        monday.setHours(0, 0, 0, 0);
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 7);
-
-        const { data: weekPosts } = await supabase
-            .from("autopilot_logs")
-            .select("*")
+        // Fetch User Credits
+        const { data: creditData } = await supabase
+            .from("user_credits")
+            .select("credits")
             .eq("user_id", authResult.userId)
-            .gte("scheduled_at", monday.toISOString())
-            .lt("scheduled_at", sunday.toISOString())
-            .order("scheduled_at", { ascending: true });
+            .single();
 
-        // Fetch total posts ever
-        const { count: totalPosts } = await supabase
-            .from("autopilot_logs")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", authResult.userId);
+        const currentCredits = creditData?.credits || 0;
 
-        // Fetch recent activity (last 5)
-        const { data: recentActivity } = await supabase
-            .from("autopilot_logs")
-            .select("id, type, platform, content, status, created_at, output")
+        // Fetch User Subscription
+        const { data: subData } = await supabase
+            .from("user_subscriptions")
+            .select("plan_name, status")
             .eq("user_id", authResult.userId)
-            .order("created_at", { ascending: false })
-            .limit(5);
+            .single();
 
-        // Fetch assistant message count today
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const { count: todayMessages } = await supabase
+        let planName = "Free";
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+            planName = subData.plan_name;
+        }
+
+        let maxCredits = 100;
+        if (planName === "Growth") maxCredits = 500;
+        else if (planName === "Pro") maxCredits = 1000;
+
+        // Fetch total assistant messages
+        const { count: totalMessages } = await supabase
             .from("assistant_messages")
             .select("*", { count: "exact", head: true })
             .eq("user_id", authResult.userId)
-            .eq("role", "user")
-            .gte("created_at", today.toISOString());
-
-        const posts = weekPosts || [];
-        const stats = {
-            totalBrands: (brands || []).length,
-            totalPosts: totalPosts || 0,
-            weekPosts: posts.length,
-            weekApproved: posts.filter(p => p.status === "approved").length,
-            weekPosted: posts.filter(p => p.status === "posted").length,
-            weekDraft: posts.filter(p => p.status === "draft").length,
-            todayMessages: todayMessages || 0,
-        };
+            .eq("role", "user");
 
         return NextResponse.json({
-            stats,
-            brands: brands || [],
-            recentActivity: recentActivity || [],
+            stats: {
+                credits: currentCredits,
+                maxCredits,
+                planName,
+                totalMessages: totalMessages || 0,
+            }
         });
     } catch {
         return NextResponse.json({
-            stats: { totalBrands: 0, totalPosts: 0, weekPosts: 0, weekApproved: 0, weekPosted: 0, weekDraft: 0, todayMessages: 0 },
-            brands: [],
-            recentActivity: [],
+            stats: { credits: 0, maxCredits: 100, planName: "Free", totalMessages: 0 }
         });
     }
 }

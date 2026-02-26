@@ -20,14 +20,14 @@ CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (0/22) ...
+   Generating static pages (5/22) 
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (0/30) ...
-   Generating static pages (7/30) 
-   Generating static pages (14/30) 
-   Generating static pages (22/30) 
- Ô£ô Generating static pages (30/30)
+   Generating static pages (10/22) 
+   Generating static pages (16/22) 
+ Ô£ô Generating static pages (22/22)
    Finalizing page optimization ...
    Collecting build traces ...
 
@@ -35,31 +35,20 @@ Route (app)                              Size     First Load JS
 Ôöî ãÆ /                                    53.4 kB         147 kB
 Ôö£ ãÆ /_not-found                          873 B            88 kB
 Ôö£ ãÆ /agents                              3.48 kB        90.6 kB
-Ôö£ ãÆ /api/agents                          0 B                0 B
-Ôö£ ãÆ /api/agents/[id]                     0 B                0 B
-Ôö£ ãÆ /api/agents/builder                  0 B                0 B
-Ôö£ ãÆ /api/agents/run                      0 B                0 B
 Ôö£ ãÆ /api/assistant                       0 B                0 B
-Ôö£ ãÆ /api/avatar/generate                 0 B                0 B
-Ôö£ ãÆ /api/connections                     0 B                0 B
-Ôö£ ãÆ /api/connections/social              0 B                0 B
-Ôö£ ãÆ /api/connections/social/[id]         0 B                0 B
-Ôö£ ãÆ /api/connections/store               0 B                0 B
-Ôö£ ãÆ /api/connections/store/[id]          0 B                0 B
 Ôö£ ãÆ /api/credits                         0 B                0 B
 Ôö£ ãÆ /api/dashboard                       0 B                0 B
 Ôö£ ãÆ /api/debug                           0 B                0 B
 Ôö£ ãÆ /api/debug/add-credits               0 B                0 B
 Ôö£ ãÆ /api/debug/storage                   0 B                0 B
 Ôö£ ãÆ /api/download                        0 B                0 B
-Ôö£ ãÆ /api/generate                        0 B                0 B
 Ôö£ ãÆ /api/image/generate                  0 B                0 B
 Ôö£ ãÆ /api/lemon/checkout                  0 B                0 B
 Ôö£ ãÆ /api/subscription                    0 B                0 B
 Ôö£ ãÆ /api/video/generate                  0 B                0 B
 Ôö£ ãÆ /api/webhooks/lemon                  0 B                0 B
 Ôö£ ãÆ /assistant                           3.14 kB        90.3 kB
-Ôö£ ãÆ /dashboard                           2.21 kB        96.2 kB
+Ôö£ ãÆ /dashboard                           1.5 kB         95.5 kB
 Ôö£ ãÆ /generate                            3.24 kB        90.4 kB
 Ôö£ ãÆ /pricing                             3.19 kB        97.2 kB
 Ôö£ ãÆ /privacy                             1.41 kB         125 kB
