@@ -184,6 +184,14 @@ export default function SubscriptionPage() {
                                 ⚡ Upgrade to Pro
                             </Link>
                         )}
+                        {sub.plan_name === "Growth" && isPaid && (
+                            <Link
+                                href="/pricing"
+                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
+                            >
+                                🚀 Upgrade to Pro — 1000 Credits & All Models
+                            </Link>
+                        )}
                     </div>
 
                     {cancelSuccess && (
