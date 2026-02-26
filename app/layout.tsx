@@ -68,6 +68,9 @@ export const metadata: Metadata = {
     canonical: BASE_URL,
   },
   category: "Technology",
+  verification: {
+    google: "wW0oJujFaeajEy-U1B3dxdH1LaVopY7sa7Ubm37VZNM",
+  },
 };
 
 export const dynamic = "force-dynamic";
