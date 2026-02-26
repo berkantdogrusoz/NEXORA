@@ -25,6 +25,8 @@ export default function RootLayout({
       publishableKey={
         process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_placeholder"
       }
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
     >
       <html lang="en" className={inter.variable} suppressHydrationWarning>
         <body className="font-sans bg-black text-slate-100 antialiased min-h-screen selection:bg-violet-500/30">
