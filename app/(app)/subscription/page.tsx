@@ -15,10 +15,12 @@ interface SubscriptionData {
 }
 
 export default function SubscriptionPage() {
-    const { credits, maxCredits, planName } = useCredits();
+    const { credits, maxCredits, planName, refreshCredits } = useCredits();
     const [sub, setSub] = useState<SubscriptionData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [cancelling, setCancelling] = useState(false);
+    const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
 
     useEffect(() => {
         fetch("/api/subscription")
@@ -142,15 +144,37 @@ export default function SubscriptionPage() {
                                 ⚙️ Manage Subscription
                             </a>
                         )}
-                        {isPaid && sub.customer_portal_url && (
-                            <a
-                                href={sub.customer_portal_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-semibold transition-all hover:scale-[1.01] active:scale-95"
+                        {isPaid && (
+                            <button
+                                onClick={async () => {
+                                    if (!confirm("Are you sure you want to cancel your subscription? You will keep access until the end of your billing period.")) return;
+                                    setCancelling(true);
+                                    try {
+                                        const res = await fetch("/api/subscription/cancel", { method: "POST" });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            const endDate = data.ends_at
+                                                ? new Date(data.ends_at).toLocaleDateString("tr-TR", { year: "numeric", month: "long", day: "numeric" })
+                                                : "the end of your billing period";
+                                            setCancelSuccess(`Your subscription has been cancelled. You will keep access until ${endDate}.`);
+                                            // Refresh data
+                                            const refreshRes = await fetch("/api/subscription");
+                                            if (refreshRes.ok) setSub(await refreshRes.json());
+                                            refreshCredits();
+                                        } else {
+                                            alert(data.error || "Failed to cancel.");
+                                        }
+                                    } catch {
+                                        alert("Something went wrong.");
+                                    } finally {
+                                        setCancelling(false);
+                                    }
+                                }}
+                                disabled={cancelling}
+                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-semibold transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
                             >
-                                ✕ Cancel Subscription
-                            </a>
+                                {cancelling ? "Cancelling..." : "✕ Cancel Subscription"}
+                            </button>
                         )}
                         {!isPaid && (
                             <Link
@@ -161,6 +185,12 @@ export default function SubscriptionPage() {
                             </Link>
                         )}
                     </div>
+
+                    {cancelSuccess && (
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-amber-300 text-sm">
+                            ⚠️ {cancelSuccess}
+                        </div>
+                    )}
 
                     {/* Plan Features */}
                     <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6">
@@ -177,7 +207,7 @@ export default function SubscriptionPage() {
                             )}
                             {sub.plan_name === "Growth" && (
                                 <>
-                                    <Feature text="200 credits per month" />
+                                    <Feature text="500 credits per month" />
                                     <Feature text="Standard AI models" />
                                     <Feature text="HD video generation" />
                                     <Feature text="Commercial usage rights" />
