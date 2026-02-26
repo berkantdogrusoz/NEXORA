@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId } from "@/lib/auth";
 import OpenAI from "openai";
+import * as fal from "@fal-ai/serverless-client";
 import { createSupabaseServer } from "@/lib/supabase";
 
 export const maxDuration = 60;
@@ -32,9 +33,9 @@ export async function POST(req: Request) {
         const finalSize = validSizes.includes(size) ? size : "1024x1024";
 
         // Validate Model & Cost
-        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro"];
+        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3"];
         const finalModel = validModels.includes(modelId) ? modelId : "dall-e-2";
-        const cost = finalModel === "dall-e-3" ? 15 : finalModel === "flux-pro" ? 20 : finalModel === "flux-schnell" ? 8 : 5;
+        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : finalModel === "flux-2-dev" ? 6 : 5;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();
@@ -49,9 +50,8 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        // Block Pro models for Free users
-        if ((finalModel === "dall-e-3" || finalModel === "flux-pro") && planName === "Free") {
-            return NextResponse.json({ error: "You need a Premium plan to use DALL-E 3 or FLUX 1.1 Pro." }, { status: 403 });
+        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && planName === "Free") {
+            return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
         }
 
         // Check balance
@@ -98,11 +98,34 @@ export async function POST(req: Request) {
                 quality: finalModel === "dall-e-3" ? "hd" : "standard",
             });
             imageUrl = response.data[0]?.url || "";
+        } else if (finalModel === "flux-2-dev" || finalModel === "recraft-v3") {
+            // Fal.ai models
+            let aspect_ratio = "1:1";
+            if (finalSize === "1024x1792") aspect_ratio = "9:16";
+            if (finalSize === "1792x1024") aspect_ratio = "16:9";
+
+            const falModel = finalModel === "flux-2-dev" ? "fal-ai/flux/dev" : "fal-ai/recraft-v3";
+
+            const result: any = await fal.subscribe(falModel, {
+                input: {
+                    prompt,
+                    image_size: finalModel === "recraft-v3" ? { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) } : undefined,
+                    aspect_ratio: finalModel === "flux-2-dev" ? aspect_ratio : undefined,
+                },
+                logs: true,
+            });
+
+            if (result?.images?.[0]?.url) {
+                imageUrl = result.images[0].url;
+            } else if (result?.image?.url) {
+                imageUrl = result.image.url;
+            } else {
+                throw new Error("No image in fal.ai response");
+            }
         } else {
             // Replicate FLUX Generation
             const { replicate } = await import("@/lib/replicate");
 
-            // Map 1024x1792 to "9:16", 1792x1024 to "16:9", 1024x1024 to "1:1"
             let aspect_ratio = "1:1";
             if (finalSize === "1024x1792") aspect_ratio = "9:16";
             if (finalSize === "1792x1024") aspect_ratio = "16:9";
@@ -120,7 +143,6 @@ export async function POST(req: Request) {
                 }
             });
 
-            // Replicate FLUX usually returns an array of URLs or a single URL stream
             let finalUrl = Array.isArray(output) ? output[0] : output;
             if (typeof finalUrl === "object" && finalUrl !== null) {
                 if (typeof finalUrl.url === "function") finalUrl = finalUrl.url().toString();

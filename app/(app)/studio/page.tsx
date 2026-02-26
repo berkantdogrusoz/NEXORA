@@ -16,6 +16,7 @@ const DURATIONS = [
 
 const VIDEO_MODELS = [
     { id: "damo", name: "DAMO Text-to-Video", tier: "Standard", cost: 5 },
+    { id: "wan-2.1", name: "Wan-2.1 Turbo (Fast)", tier: "Standard", cost: 8 },
     { id: "zeroscope", name: "Zeroscope V2 (HD)", tier: "Standard", cost: 8 },
     { id: "minimax", name: "Minimax Video-01", tier: "Standard", cost: 12.5 },
     { id: "seedance-2", name: "Seedance 2.0 (Cinematic)", tier: "Pro", cost: 50 },

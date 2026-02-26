@@ -20,7 +20,9 @@ const SIZES = [
 
 const IMAGE_MODELS = [
   { id: "dall-e-2", name: "DALL-E 2 (Fast)", tier: "Standard", cost: 5 },
+  { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 6 },
   { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 8 },
+  { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 12 },
   { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 15 },
   { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 20 },
 ];

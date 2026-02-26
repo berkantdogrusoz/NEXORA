@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, model: modelId = "minimax", aspectRatio = "16:9", duration = "4s" } = body;
+        const { prompt, model: modelId = "minimax", aspectRatio = "16:9", duration = "4s", quality = "standard" } = body;
 
         if (!prompt) {
             return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -156,6 +156,28 @@ export async function POST(req: Request) {
                 finalUrl = result.video.url;
             } else {
                 throw new Error("Invalid output from fal.ai");
+            }
+        } else if (modelId === "wan-2.1") {
+            console.log(`Generating video using fal.ai Wan-2.1 Turbo with prompt: ${englishPrompt}`);
+            const result: any = await fal.subscribe("fal-ai/wan/v2.1/turbo/text-to-video", {
+                input: {
+                    prompt: englishPrompt,
+                    num_frames: duration === "10s" ? 81 : 41,
+                    resolution: quality === "hd" ? "720p" : "480p",
+                    aspect_ratio: aspectRatio,
+                },
+                logs: true,
+                onQueueUpdate: (update) => {
+                    if (update.status === "IN_PROGRESS") {
+                        update.logs.map((log: any) => log.message).forEach(console.log);
+                    }
+                },
+            });
+
+            if (result && result.video && result.video.url && typeof result.video.url === "string") {
+                finalUrl = result.video.url;
+            } else {
+                throw new Error("Invalid output from fal.ai Wan-2.1");
             }
         } else {
             console.log(`Generating video using ${modelString} with prompt: ${englishPrompt}`);

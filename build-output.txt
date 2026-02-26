@@ -22,9 +22,9 @@ CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
    Generating static pages (0/30) ...
    Generating static pages (7/30) 
-CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
    Generating static pages (14/30) 
    Generating static pages (22/30) 
  Ô£ô Generating static pages (30/30)
@@ -60,12 +60,12 @@ Route (app)                              Size     First Load JS
 Ôö£ ãÆ /api/webhooks/lemon                  0 B                0 B
 Ôö£ ãÆ /assistant                           3.14 kB        90.3 kB
 Ôö£ ãÆ /dashboard                           2.21 kB        96.2 kB
-Ôö£ ãÆ /generate                            3.2 kB         90.4 kB
+Ôö£ ãÆ /generate                            3.24 kB        90.4 kB
 Ôö£ ãÆ /pricing                             3.19 kB        97.2 kB
 Ôö£ ãÆ /privacy                             1.41 kB         125 kB
 Ôö£ ãÆ /sign-in/[[...sign-in]]              206 B           128 kB
 Ôö£ ãÆ /sign-up/[[...sign-up]]              206 B           128 kB
-Ôö£ ãÆ /studio                              3.33 kB        90.5 kB
+Ôö£ ãÆ /studio                              3.36 kB        90.5 kB
 Ôö£ ãÆ /subscription                        2.22 kB        96.2 kB
 Ôöö ãÆ /terms                               1.41 kB         125 kB
 + First Load JS shared by all            87.2 kB
