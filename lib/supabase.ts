@@ -1,23 +1,25 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Server-side Supabase client (used in API routes)
+// IMPORTANT: This project has been migrated to Supabase's new API key format.
+// The old JWT-format anon key (eyJhb...) is INVALID.
+// We use the new sb_secret_ or sb_publishable_ keys instead.
 export function createSupabaseServer() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-    // IMPORTANT: Only use JWT-format keys (eyJhbGci...). 
-    // The new sb_secret_/sb_publishable_ format is NOT compatible with @supabase/supabase-js
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+
+    // Priority: service_role key > publishable key > anon key (legacy, likely invalid)
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+        || process.env.SUPABASE_PUBLISHABLE_KEY
+        || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        || "placeholder";
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || url === "https://placeholder.supabase.co") {
         console.error("CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!");
-    }
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || key === "placeholder") {
-        console.error("CRITICAL: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set!");
     }
 
     return createClient(url, key);
 }
 
-// Singleton instance for convenience — do NOT use at module level in serverless
-// because NEXT_PUBLIC_ vars get inlined at build time. Always call createSupabaseServer() instead.
+// Do NOT use this singleton in API routes — call createSupabaseServer() directly instead.
 export const supabase = createSupabaseServer();
 
