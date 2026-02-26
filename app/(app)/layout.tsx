@@ -120,9 +120,9 @@ function AppLayout({
                     })}
                 </nav>
 
-                {/* Credits + Upgrade */}
+                {/* Credits + Plan */}
                 <div className="p-3 space-y-3 border-t border-white/[0.06]">
-                    <div className="bg-white/[0.04] rounded-xl p-3.5 border border-white/[0.06]">
+                    <Link href="/subscription" className="block bg-white/[0.04] rounded-xl p-3.5 border border-white/[0.06] hover:bg-white/[0.06] transition-colors">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-medium text-slate-300">
                                 Credits
@@ -131,14 +131,23 @@ function AppLayout({
                                 {credits ?? "..."}
                             </span>
                         </div>
-                    </div>
-
-                    <Link
-                        href="/pricing"
-                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
-                    >
-                        ⚡ Upgrade Plan
                     </Link>
+
+                    {planName === "Free" ? (
+                        <Link
+                            href="/pricing"
+                            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
+                        >
+                            ⚡ Upgrade Plan
+                        </Link>
+                    ) : (
+                        <Link
+                            href="/subscription"
+                            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white text-sm font-semibold transition-all hover:scale-[1.01] active:scale-95"
+                        >
+                            ⚙️ Manage Plan
+                        </Link>
+                    )}
                 </div>
 
                 {/* User */}

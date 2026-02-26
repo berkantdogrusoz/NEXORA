@@ -24,15 +24,11 @@ export async function POST(req: NextRequest) {
         const signatureBuffer = Buffer.from(signature, "utf8");
 
         if (digest.length !== signatureBuffer.length || !crypto.timingSafeEqual(digest, signatureBuffer)) {
-            console.error("Signature mismatch:", { digest: digest.toString('hex'), signature, lengthA: digest.length, lengthB: signatureBuffer.length });
-            // NOTE: We are NOT returning 401 right now just so we can see if the DB operation works and grab the true error.
-            // return NextResponse.json({ message: "Invalid signature" }, { status: 401 });
+            return NextResponse.json({ message: "Invalid signature" }, { status: 401 });
         }
 
         const payload = JSON.parse(body);
         const { meta, data } = payload;
-
-        console.log("Parsed Payload Meta:", meta);
 
         // We expect user_id in custom_data
         const userId = meta.custom_data?.user_id;

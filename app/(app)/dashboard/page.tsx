@@ -35,21 +35,12 @@ const PLAN = {
 export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isInstagramConnected, setIsInstagramConnected] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [dashboardRes, statusRes] = await Promise.all([
-                fetch("/api/dashboard"),
-                fetch("/api/instagram/status"),
-            ]);
-
+            const dashboardRes = await fetch("/api/dashboard");
             if (dashboardRes.ok) setData(await dashboardRes.json());
-            if (statusRes.ok) {
-                const statusData = await statusRes.json();
-                setIsInstagramConnected(statusData.connected);
-            }
         } catch {
             /* empty */
         } finally {
@@ -77,32 +68,6 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                {/* Connect Instagram Banner */}
-                {!loading && !isInstagramConnected && (
-                    <div className="mb-6 p-[1px] rounded-2xl bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500">
-                        <div className="bg-[#0a0a0a] rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center text-2xl shadow-lg">
-                                    📸
-                                </div>
-                                <div>
-                                    <h2 className="text-base font-bold text-white">
-                                        Connect Instagram
-                                    </h2>
-                                    <p className="text-xs text-slate-400">
-                                        Link your Business account to enable auto-posting.
-                                    </p>
-                                </div>
-                            </div>
-                            <Link
-                                href="/store"
-                                className="px-6 py-2.5 rounded-xl bg-white text-black font-bold text-sm hover:scale-105 active:scale-95 transition-transform"
-                            >
-                                Connect Now →
-                            </Link>
-                        </div>
-                    </div>
-                )}
 
                 {loading ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -180,10 +145,10 @@ export default function DashboardPage() {
                                     <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                                         <div
                                             className={`h-full rounded-full transition-all duration-500 ${postsPercent >= 100
-                                                    ? "bg-red-500"
-                                                    : postsPercent >= 70
-                                                        ? "bg-amber-500"
-                                                        : "bg-violet-500"
+                                                ? "bg-red-500"
+                                                : postsPercent >= 70
+                                                    ? "bg-amber-500"
+                                                    : "bg-violet-500"
                                                 }`}
                                             style={{ width: `${postsPercent}%` }}
                                         />
@@ -344,12 +309,12 @@ export default function DashboardPage() {
                                             </div>
                                             <span
                                                 className={`text-[10px] px-2 py-1 rounded-full font-semibold uppercase tracking-wider ${item.status === "approved"
-                                                        ? "bg-emerald-500/10 text-emerald-400"
-                                                        : item.status === "posted"
-                                                            ? "bg-blue-500/10 text-blue-400"
-                                                            : item.status === "failed"
-                                                                ? "bg-red-500/10 text-red-400"
-                                                                : "bg-slate-500/10 text-slate-400"
+                                                    ? "bg-emerald-500/10 text-emerald-400"
+                                                    : item.status === "posted"
+                                                        ? "bg-blue-500/10 text-blue-400"
+                                                        : item.status === "failed"
+                                                            ? "bg-red-500/10 text-red-400"
+                                                            : "bg-slate-500/10 text-slate-400"
                                                     }`}
                                             >
                                                 {item.status}

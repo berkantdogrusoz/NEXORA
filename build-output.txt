@@ -1,0 +1,103 @@
+﻿  Ôû▓ Next.js 14.2.25
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+node.exe : CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (CRITICAL: NEXT_...URL is not set!:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (0/49) ...
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (12/49) 
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (24/49) 
+   Generating static pages (36/49) 
+ Ô£ô Generating static pages (49/49)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Ôöî ãÆ /                                    48.5 kB         148 kB
+Ôö£ ãÆ /_not-found                          873 B          88.1 kB
+Ôö£ ãÆ /agents                              3.48 kB        90.8 kB
+Ôö£ ãÆ /analytics                           1.9 kB         89.2 kB
+Ôö£ ãÆ /api/agents                          0 B                0 B
+Ôö£ ãÆ /api/agents/[id]                     0 B                0 B
+Ôö£ ãÆ /api/agents/builder                  0 B                0 B
+Ôö£ ãÆ /api/agents/run                      0 B                0 B
+Ôö£ ãÆ /api/assistant                       0 B                0 B
+Ôö£ ãÆ /api/autopilot                       0 B                0 B
+Ôö£ ãÆ /api/autopilot/execute               0 B                0 B
+Ôö£ ãÆ /api/avatar/generate                 0 B                0 B
+Ôö£ ãÆ /api/calendar                        0 B                0 B
+Ôö£ ãÆ /api/calendar/clear                  0 B                0 B
+Ôö£ ãÆ /api/calendar/create                 0 B                0 B
+Ôö£ ãÆ /api/calendar/regenerate             0 B                0 B
+Ôö£ ãÆ /api/calendar/update                 0 B                0 B
+Ôö£ ãÆ /api/campaigns                       0 B                0 B
+Ôö£ ãÆ /api/campaigns/[id]                  0 B                0 B
+Ôö£ ãÆ /api/campaigns/generate              0 B                0 B
+Ôö£ ãÆ /api/connections                     0 B                0 B
+Ôö£ ãÆ /api/connections/social              0 B                0 B
+Ôö£ ãÆ /api/connections/social/[id]         0 B                0 B
+Ôö£ ãÆ /api/connections/store               0 B                0 B
+Ôö£ ãÆ /api/connections/store/[id]          0 B                0 B
+Ôö£ ãÆ /api/credits                         0 B                0 B
+Ôö£ ãÆ /api/dashboard                       0 B                0 B
+Ôö£ ãÆ /api/debug                           0 B                0 B
+Ôö£ ãÆ /api/debug/add-credits               0 B                0 B
+Ôö£ ãÆ /api/debug/storage                   0 B                0 B
+Ôö£ Ôùï /api/debug/supabase-check            0 B                0 B
+Ôö£ ãÆ /api/download                        0 B                0 B
+Ôö£ ãÆ /api/generate                        0 B                0 B
+Ôö£ ãÆ /api/generate-image                  0 B                0 B
+Ôö£ ãÆ /api/image/generate                  0 B                0 B
+Ôö£ ãÆ /api/lemon/checkout                  0 B                0 B
+Ôö£ ãÆ /api/store                           0 B                0 B
+Ôö£ ãÆ /api/store/config                    0 B                0 B
+Ôö£ ãÆ /api/store/products                  0 B                0 B
+Ôö£ ãÆ /api/store/products/[id]             0 B                0 B
+Ôö£ ãÆ /api/subscription                    0 B                0 B
+Ôö£ ãÆ /api/video/generate                  0 B                0 B
+Ôö£ ãÆ /api/webhooks/lemon                  0 B                0 B
+Ôö£ ãÆ /assistant                           3.14 kB        90.4 kB
+Ôö£ ãÆ /autopilot                           4.99 kB        99.1 kB
+Ôö£ ãÆ /calendar                            4 kB           96.6 kB
+Ôö£ ãÆ /campaigns                           5.29 kB        92.6 kB
+Ôö£ ãÆ /dashboard                           2.21 kB        96.3 kB
+Ôö£ ãÆ /generate                            3.2 kB         90.5 kB
+Ôö£ ãÆ /pricing                             2.93 kB          97 kB
+Ôö£ ãÆ /privacy                             1.41 kB         125 kB
+Ôö£ ãÆ /sign-in/[[...sign-in]]              206 B           128 kB
+Ôö£ ãÆ /sign-up/[[...sign-up]]              206 B           128 kB
+Ôö£ ãÆ /store                               2.39 kB        89.7 kB
+Ôö£ ãÆ /studio                              3.33 kB        90.6 kB
+Ôö£ ãÆ /subscription                        2.22 kB        96.3 kB
+Ôöö ãÆ /terms                               1.41 kB         125 kB
++ First Load JS shared by all            87.3 kB
+  Ôö£ chunks/117-686bbb63d1c166ef.js       31.6 kB
+  Ôö£ chunks/fd9d1056-c070b96a0ee9b52d.js  53.6 kB
+  Ôöö other shared chunks (total)          2.04 kB
+
+
+ãÆ Middleware                             77.5 kB
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+
