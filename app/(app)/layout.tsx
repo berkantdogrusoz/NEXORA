@@ -10,10 +10,7 @@ const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: "📊", color: "text-sky-400" },
     { href: "/studio", label: "Video Studio", icon: "🎬", color: "text-pink-400" },
     { href: "/generate", label: "Image Gen", icon: "🖼️", color: "text-violet-400" },
-    { href: "/calendar", label: "Calendar", icon: "📅", color: "text-emerald-400" },
     { href: "/assistant", label: "Assistant", icon: "🤖", color: "text-amber-400" },
-    { href: "/autopilot", label: "Autopilot", icon: "⚡", color: "text-orange-400" },
-    { href: "/store", label: "Store", icon: "🛒", color: "text-cyan-400" },
 ];
 
 import { useCredits, CreditProvider } from "@/app/providers/credit-provider";

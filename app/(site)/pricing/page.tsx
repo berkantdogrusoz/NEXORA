@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const CHECK = (
@@ -37,6 +37,7 @@ const PLANS = [
     cta: "Get Started Free",
     ctaStyle: "border",
     checkoutPlan: null,
+    planKey: "Free",
   },
   {
     name: "Nexora",
@@ -51,13 +52,14 @@ const PLANS = [
       { text: "All Video Models (HD included)", has: true },
       { text: "DALL-E 3 (Unlimited styles)", has: true },
       { text: "Full Content Calendar", has: true },
-      { text: "Instagram Auto-Post", has: true },
+      { text: "All Aspect Ratios & Durations", has: true },
       { text: "Priority AI Queue", has: true },
       { text: "Email Support", has: true },
     ],
     cta: "Subscribe to Nexora",
     ctaStyle: "gradient",
     checkoutPlan: "Growth" as const,
+    planKey: "Growth",
   },
   {
     name: "Pro",
@@ -79,12 +81,24 @@ const PLANS = [
     cta: "Upgrade to Pro",
     ctaStyle: "border",
     checkoutPlan: "Pro" as const,
+    planKey: "Pro",
   },
 ];
 
+// Plan hierarchy for comparison
+const PLAN_RANK: Record<string, number> = { Free: 0, Growth: 1, Pro: 2 };
+
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<string>("Free");
   const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/credits")
+      .then((r) => r.json())
+      .then((d) => { if (d.planName) setUserPlan(d.planName); })
+      .catch(() => { });
+  }, []);
 
   const handleCheckout = async (plan: "Growth" | "Pro") => {
     setLoading(plan);
@@ -187,32 +201,59 @@ export default function PricingPage() {
               </ul>
 
               {/* CTA Button */}
-              {plan.checkoutPlan ? (
-                <button
-                  onClick={() => handleCheckout(plan.checkoutPlan!)}
-                  disabled={loading === plan.checkoutPlan}
-                  className={`mt-auto w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 ${plan.ctaStyle === "gradient"
-                    ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:opacity-90 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02]"
-                    : "border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-white/20"
-                    }`}
-                >
-                  {loading === plan.checkoutPlan ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : plan.cta}
-                </button>
-              ) : (
-                <Link href="/dashboard" className="mt-auto block w-full">
-                  <button className="w-full py-3.5 rounded-xl border border-white/10 bg-white/[0.04] text-white font-semibold text-sm hover:bg-white/[0.08] hover:border-white/20 transition-all">
-                    {plan.cta}
-                  </button>
-                </Link>
-              )}
+              {(() => {
+                const isCurrentPlan = userPlan === plan.planKey || (userPlan === "Growth" && plan.planKey === "Growth") || (userPlan === "Pro" && plan.planKey === "Pro");
+                const userRank = PLAN_RANK[userPlan] ?? 0;
+                const planRank = PLAN_RANK[plan.planKey] ?? 0;
+                const isLowerPlan = planRank < userRank;
+
+                if (isCurrentPlan) {
+                  return (
+                    <div className="mt-auto w-full py-3.5 rounded-xl border-2 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-semibold text-sm text-center">
+                      ✓ Current Plan
+                    </div>
+                  );
+                }
+
+                if (isLowerPlan) {
+                  return (
+                    <div className="mt-auto w-full py-3.5 rounded-xl border border-white/5 bg-white/[0.02] text-slate-600 font-semibold text-sm text-center cursor-not-allowed">
+                      Included in your plan
+                    </div>
+                  );
+                }
+
+                if (plan.checkoutPlan) {
+                  return (
+                    <button
+                      onClick={() => handleCheckout(plan.checkoutPlan!)}
+                      disabled={loading === plan.checkoutPlan}
+                      className={`mt-auto w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 ${plan.ctaStyle === "gradient"
+                        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:opacity-90 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02]"
+                        : "border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-white/20"
+                        }`}
+                    >
+                      {loading === plan.checkoutPlan ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Processing...
+                        </span>
+                      ) : plan.cta}
+                    </button>
+                  );
+                }
+
+                return (
+                  <Link href="/dashboard" className="mt-auto block w-full">
+                    <button className="w-full py-3.5 rounded-xl border border-white/10 bg-white/[0.04] text-white font-semibold text-sm hover:bg-white/[0.08] hover:border-white/20 transition-all">
+                      {plan.cta}
+                    </button>
+                  </Link>
+                );
+              })()}
             </div>
           ))}
         </div>

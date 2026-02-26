@@ -22,13 +22,12 @@ CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (0/49) ...
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (12/49) 
-CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (24/49) 
-   Generating static pages (36/49) 
- Ô£ô Generating static pages (49/49)
+   Generating static pages (0/48) ...
+   Generating static pages (12/48) 
+   Generating static pages (24/48) 
+   Generating static pages (36/48) 
+ Ô£ô Generating static pages (48/48)
    Finalizing page optimization ...
    Collecting build traces ...
 
@@ -63,7 +62,6 @@ Route (app)                              Size     First Load JS
 Ôö£ ãÆ /api/debug                           0 B                0 B
 Ôö£ ãÆ /api/debug/add-credits               0 B                0 B
 Ôö£ ãÆ /api/debug/storage                   0 B                0 B
-Ôö£ Ôùï /api/debug/supabase-check            0 B                0 B
 Ôö£ ãÆ /api/download                        0 B                0 B
 Ôö£ ãÆ /api/generate                        0 B                0 B
 Ôö£ ãÆ /api/generate-image                  0 B                0 B
@@ -82,7 +80,7 @@ Route (app)                              Size     First Load JS
 Ôö£ ãÆ /campaigns                           5.29 kB        92.6 kB
 Ôö£ ãÆ /dashboard                           2.21 kB        96.3 kB
 Ôö£ ãÆ /generate                            3.2 kB         90.5 kB
-Ôö£ ãÆ /pricing                             2.93 kB          97 kB
+Ôö£ ãÆ /pricing                             3.21 kB        97.3 kB
 Ôö£ ãÆ /privacy                             1.41 kB         125 kB
 Ôö£ ãÆ /sign-in/[[...sign-in]]              206 B           128 kB
 Ôö£ ãÆ /sign-up/[[...sign-up]]              206 B           128 kB
@@ -98,6 +96,5 @@ Route (app)                              Size     First Load JS
 
 ãÆ Middleware                             77.5 kB
 
-Ôùï  (Static)   prerendered as static content
 ãÆ  (Dynamic)  server-rendered on demand
 
