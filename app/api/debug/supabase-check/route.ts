@@ -1,61 +1,111 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServer } from "@/lib/supabase";
+
+const TEST_USER_ID = "user_3A5NPLbxusyukp1lCBTecyLkq9N";
 
 export async function GET() {
     const results: Record<string, any> = {};
+    const supabase = createSupabaseServer();
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-
-    // Test 1: Try with the current ANON KEY  
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-    results.test_anon_key = { key_preview: anonKey ? anonKey.substring(0, 20) + "..." : "NOT SET" };
-
-    if (url && anonKey) {
-        try {
-            const client1 = createClient(url, anonKey);
-            const { data, error } = await client1.from("user_subscriptions").select("*").limit(1);
-            results.test_anon_key.success = !error;
-            results.test_anon_key.error = error?.message || null;
-            results.test_anon_key.data = data;
-        } catch (e: any) {
-            results.test_anon_key.error = e.message;
-        }
-    }
-
-    // Test 2: Try with SUPABASE_SERVICE_ROLE_KEY
+    // 1. Check which key is being used
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-    results.test_service_key = { key_preview: serviceKey ? serviceKey.substring(0, 20) + "..." : "NOT SET" };
-
-    if (url && serviceKey) {
-        try {
-            const client2 = createClient(url, serviceKey);
-            const { data, error } = await client2.from("user_subscriptions").select("*").limit(1);
-            results.test_service_key.success = !error;
-            results.test_service_key.error = error?.message || null;
-            results.test_service_key.data = data;
-        } catch (e: any) {
-            results.test_service_key.error = e.message;
-        }
-    }
-
-    // Test 3: Try with a PUBLISHABLE key if set
     const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY || "";
-    results.test_publishable_key = { key_preview: pubKey ? pubKey.substring(0, 20) + "..." : "NOT SET" };
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+    results.key_being_used = serviceKey ? "SUPABASE_SERVICE_ROLE_KEY" : pubKey ? "SUPABASE_PUBLISHABLE_KEY" : anonKey ? "NEXT_PUBLIC_SUPABASE_ANON_KEY" : "NONE";
 
-    if (url && pubKey) {
-        try {
-            const client3 = createClient(url, pubKey);
-            const { data, error } = await client3.from("user_subscriptions").select("*").limit(1);
-            results.test_publishable_key.success = !error;
-            results.test_publishable_key.error = error?.message || null;
-            results.test_publishable_key.data = data;
-        } catch (e: any) {
-            results.test_publishable_key.error = e.message;
-        }
-    }
+    // 2. Check LEMON variant env vars (needed for plan matching)
+    results.lemon_variants = {
+        NEXT_PUBLIC_LEMON_VARIANT_PRO: process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO || "NOT SET",
+        NEXT_PUBLIC_LEMON_VARIANT_GROWTH: process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH || "NOT SET",
+    };
 
-    results.url_preview = url ? url.substring(0, 35) + "..." : "NOT SET";
-    results.supabase_js_note = "Testing which key format works with @supabase/supabase-js v2.95.3";
+    // 3. Check user's subscription data
+    const { data: subData, error: subError } = await supabase
+        .from("user_subscriptions")
+        .select("*")
+        .eq("user_id", TEST_USER_ID)
+        .single();
+
+    results.user_subscription = {
+        found: !!subData,
+        error: subError?.message || null,
+        data: subData,
+    };
+
+    // 4. Check user's credits
+    const { data: creditData, error: creditError } = await supabase
+        .from("user_credits")
+        .select("*")
+        .eq("user_id", TEST_USER_ID)
+        .single();
+
+    results.user_credits = {
+        found: !!creditData,
+        error: creditError?.message || null,
+        data: creditData,
+    };
+
+    // 5. TEST WRITE: Try to upsert a subscription row for this user
+    const { data: writeSubData, error: writeSubError } = await supabase
+        .from("user_subscriptions")
+        .upsert(
+            {
+                user_id: TEST_USER_ID,
+                lemon_customer_id: "7875214",
+                lemon_subscription_id: "1904989",
+                lemon_variant_id: "1319827",
+                status: "active",
+                renews_at: "2026-03-23T23:28:19.000000Z",
+                ends_at: null,
+                plan_name: "Pro",
+                updated_at: new Date().toISOString(),
+            },
+            { onConflict: "user_id" }
+        )
+        .select();
+
+    results.write_subscription_test = {
+        success: !writeSubError,
+        error: writeSubError?.message || null,
+        data: writeSubData,
+    };
+
+    // 6. TEST WRITE: Try to upsert credits
+    const { data: writeCreditData, error: writeCreditError } = await supabase
+        .from("user_credits")
+        .upsert(
+            {
+                user_id: TEST_USER_ID,
+                credits: 1000,
+                updated_at: new Date().toISOString(),
+            },
+            { onConflict: "user_id" }
+        )
+        .select();
+
+    results.write_credits_test = {
+        success: !writeCreditError,
+        error: writeCreditError?.message || null,
+        data: writeCreditData,
+    };
+
+    // 7. Re-read to confirm writes
+    const { data: finalSub } = await supabase
+        .from("user_subscriptions")
+        .select("*")
+        .eq("user_id", TEST_USER_ID)
+        .single();
+
+    const { data: finalCredits } = await supabase
+        .from("user_credits")
+        .select("*")
+        .eq("user_id", TEST_USER_ID)
+        .single();
+
+    results.after_write = {
+        subscription: finalSub,
+        credits: finalCredits,
+    };
 
     return NextResponse.json(results, { status: 200 });
 }
