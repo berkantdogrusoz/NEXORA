@@ -2,19 +2,22 @@ import { createClient } from "@supabase/supabase-js";
 
 // Server-side Supabase client (used in API routes)
 export function createSupabaseServer() {
-    // Next.js can sometimes aggressively inline NEXT_PUBLIC vars at build time. 
-    // To ensure we get the latest Vercel runtime env vars, we check them dynamically.
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
+    // IMPORTANT: Only use JWT-format keys (eyJhbGci...). 
+    // The new sb_secret_/sb_publishable_ format is NOT compatible with @supabase/supabase-js
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder";
 
-    // DO NOT use placeholder in production if we can avoid it. If it throws fetch failed, it's better to log the exact missing var.
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        console.error("CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set in process.env!");
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || url === "https://placeholder.supabase.co") {
+        console.error("CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!");
+    }
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || key === "placeholder") {
+        console.error("CRITICAL: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set!");
     }
 
     return createClient(url, key);
 }
 
-// Singleton instance for convenience
+// Singleton instance for convenience — do NOT use at module level in serverless
+// because NEXT_PUBLIC_ vars get inlined at build time. Always call createSupabaseServer() instead.
 export const supabase = createSupabaseServer();
 
