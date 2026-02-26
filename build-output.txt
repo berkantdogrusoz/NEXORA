@@ -18,16 +18,15 @@ CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+ ÔÜá Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/25) ...
+CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (6/25) 
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (0/22) ...
-   Generating static pages (5/22) 
-CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (10/22) 
-   Generating static pages (16/22) 
- Ô£ô Generating static pages (22/22)
+   Generating static pages (12/25) 
+   Generating static pages (18/25) 
+ Ô£ô Generating static pages (25/25)
    Finalizing page optimization ...
    Collecting build traces ...
 
@@ -50,10 +49,14 @@ Route (app)                              Size     First Load JS
 Ôö£ ãÆ /assistant                           3.14 kB        90.3 kB
 Ôö£ ãÆ /dashboard                           1.5 kB         95.5 kB
 Ôö£ ãÆ /generate                            3.24 kB        90.4 kB
+Ôö£ Ôùï /icon.svg                            0 B                0 B
+Ôö£ ãÆ /opengraph-image                     0 B                0 B
 Ôö£ ãÆ /pricing                             3.19 kB        97.2 kB
 Ôö£ ãÆ /privacy                             1.41 kB         125 kB
+Ôö£ Ôùï /robots.txt                          0 B                0 B
 Ôö£ ãÆ /sign-in/[[...sign-in]]              206 B           128 kB
 Ôö£ ãÆ /sign-up/[[...sign-up]]              206 B           128 kB
+Ôö£ Ôùï /sitemap.xml                         0 B                0 B
 Ôö£ ãÆ /studio                              3.36 kB        90.5 kB
 Ôö£ ãÆ /subscription                        2.22 kB        96.2 kB
 Ôöö ãÆ /terms                               1.41 kB         125 kB
@@ -63,7 +66,8 @@ Route (app)                              Size     First Load JS
   Ôöö other shared chunks (total)          1.93 kB
 
 
-ãÆ Middleware                             77.5 kB
+ãÆ Middleware                             77.7 kB
 
+Ôùï  (Static)   prerendered as static content
 ãÆ  (Dynamic)  server-rendered on demand
 
