@@ -1,0 +1,68 @@
+﻿  Ôû▓ Next.js 14.2.25
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+node.exe : eN [Error]: Missing cred
+entials. Please pass an `apiKey`, o
+r set the `OPENAI_API_KEY` environm
+ent variable.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.e
+xe" "C:\Program Files\nodejs/node_m
+o ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo          : NotS 
+   pecified: (eN [Error]: Mis...n  
+  ment variable.:String) [], Rem   
+ oteException
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+    at new nv (C:\Users\berka\OneDr
+ive\Masa├╝st├╝\NEXORA\.next\server\
+chunks\88.js:8:48191)
+    at 21797 (C:\Users\berka\OneDri
+ve\Masa├╝st├╝\NEXORA\.next\server\a
+pp\api\image\generate\route.js:1:96
+9)
+    at t (C:\Users\berka\OneDrive\M
+asa├╝st├╝\NEXORA\.next\server\webpa
+ck-runtime.js:1:128)
+    at t (C:\Users\berka\OneDrive\M
+asa├╝st├╝\NEXORA\.next\server\app\a
+pi\image\generate\route.js:1:5558)
+    at C:\Users\berka\OneDrive\Masa
+├╝st├╝\NEXORA\.next\server\app\api\
+image\generate\route.js:1:5599
+    at t.X (C:\Users\berka\OneDrive
+\Masa├╝st├╝\NEXORA\.next\server\web
+pack-runtime.js:1:1206)
+    at C:\Users\berka\OneDrive\Masa
+├╝st├╝\NEXORA\.next\server\app\api\
+image\generate\route.js:1:5571
+    at Object.<anonymous> (C:\Users
+\berka\OneDrive\Masa├╝st├╝\NEXORA\.
+next\server\app\api\image\generate\
+route.js:1:5627)
+    at Module._compile (node:intern
+al/modules/cjs/loader:1804:14)
+    at Object..js (node:internal/mo
+dules/cjs/loader:1936:10)
+
+> Build error occurred
+Error: Failed to collect page data 
+for /api/image/generate
+    at C:\Users\berka\OneDrive\Masa
+├╝st├╝\NEXORA\node_modules\next\dis
+t\build\utils.js:1269:15
+    at process.processTicksAndRejec
+tions (node:internal/process/task_q
+ueues:103:5) {
+  type: 'Error'
+}

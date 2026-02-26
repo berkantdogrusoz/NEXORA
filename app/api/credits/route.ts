@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabase";
 import { getAuthUserId } from "@/lib/auth";
 
 /**
@@ -7,6 +7,7 @@ import { getAuthUserId } from "@/lib/auth";
  */
 export async function GET() {
     try {
+        const supabase = createSupabaseServer();
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
 
@@ -70,6 +71,7 @@ export async function GET() {
  */
 export async function POST(req: Request) {
     try {
+        const supabase = createSupabaseServer();
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
 

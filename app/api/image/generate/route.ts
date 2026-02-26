@@ -5,7 +5,7 @@ import { createSupabaseServer } from "@/lib/supabase";
 
 export const maxDuration = 60;
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "placeholder" });
 
 export async function POST(req: Request) {
     let creditDeducted = false;
