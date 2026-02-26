@@ -22,36 +22,25 @@ CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
+   Generating static pages (0/30) ...
+   Generating static pages (7/30) 
 CRITICAL: NEXT_PUBLIC_SUPABASE_URL is not set!
-   Generating static pages (0/48) ...
-   Generating static pages (12/48) 
-   Generating static pages (24/48) 
-   Generating static pages (36/48) 
- Ô£ô Generating static pages (48/48)
+   Generating static pages (14/30) 
+   Generating static pages (22/30) 
+ Ô£ô Generating static pages (30/30)
    Finalizing page optimization ...
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
-Ôöî ãÆ /                                    48.5 kB         148 kB
-Ôö£ ãÆ /_not-found                          873 B          88.1 kB
-Ôö£ ãÆ /agents                              3.48 kB        90.8 kB
-Ôö£ ãÆ /analytics                           1.9 kB         89.2 kB
+Ôöî ãÆ /                                    53.4 kB         147 kB
+Ôö£ ãÆ /_not-found                          873 B            88 kB
+Ôö£ ãÆ /agents                              3.48 kB        90.6 kB
 Ôö£ ãÆ /api/agents                          0 B                0 B
 Ôö£ ãÆ /api/agents/[id]                     0 B                0 B
 Ôö£ ãÆ /api/agents/builder                  0 B                0 B
 Ôö£ ãÆ /api/agents/run                      0 B                0 B
 Ôö£ ãÆ /api/assistant                       0 B                0 B
-Ôö£ ãÆ /api/autopilot                       0 B                0 B
-Ôö£ ãÆ /api/autopilot/execute               0 B                0 B
 Ôö£ ãÆ /api/avatar/generate                 0 B                0 B
-Ôö£ ãÆ /api/calendar                        0 B                0 B
-Ôö£ ãÆ /api/calendar/clear                  0 B                0 B
-Ôö£ ãÆ /api/calendar/create                 0 B                0 B
-Ôö£ ãÆ /api/calendar/regenerate             0 B                0 B
-Ôö£ ãÆ /api/calendar/update                 0 B                0 B
-Ôö£ ãÆ /api/campaigns                       0 B                0 B
-Ôö£ ãÆ /api/campaigns/[id]                  0 B                0 B
-Ôö£ ãÆ /api/campaigns/generate              0 B                0 B
 Ôö£ ãÆ /api/connections                     0 B                0 B
 Ôö£ ãÆ /api/connections/social              0 B                0 B
 Ôö£ ãÆ /api/connections/social/[id]         0 B                0 B
@@ -64,34 +53,25 @@ Route (app)                              Size     First Load JS
 Ôö£ ãÆ /api/debug/storage                   0 B                0 B
 Ôö£ ãÆ /api/download                        0 B                0 B
 Ôö£ ãÆ /api/generate                        0 B                0 B
-Ôö£ ãÆ /api/generate-image                  0 B                0 B
 Ôö£ ãÆ /api/image/generate                  0 B                0 B
 Ôö£ ãÆ /api/lemon/checkout                  0 B                0 B
-Ôö£ ãÆ /api/store                           0 B                0 B
-Ôö£ ãÆ /api/store/config                    0 B                0 B
-Ôö£ ãÆ /api/store/products                  0 B                0 B
-Ôö£ ãÆ /api/store/products/[id]             0 B                0 B
 Ôö£ ãÆ /api/subscription                    0 B                0 B
 Ôö£ ãÆ /api/video/generate                  0 B                0 B
 Ôö£ ãÆ /api/webhooks/lemon                  0 B                0 B
-Ôö£ ãÆ /assistant                           3.14 kB        90.4 kB
-Ôö£ ãÆ /autopilot                           4.99 kB        99.1 kB
-Ôö£ ãÆ /calendar                            4 kB           96.6 kB
-Ôö£ ãÆ /campaigns                           5.29 kB        92.6 kB
-Ôö£ ãÆ /dashboard                           2.21 kB        96.3 kB
-Ôö£ ãÆ /generate                            3.2 kB         90.5 kB
-Ôö£ ãÆ /pricing                             3.21 kB        97.3 kB
+Ôö£ ãÆ /assistant                           3.14 kB        90.3 kB
+Ôö£ ãÆ /dashboard                           2.21 kB        96.2 kB
+Ôö£ ãÆ /generate                            3.2 kB         90.4 kB
+Ôö£ ãÆ /pricing                             3.19 kB        97.2 kB
 Ôö£ ãÆ /privacy                             1.41 kB         125 kB
 Ôö£ ãÆ /sign-in/[[...sign-in]]              206 B           128 kB
 Ôö£ ãÆ /sign-up/[[...sign-up]]              206 B           128 kB
-Ôö£ ãÆ /store                               2.39 kB        89.7 kB
-Ôö£ ãÆ /studio                              3.33 kB        90.6 kB
-Ôö£ ãÆ /subscription                        2.22 kB        96.3 kB
+Ôö£ ãÆ /studio                              3.33 kB        90.5 kB
+Ôö£ ãÆ /subscription                        2.22 kB        96.2 kB
 Ôöö ãÆ /terms                               1.41 kB         125 kB
-+ First Load JS shared by all            87.3 kB
-  Ôö£ chunks/117-686bbb63d1c166ef.js       31.6 kB
-  Ôö£ chunks/fd9d1056-c070b96a0ee9b52d.js  53.6 kB
-  Ôöö other shared chunks (total)          2.04 kB
++ First Load JS shared by all            87.2 kB
+  Ôö£ chunks/117-bca6a1c2051b9c7e.js       31.6 kB
+  Ôö£ chunks/fd9d1056-7e2aed65a973ff78.js  53.6 kB
+  Ôöö other shared chunks (total)          1.93 kB
 
 
 ãÆ Middleware                             77.5 kB
