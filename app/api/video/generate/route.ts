@@ -107,14 +107,14 @@ export async function POST(req: Request) {
             };
         } else if (modelId === "runway-gen4") {
             // PRO MODEL: Runway Gen-4.5 Equivalent
-            modelString = "luma/ray2";
+            modelString = "luma/ray-2-720p";
             input = {
                 prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity, perfect adherence) ${englishPrompt}`,
                 aspect_ratio: aspectRatio,
             };
         } else if (modelId === "luma") {
             // PRO MODEL: Luma Ray (Cinematic 5s)
-            modelString = "luma/ray2";
+            modelString = "luma/ray-2-720p";
             input = {
                 prompt: englishPrompt,
                 aspect_ratio: aspectRatio,
