@@ -178,14 +178,14 @@ export default function AgentsPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-slate-700">Select Agents</label>
-                <button onClick={selectAll} className="text-xs text-violet-500 hover:text-violet-700">{selectedIds.size === agents.length ? "Deselect all" : "Select all"}</button>
+                <button onClick={selectAll} className="text-xs text-cyan-500 hover:text-cyan-700">{selectedIds.size === agents.length ? "Deselect all" : "Select all"}</button>
               </div>
               {agents.length === 0 ? (
                 <p className="text-xs text-slate-400">No agents found. Create one first.</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {agents.map(a => (
-                    <button key={a.id} onClick={() => toggleAgent(a.id)} className={`p-3 rounded-xl text-left text-sm border transition-all ${selectedIds.has(a.id) ? "border-violet-300 bg-violet-50 text-violet-700" : "border-black/[0.06] bg-white text-slate-600 hover:border-black/[0.12]"}`}>
+                    <button key={a.id} onClick={() => toggleAgent(a.id)} className={`p-3 rounded-xl text-left text-sm border transition-all ${selectedIds.has(a.id) ? "border-cyan-300 bg-violet-50 text-cyan-700" : "border-black/[0.06] bg-white text-slate-600 hover:border-black/[0.12]"}`}>
                       <span className="font-medium">{a.name}</span>
                       <span className="block text-[10px] text-slate-400 mt-0.5">{a.description || "No description"}</span>
                     </button>

@@ -147,7 +147,7 @@ export default function AssistantPage() {
                                 key={m.id}
                                 onClick={() => setModel(m.id)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${model === m.id
-                                    ? "bg-violet-600 text-white shadow-lg shadow-violet-500/20"
+                                    ? "bg-cyan-600 text-white shadow-lg shadow-cyan-500/20"
                                     : "text-slate-400 hover:text-white hover:bg-white/5"
                                     }`}
                             >
@@ -175,7 +175,7 @@ export default function AssistantPage() {
                         </div>
                     ) : messages.length === 0 ? (
                         <div className="text-center py-20 animate-fade-in-up">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-3xl shadow-2xl shadow-violet-500/20 mx-auto mb-6">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600 to-indigo-600 flex items-center justify-center text-3xl shadow-2xl shadow-cyan-500/20 mx-auto mb-6">
                                 🤖
                             </div>
                             <h3 className="text-xl font-semibold text-white mb-3">How can I help you grow today?</h3>
@@ -185,7 +185,7 @@ export default function AssistantPage() {
                                     <button
                                         key={i}
                                         onClick={() => sendMessage(action.prompt)}
-                                        className="glass-card p-4 text-xs text-left text-slate-300 hover:text-white hover:border-violet-500/50 hover:bg-violet-500/10 transition-all group"
+                                        className="glass-card p-4 text-xs text-left text-slate-300 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all group"
                                     >
                                         <span className="block mb-1 text-lg group-hover:scale-110 transition-transform origin-left">{action.label.split(" ")[0]}</span>
                                         {action.label.substring(2)}
@@ -198,12 +198,12 @@ export default function AssistantPage() {
                             {messages.map(msg => (
                                 <div key={msg.id} className={`flex gap-4 ${msg.role === "user" ? "justify-end" : ""} animate-fade-in-up`}>
                                     {msg.role === "assistant" && (
-                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-violet-500/20">
+                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-lg shadow-cyan-500/20">
                                             N
                                         </div>
                                     )}
                                     <div className={`max-w-[85%] md:max-w-[70%] ${msg.role === "user"
-                                        ? "bg-violet-600 text-white rounded-2xl rounded-br-sm px-5 py-3 shadow-lg shadow-violet-500/10"
+                                        ? "bg-cyan-600 text-white rounded-2xl rounded-br-sm px-5 py-3 shadow-lg shadow-cyan-500/10"
                                         : "glass-card px-5 py-4 border-white/10 bg-white/5"
                                         }`}>
                                         <div className={`text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "assistant" ? "text-slate-200" : ""}`}>
@@ -219,14 +219,14 @@ export default function AssistantPage() {
                             ))}
                             {loading && (
                                 <div className="flex gap-4 animate-fade-in-up">
-                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                         N
                                     </div>
                                     <div className="glass-card px-4 py-3 bg-black/40">
                                         <div className="flex gap-1.5">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
                                         </div>
                                     </div>
                                 </div>

@@ -89,7 +89,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/dashboard"
     >
       <html lang="en" className={inter.variable} suppressHydrationWarning>
-        <body className="font-sans bg-black text-slate-100 antialiased min-h-screen selection:bg-violet-500/30">
+        <body className="font-sans bg-black text-slate-100 antialiased min-h-screen selection:bg-cyan-500/30">
           <JsonLd />
           {children}
         </body>

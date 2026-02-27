@@ -120,7 +120,7 @@ export default function DashboardPage() {
                                                 ? "bg-red-500"
                                                 : creditsPercent >= 70
                                                     ? "bg-amber-500"
-                                                    : "bg-violet-500"
+                                                    : "bg-cyan-500"
                                                 }`}
                                             style={{ width: `${creditsPercent}%` }}
                                         />

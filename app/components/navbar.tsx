@@ -31,7 +31,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-10 h-10 flex items-center justify-center">
             {/* Glow Effect */}
-            <div className="absolute inset-0 bg-violet-600 rounded-xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-cyan-600 rounded-xl blur-lg opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Main Logo Box */}
             <div className="relative w-full h-full bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl flex items-center justify-center overflow-hidden shadow-xl group-hover:scale-105 transition-transform duration-300">
@@ -39,7 +39,7 @@ export default function Navbar() {
               <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
               {/* N Character */}
-              <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-violet-400 to-indigo-400">
+              <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-indigo-400">
                 N
               </span>
             </div>
@@ -81,7 +81,7 @@ export default function Navbar() {
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-violet-500 transition-colors"
+                    avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors"
                   }
                 }}
               />
@@ -101,7 +101,7 @@ export default function Navbar() {
                 className="group relative px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-100 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] overflow-hidden"
               >
                 <span className="relative z-10">Get Started</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-200 to-pink-200 opacity-0 group-hover:opacity-50 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-200 to-pink-200 opacity-0 group-hover:opacity-50 transition-opacity" />
               </Link>
             </div>
           )}

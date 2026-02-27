@@ -22,7 +22,7 @@ export default function Sidebar() {
             <div className="p-6 border-b border-white/5">
                 <Link href="/studio" className="flex items-center gap-3 group">
                     <div className="relative w-8 h-8 flex items-center justify-center">
-                        <div className="absolute inset-0 bg-violet-600 rounded-lg blur-md opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-cyan-600 rounded-lg blur-md opacity-50 group-hover:opacity-100 transition-opacity" />
                         <div className="relative w-full h-full bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
                             <span className="text-lg font-bold text-white">N</span>
                         </div>
@@ -40,7 +40,7 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                                    ? "bg-violet-600/10 text-violet-400 border border-violet-600/20"
+                                    ? "bg-cyan-600/10 text-cyan-400 border border-cyan-600/20"
                                     : "text-slate-400 hover:text-white hover:bg-white/5"
                                 }`}
                         >
@@ -58,7 +58,7 @@ export default function Sidebar() {
                         afterSignOutUrl="/"
                         appearance={{
                             elements: {
-                                avatarBox: "w-8 h-8 ring-2 ring-white/10 hover:ring-violet-500 transition-all"
+                                avatarBox: "w-8 h-8 ring-2 ring-white/10 hover:ring-cyan-500 transition-all"
                             }
                         }}
                     />

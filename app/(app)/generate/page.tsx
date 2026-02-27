@@ -175,7 +175,7 @@ export default function GeneratePage() {
                     </a>
                     <button
                       onClick={sendToCalendar}
-                      className="px-3 py-1.5 rounded-lg bg-violet-600/80 backdrop-blur text-white text-xs font-medium border border-violet-500/30 hover:bg-violet-600 transition"
+                      className="px-3 py-1.5 rounded-lg bg-cyan-600/80 backdrop-blur text-white text-xs font-medium border border-cyan-500/30 hover:bg-cyan-600 transition"
                     >
                       📅 Calendar
                     </button>
@@ -183,7 +183,7 @@ export default function GeneratePage() {
                 </div>
               ) : generating ? (
                 <div className="w-full aspect-square max-w-lg mx-auto rounded-2xl border border-white/[0.06] bg-[#0a0a0a] flex flex-col items-center justify-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-violet-600 animate-pulse flex items-center justify-center text-3xl">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-600 to-cyan-600 animate-pulse flex items-center justify-center text-3xl">
                     🖼️
                   </div>
                   <p className="text-sm font-medium text-white">
@@ -233,7 +233,7 @@ export default function GeneratePage() {
                   <select
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
+                    className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer"
                   >
                     {IMAGE_MODELS.map((m) => (
                       <option key={m.id} value={m.id} className="bg-black text-white">
@@ -259,7 +259,7 @@ export default function GeneratePage() {
                       key={s.value}
                       onClick={() => setStyle(s.value)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${style === s.value
-                        ? "bg-violet-600/20 border-violet-500/30 text-violet-300"
+                        ? "bg-cyan-600/20 border-cyan-500/30 text-cyan-300"
                         : "bg-white/[0.04] border-white/[0.06] text-slate-500 hover:text-slate-300"
                         }`}
                     >
@@ -290,7 +290,7 @@ export default function GeneratePage() {
                   <button
                     onClick={generateImage}
                     disabled={generating || !prompt}
-                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-violet-600 hover:from-pink-500 hover:to-violet-500 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 shadow-lg shadow-pink-500/20"
+                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-cyan-600 hover:from-pink-500 hover:to-cyan-500 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 shadow-lg shadow-pink-500/20"
                   >
                     {generating ? (
                       <>

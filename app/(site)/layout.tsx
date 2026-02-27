@@ -26,7 +26,7 @@ export default function SiteLayout({
     const handleMouseLeave = () => setActiveDropdown(null);
 
     return (
-        <div className="min-h-screen bg-black text-white font-sans selection:bg-violet-500/30">
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-cyan-500/30">
             {/* Navbar */}
             <nav
                 className={`w-full z-[100] transition-all duration-300 py-4 px-6 fixed top-0 left-0 right-0 ${scrolled
@@ -62,20 +62,20 @@ export default function SiteLayout({
                                         <div>
                                             <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Media</p>
                                             <Link href="/generate" className="flex items-start gap-4 group p-2 -ml-2 rounded-xl hover:bg-white/5 transition-colors">
-                                                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center shrink-0 group-hover:bg-violet-600/20 group-hover:text-violet-400 transition-colors">
+                                                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center shrink-0 group-hover:bg-cyan-600/20 group-hover:text-cyan-400 transition-colors">
                                                     <ImageIcon className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-violet-300 transition-colors">AI Image Generator</h4>
+                                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">AI Image Generator</h4>
                                                     <p className="text-xs text-white/50 leading-relaxed">Create stunning images from text prompts or reference photos.</p>
                                                 </div>
                                             </Link>
                                             <Link href="/studio" className="flex items-start gap-4 group mt-4 p-2 -ml-2 rounded-xl hover:bg-white/5 transition-colors">
-                                                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center shrink-0 group-hover:bg-fuchsia-600/20 group-hover:text-fuchsia-400 transition-colors">
+                                                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center shrink-0 group-hover:bg-blue-600/20 group-hover:text-blue-400 transition-colors">
                                                     <Video className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-fuchsia-300 transition-colors">AI Video Studio</h4>
+                                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">AI Video Studio</h4>
                                                     <p className="text-xs text-white/50 leading-relaxed">Bring visuals to motion with cinematic video generation.</p>
                                                 </div>
                                             </Link>
@@ -83,14 +83,14 @@ export default function SiteLayout({
                                         <div>
                                             <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Featured Models</p>
                                             <div className="space-y-3">
-                                                <div className="p-3 rounded-xl bg-black border border-white/5 group hover:border-violet-500/30 transition-colors cursor-pointer">
+                                                <div className="p-3 rounded-xl bg-black border border-white/5 group hover:border-cyan-500/30 transition-colors cursor-pointer">
                                                     <div className="flex items-center justify-between mb-1">
                                                         <span className="text-sm font-bold text-white">Seedance 2.0</span>
-                                                        <span className="text-[10px] uppercase font-bold text-fuchsia-400 bg-fuchsia-400/10 px-2 py-0.5 rounded-sm">New</span>
+                                                        <span className="text-[10px] uppercase font-bold text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded-sm">New</span>
                                                     </div>
                                                     <p className="text-xs text-white/40">Next-gen cinematic video motion.</p>
                                                 </div>
-                                                <div className="p-3 rounded-xl bg-black border border-white/5 group hover:border-violet-500/30 transition-colors cursor-pointer">
+                                                <div className="p-3 rounded-xl bg-black border border-white/5 group hover:border-cyan-500/30 transition-colors cursor-pointer">
                                                     <div className="flex items-center justify-between mb-1">
                                                         <span className="text-sm font-bold text-white">DALL-E 3</span>
                                                     </div>
@@ -153,7 +153,7 @@ export default function SiteLayout({
                                     afterSignOutUrl="/"
                                     appearance={{
                                         elements: {
-                                            avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-violet-500 transition-colors",
+                                            avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors",
                                         },
                                     }}
                                 />

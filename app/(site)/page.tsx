@@ -17,7 +17,7 @@ export default function Home() {
   const bannerOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <div className="relative min-h-screen bg-[#000000] text-white selection:bg-fuchsia-500/30 overflow-hidden font-sans">
+    <div className="relative min-h-screen bg-[#000000] text-white selection:bg-blue-500/30 overflow-hidden font-sans">
 
       {/* ── Background Noise Texture ── */}
       <div
@@ -96,7 +96,7 @@ export default function Home() {
             >
               <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shrink-0">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-fuchsia-500/20 flex items-center justify-center text-fuchsia-400">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
                     <Video className="w-5 h-5" />
                   </div>
                   <div>
@@ -110,9 +110,9 @@ export default function Home() {
               </div>
 
               <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shrink-0 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex items-center gap-3 mb-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400">
+                  <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
                     <ImageIcon className="w-5 h-5" />
                   </div>
                   <div>
@@ -144,7 +144,7 @@ export default function Home() {
                 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9] mb-6"
               >
                 Bring Visuals<br />
-                <span className="text-fuchsia-400">Into Motion</span>
+                <span className="text-blue-400">Into Motion</span>
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 30 }}

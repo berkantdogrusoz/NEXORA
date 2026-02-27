@@ -140,10 +140,10 @@ export default function PricingPage() {
     <main className="relative min-h-screen text-slate-100 bg-black pb-20">
 
       {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative pt-36 px-6 max-w-7xl mx-auto text-center">
-        <p className="text-xs font-semibold text-violet-400 uppercase tracking-widest mb-4">
+        <p className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-4">
           Pricing
         </p>
         <h1 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 mb-5">
@@ -159,26 +159,26 @@ export default function PricingPage() {
             <div
               key={i}
               className={`relative rounded-2xl p-8 flex flex-col text-left transition-all duration-300 ${plan.highlight
-                ? "bg-white/[0.04] border-2 border-violet-500/50 shadow-2xl shadow-violet-500/10 scale-[1.02]"
+                ? "bg-white/[0.04] border-2 border-cyan-500/50 shadow-2xl shadow-cyan-500/10 scale-[1.02]"
                 : "bg-white/[0.02] border border-white/[0.08] hover:border-white/[0.15]"
                 }`}
             >
               {/* Most Popular Badge */}
               {plan.badge && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                  <span className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[11px] uppercase font-bold px-4 py-1.5 rounded-full tracking-wider shadow-lg shadow-violet-500/30 whitespace-nowrap">
+                  <span className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-[11px] uppercase font-bold px-4 py-1.5 rounded-full tracking-wider shadow-lg shadow-cyan-500/30 whitespace-nowrap">
                     ⭐ {plan.badge}
                   </span>
                 </div>
               )}
 
               {plan.highlight && (
-                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-t-2xl" />
+                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-cyan-500 via-blue-500 to-pink-500 rounded-t-2xl" />
               )}
 
               {/* Plan header */}
               <div className="mb-6 pt-2">
-                <h3 className={`text-lg font-semibold ${plan.highlight ? "text-violet-300" : "text-slate-300"}`}>
+                <h3 className={`text-lg font-semibold ${plan.highlight ? "text-cyan-300" : "text-slate-300"}`}>
                   {plan.name}
                 </h3>
                 <div className="mt-3 flex items-baseline gap-1">
@@ -229,7 +229,7 @@ export default function PricingPage() {
                       onClick={() => handleCheckout(plan.checkoutPlan!)}
                       disabled={loading === plan.checkoutPlan}
                       className={`mt-auto w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 ${plan.ctaStyle === "gradient"
-                        ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:opacity-90 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02]"
+                        ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:opacity-90 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.02]"
                         : "border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-white/20"
                         }`}
                     >

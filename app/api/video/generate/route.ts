@@ -21,14 +21,10 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, model: modelId = "minimax", aspectRatio = "16:9", duration = "4s", quality = "standard" } = body;
+        const { prompt, model: modelId = "wan-2.1", aspectRatio = "16:9", duration = "5", quality = "hd", imageUrl } = body;
 
-        if (!prompt) {
-            return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
-        }
-
-        if (!process.env.REPLICATE_API_TOKEN) {
-            return NextResponse.json({ error: "Replicate API Token missing" }, { status: 500 });
+        if (!prompt && !imageUrl) {
+            return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });
         }
 
         // Check user plan and credits
@@ -44,10 +40,20 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        const cost = modelId === "runway-gwm" ? 45 : modelId === "runway-gen4" ? 35 : modelId === "seedance-2" ? 50 : modelId === "luma" ? 25 : modelId === "minimax" ? 12.5 : modelId === "zeroscope" ? 8 : 5;
+        // Cost mapping
+        const costMap: Record<string, number> = {
+            "wan-2.1": 8,
+            "kling-3": 15,
+            "luma": 25,
+            "runway-gen4": 35,
+            "runway-gwm": 45,
+            "seedance-2": 50,
+        };
+        const cost = costMap[modelId] || 8;
 
         // Block Pro models for Free users
-        if ((modelId === "luma" || modelId === "seedance-2" || modelId.startsWith("runway")) && planName === "Free") {
+        const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm"];
+        if (proModels.includes(modelId) && planName === "Free") {
             return NextResponse.json({ error: "You need a Premium plan to use Pro models." }, { status: 403 });
         }
 
@@ -77,8 +83,8 @@ export async function POST(req: Request) {
         creditDeducted = true;
         deductedCost = cost;
 
-        // 1. Translate prompt to English for better model adherence
-        let englishPrompt = prompt;
+        // Translate prompt to English for better model adherence
+        let englishPrompt = prompt || "Animate this image with smooth cinematic motion";
         try {
             const { default: OpenAI } = await import("openai");
             const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -86,64 +92,35 @@ export async function POST(req: Request) {
                 model: "gpt-4o-mini",
                 messages: [
                     { role: "system", content: "You are a prompt translator. Translate the following video generation prompt to English. Only return the english translation, nothing else. Enhance it slightly for cinematic quality if it's very brief." },
-                    { role: "user", content: prompt }
+                    { role: "user", content: prompt || "Animate this image" }
                 ]
             });
-            englishPrompt = translation.choices[0].message.content || prompt;
+            englishPrompt = translation.choices[0].message.content || englishPrompt;
         } catch (e) {
             console.error("Translation skipped, using original prompt:", e);
         }
 
-        // 2. Model Mapping
-        let modelString = "";
-        let input: any = {};
-
-        if (modelId === "runway-gwm") {
-            // PRO MODEL: Runway GWM-1 Equivalent
-            modelString = "minimax/video-01";
-            input = {
-                prompt: `(Extremely high fidelity, real-world physics, complex world simulation interaction) ${englishPrompt} (Length: ${duration} seconds, Ratio: ${aspectRatio})`,
-                prompt_optimizer: true
-            };
-        } else if (modelId === "runway-gen4") {
-            // PRO MODEL: Runway Gen-4.5 Equivalent
-            modelString = "luma/ray-2-720p";
-            input = {
-                prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity, perfect adherence) ${englishPrompt}`,
-                aspect_ratio: aspectRatio,
-            };
-        } else if (modelId === "luma") {
-            // PRO MODEL: Luma Ray (Cinematic 5s)
-            modelString = "luma/ray-2-720p";
-            input = {
-                prompt: englishPrompt,
-                aspect_ratio: aspectRatio,
-            };
-        } else if (modelId === "zeroscope") {
-            // STANDARD: Zeroscope V2
-            modelString = "anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351";
-            input = { prompt: englishPrompt };
-        } else if (modelId === "damo") {
-            // STANDARD: DAMO (Fast/Cheap)
-            modelString = "cjwbw/damo-text-to-video:1e205ea73084bd17a0a3b43396e49ba0d6bc2e754e9283b2df49fad2dcf95755";
-            input = { prompt: englishPrompt };
-        } else {
-            // STANDARD MODEL: Minimax Video-01
-            modelString = "minimax/video-01";
-            input = {
-                prompt: englishPrompt,
-                prompt_optimizer: true
-            };
-        }
-
         let finalUrl: any = "";
 
-        if (modelId === "seedance-2") {
-            console.log(`Generating video using fal.ai Seedance with prompt: ${englishPrompt}`);
-            const result: any = await fal.subscribe("fal-ai/seedance", {
-                input: {
-                    prompt: englishPrompt,
-                },
+        // ═══════════════════════════════════════════
+        //   FAL.AI MODELS (Kling, Seedance, Wan-2.1)
+        // ═══════════════════════════════════════════
+
+        if (modelId === "kling-3") {
+            console.log(`Generating video using fal.ai Kling 3.0 (image-to-video: ${!!imageUrl})`);
+            const falModel = imageUrl
+                ? "fal-ai/kling-video/v2/master/image-to-video"
+                : "fal-ai/kling-video/v2/master/text-to-video";
+
+            const falInput: any = {
+                prompt: englishPrompt,
+                aspect_ratio: aspectRatio,
+                duration: duration === "10" ? "10" : "5",
+            };
+            if (imageUrl) falInput.image_url = imageUrl;
+
+            const result: any = await fal.subscribe(falModel, {
+                input: falInput,
                 logs: true,
                 onQueueUpdate: (update) => {
                     if (update.status === "IN_PROGRESS") {
@@ -152,20 +129,19 @@ export async function POST(req: Request) {
                 },
             });
 
-            if (result && result.video && result.video.url && typeof result.video.url === "string") {
+            if (result?.video?.url) {
                 finalUrl = result.video.url;
             } else {
-                throw new Error("Invalid output from fal.ai");
+                throw new Error("Invalid output from fal.ai Kling");
             }
-        } else if (modelId === "wan-2.1") {
-            console.log(`Generating video using fal.ai Wan-2.1 Turbo with prompt: ${englishPrompt}`);
-            const result: any = await fal.subscribe("fal-ai/wan/v2.1/turbo/text-to-video", {
-                input: {
-                    prompt: englishPrompt,
-                    num_frames: duration === "10s" ? 81 : 41,
-                    resolution: quality === "hd" ? "720p" : "480p",
-                    aspect_ratio: aspectRatio,
-                },
+
+        } else if (modelId === "seedance-2") {
+            console.log(`Generating video using fal.ai Seedance (image-to-video: ${!!imageUrl})`);
+            const falInput: any = { prompt: englishPrompt };
+            if (imageUrl) falInput.image_url = imageUrl;
+
+            const result: any = await fal.subscribe("fal-ai/seedance", {
+                input: falInput,
                 logs: true,
                 onQueueUpdate: (update) => {
                     if (update.status === "IN_PROGRESS") {
@@ -174,26 +150,85 @@ export async function POST(req: Request) {
                 },
             });
 
-            if (result && result.video && result.video.url && typeof result.video.url === "string") {
+            if (result?.video?.url) {
+                finalUrl = result.video.url;
+            } else {
+                throw new Error("Invalid output from fal.ai Seedance");
+            }
+
+        } else if (modelId === "wan-2.1") {
+            console.log(`Generating video using fal.ai Wan-2.1 (image-to-video: ${!!imageUrl})`);
+            const falModel = imageUrl
+                ? "fal-ai/wan/v2.1/turbo/image-to-video"
+                : "fal-ai/wan/v2.1/turbo/text-to-video";
+
+            const falInput: any = {
+                prompt: englishPrompt,
+                num_frames: duration === "10" ? 81 : 41,
+                resolution: quality === "hd" ? "720p" : "480p",
+                aspect_ratio: aspectRatio,
+            };
+            if (imageUrl) falInput.image_url = imageUrl;
+
+            const result: any = await fal.subscribe(falModel, {
+                input: falInput,
+                logs: true,
+                onQueueUpdate: (update) => {
+                    if (update.status === "IN_PROGRESS") {
+                        update.logs.map((log: any) => log.message).forEach(console.log);
+                    }
+                },
+            });
+
+            if (result?.video?.url) {
                 finalUrl = result.video.url;
             } else {
                 throw new Error("Invalid output from fal.ai Wan-2.1");
             }
-        } else {
-            console.log(`Generating video using ${modelString} with prompt: ${englishPrompt}`);
-            const output = await replicate.run(modelString as any, { input });
 
-            // IMPORTANT FIX: Replicate sometimes returns an array of streams, sometimes a direct stream, sometimes strings.
+            // ═══════════════════════════════════════════
+            //   REPLICATE MODELS (Luma, Runway)
+            // ═══════════════════════════════════════════
+
+        } else if (modelId === "luma") {
+            const input: any = {
+                prompt: englishPrompt,
+                aspect_ratio: aspectRatio,
+            };
+            if (imageUrl) input.start_image_url = imageUrl;
+
+            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!imageUrl})`);
+            const output = await replicate.run("luma/ray-2-720p" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
 
-            // If Replicate SDK gives us a FileOutput stream, extract the URL
-            if (typeof finalUrl === "object" && finalUrl !== null) {
-                if (typeof finalUrl.url === "function") {
-                    // Ensure we convert the URL object to a string!
-                    finalUrl = finalUrl.url().toString();
-                } else if (typeof finalUrl.url === "string") {
-                    finalUrl = finalUrl.url;
+        } else if (modelId === "runway-gen4") {
+            const input: any = {
+                prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity) ${englishPrompt}`,
+                aspect_ratio: aspectRatio,
+            };
+            if (imageUrl) input.start_image_url = imageUrl;
+
+            console.log(`Generating video using Replicate (Runway Gen-4.5 equivalent)`);
+            const output = await replicate.run("luma/ray-2-720p" as any, { input });
+            finalUrl = Array.isArray(output) ? output[0] : output;
+
+        } else if (modelId === "runway-gwm") {
+            console.log(`Generating video using Replicate (GWM-1 equivalent)`);
+            const output = await replicate.run("minimax/video-01" as any, {
+                input: {
+                    prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${englishPrompt} (Length: ${duration} seconds, Ratio: ${aspectRatio})`,
+                    prompt_optimizer: true
                 }
+            });
+            finalUrl = Array.isArray(output) ? output[0] : output;
+        }
+
+        // Handle Replicate FileOutput objects
+        if (typeof finalUrl === "object" && finalUrl !== null) {
+            if (typeof finalUrl.url === "function") {
+                finalUrl = finalUrl.url().toString();
+            } else if (typeof finalUrl.url === "string") {
+                finalUrl = finalUrl.url;
             }
         }
 
@@ -210,8 +245,6 @@ export async function POST(req: Request) {
         if (creditDeducted && userId) {
             try {
                 const supabase = createSupabaseServer();
-
-                // Need to fetch latest credits again just to be perfectly safe before refunding
                 const { data: currentCreditData } = await supabase
                     .from("user_credits")
                     .select("credits")

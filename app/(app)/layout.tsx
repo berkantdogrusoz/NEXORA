@@ -9,7 +9,7 @@ import AnimatedShaderBackground from "@/app/components/ui/animated-shader-backgr
 const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: "📊", color: "text-sky-400" },
     { href: "/studio", label: "Video Studio", icon: "🎬", color: "text-pink-400" },
-    { href: "/generate", label: "Image Gen", icon: "🖼️", color: "text-violet-400" },
+    { href: "/generate", label: "Image Gen", icon: "🖼️", color: "text-cyan-400" },
     { href: "/assistant", label: "Assistant", icon: "🤖", color: "text-amber-400" },
 ];
 
@@ -51,9 +51,9 @@ function AppLayout({
                 <div className="p-5 border-b border-white/[0.06]">
                     <Link href="/dashboard" className="flex items-center gap-3 group">
                         <div className="relative w-9 h-9 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl blur-md opacity-40 group-hover:opacity-80 transition-opacity" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl blur-md opacity-40 group-hover:opacity-80 transition-opacity" />
                             <div className="relative w-full h-full bg-black border border-white/10 rounded-xl flex items-center justify-center">
-                                <span className="text-lg font-black bg-clip-text text-transparent bg-gradient-to-br from-violet-400 to-fuchsia-400">
+                                <span className="text-lg font-black bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-blue-400">
                                     N
                                 </span>
                             </div>
@@ -85,7 +85,7 @@ function AppLayout({
                                 <span className="text-base">{item.icon}</span>
                                 <span>{item.label}</span>
                                 {isActive && (
-                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500" />
+                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-500" />
                                 )}
                             </Link>
                         );
@@ -110,7 +110,7 @@ function AppLayout({
                                 <span className="text-base">{item.icon}</span>
                                 <span>{item.label}</span>
                                 {isActive && (
-                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500" />
+                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-500" />
                                 )}
                             </Link>
                         );
@@ -133,7 +133,7 @@ function AppLayout({
                     {planName === "Free" ? (
                         <Link
                             href="/pricing"
-                            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
+                            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
                         >
                             ⚡ Upgrade Plan
                         </Link>
@@ -155,7 +155,7 @@ function AppLayout({
                             appearance={{
                                 elements: {
                                     avatarBox:
-                                        "w-8 h-8 ring-2 ring-white/10 hover:ring-violet-500 transition-all",
+                                        "w-8 h-8 ring-2 ring-white/10 hover:ring-cyan-500 transition-all",
                                 },
                             }}
                         />

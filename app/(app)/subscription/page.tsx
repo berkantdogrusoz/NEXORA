@@ -42,7 +42,7 @@ export default function SubscriptionPage() {
 
             {loading && (
                 <div className="flex items-center justify-center py-20">
-                    <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
                 </div>
             )}
 
@@ -57,7 +57,7 @@ export default function SubscriptionPage() {
                     {/* Current Plan Card */}
                     <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 relative overflow-hidden">
                         {isPaid && (
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-600/20 to-transparent rounded-bl-full" />
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-600/20 to-transparent rounded-bl-full" />
                         )}
                         <div className="flex items-start justify-between relative z-10">
                             <div>
@@ -179,7 +179,7 @@ export default function SubscriptionPage() {
                         {!isPaid && (
                             <Link
                                 href="/pricing"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
+                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
                             >
                                 ⚡ Upgrade to Pro
                             </Link>
@@ -187,7 +187,7 @@ export default function SubscriptionPage() {
                         {sub.plan_name === "Growth" && isPaid && (
                             <Link
                                 href="/pricing"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
+                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
                             >
                                 🚀 Upgrade to Pro — 1000 Credits & All Models
                             </Link>
@@ -239,8 +239,8 @@ export default function SubscriptionPage() {
 function Feature({ text }: { text: string }) {
     return (
         <div className="flex items-center gap-3">
-            <div className="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-3 h-3 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
             </div>

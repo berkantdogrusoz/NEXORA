@@ -28,7 +28,7 @@ export default function Image() {
                         width: 600,
                         height: 600,
                         borderRadius: "50%",
-                        background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
+                        background: "radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 70%)",
                         top: -100,
                         left: 200,
                     }}
@@ -39,7 +39,7 @@ export default function Image() {
                         width: 400,
                         height: 400,
                         borderRadius: "50%",
-                        background: "radial-gradient(circle, rgba(217,70,239,0.25) 0%, transparent 70%)",
+                        background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%)",
                         bottom: -50,
                         right: 150,
                     }}
@@ -59,7 +59,7 @@ export default function Image() {
                             width: 72,
                             height: 72,
                             borderRadius: 18,
-                            background: "linear-gradient(135deg, #7c3aed, #d946ef)",
+                            background: "linear-gradient(135deg, #06b6d4, #3b82f6)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
