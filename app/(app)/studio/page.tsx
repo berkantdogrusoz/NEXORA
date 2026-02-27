@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 
 const ASPECT_RATIOS = [
@@ -42,6 +42,22 @@ export default function StudioPage() {
     >([]);
 
     const selectedModelConfig = VIDEO_MODELS.find(m => m.id === model) || VIDEO_MODELS[0];
+
+    // Load history from database on mount
+    useEffect(() => {
+        fetch("/api/generations?type=video")
+            .then(r => r.json())
+            .then(data => {
+                if (data.generations?.length) {
+                    setHistory(data.generations.map((g: any) => ({
+                        url: g.output_url,
+                        prompt: g.prompt,
+                        createdAt: new Date(g.created_at).getTime(),
+                    })));
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -112,8 +128,19 @@ export default function StudioPage() {
                 setVideoUrl(data.videoUrl);
                 setHistory((prev) => [
                     { url: data.videoUrl, prompt, createdAt: Date.now() },
-                    ...prev,
+                    ...prev.slice(0, 9),
                 ]);
+                // Save to database
+                fetch("/api/generations", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "video",
+                        prompt,
+                        model,
+                        outputUrl: data.videoUrl,
+                    }),
+                }).catch(() => { });
             } else {
                 setError(data.error || "Failed to generate video.");
                 refundCredits(selectedModelConfig.cost); // refund on error

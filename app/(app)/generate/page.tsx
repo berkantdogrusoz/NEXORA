@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 
 const STYLES = [
@@ -43,6 +43,21 @@ export default function GeneratePage() {
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
 
+  // Load history from database on mount
+  useEffect(() => {
+    fetch("/api/generations?type=image")
+      .then(r => r.json())
+      .then(data => {
+        if (data.generations?.length) {
+          setGallery(data.generations.map((g: any) => ({
+            url: g.output_url,
+            prompt: g.prompt,
+          })));
+        }
+      })
+      .catch(() => { });
+  }, []);
+
   const generateImage = async () => {
     if (!prompt) return;
 
@@ -75,7 +90,18 @@ export default function GeneratePage() {
 
       if (res.ok && data.imageUrl) {
         setImageUrl(data.imageUrl);
-        setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev]);
+        setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev.slice(0, 9)]);
+        // Save to database
+        fetch("/api/generations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "image",
+            prompt,
+            model,
+            outputUrl: data.imageUrl,
+          }),
+        }).catch(() => { });
       } else {
         setError(data.error || "Failed to generate image.");
         refundCredits(selectedModelConfig.cost);

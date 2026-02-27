@@ -87,6 +87,20 @@ create table if not exists assistant_messages (
 );
 
 -- ═══════════════════════════════════════
+-- GENERATION HISTORY
+-- ═══════════════════════════════════════
+
+create table if not exists generations (
+    id uuid primary key default gen_random_uuid(),
+    user_id text not null,
+    type text not null default 'video',
+    prompt text not null default '',
+    model text not null default '',
+    output_url text not null,
+    created_at timestamptz not null default now()
+);
+
+-- ═══════════════════════════════════════
 -- INDEXES
 -- ═══════════════════════════════════════
 
@@ -97,6 +111,8 @@ create index if not exists idx_autopilot_logs_scheduled on autopilot_logs(schedu
 create index if not exists idx_social_connections_user on social_connections(user_id);
 create index if not exists idx_store_integrations_user on store_integrations(user_id);
 create index if not exists idx_assistant_messages_user on assistant_messages(user_id);
+create index if not exists idx_generations_user on generations(user_id);
+create index if not exists idx_generations_type on generations(user_id, type);
 
 -- ═══════════════════════════════════════
 -- DISABLE RLS
@@ -107,3 +123,4 @@ alter table autopilot_logs disable row level security;
 alter table social_connections disable row level security;
 alter table store_integrations disable row level security;
 alter table assistant_messages disable row level security;
+alter table generations disable row level security;
