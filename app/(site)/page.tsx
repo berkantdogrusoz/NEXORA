@@ -143,7 +143,7 @@ export default function Home() {
                 className="group relative aspect-video bg-[#0a0a0a] rounded-3xl overflow-hidden border border-white/5"
               >
                 <Image
-                  src="https://images.unsplash.com/photo-1614729939124-032d1e6c9945?w=1200&q=80"
+                  src="/arts/nexora-1772282772787.png"
                   alt="Fashion Video Preview"
                   fill
                   className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
