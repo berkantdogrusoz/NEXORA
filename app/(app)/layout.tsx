@@ -7,11 +7,11 @@ import { UserButton } from "@clerk/nextjs";
 import AnimatedShaderBackground from "@/app/components/ui/animated-shader-background";
 
 const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: "📊", color: "text-sky-400" },
-    { href: "/studio", label: "Video Studio", icon: "🎬", color: "text-pink-400" },
-    { href: "/director", label: "Director Studio", icon: "🎥", color: "text-cyan-500" },
-    { href: "/generate", label: "Image Gen", icon: "🖼️", color: "text-cyan-400" },
-    { href: "/assistant", label: "Assistant", icon: "🤖", color: "text-amber-400" },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/studio", label: "Video Studio" },
+    { href: "/director", label: "Director Studio" },
+    { href: "/generate", label: "Image Gen" },
+    { href: "/assistant", label: "Assistant" },
 ];
 
 import { useCredits, CreditProvider } from "@/app/providers/credit-provider";
@@ -83,7 +83,6 @@ function AppLayout({
                                     : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                                     }`}
                             >
-                                <span className="text-base">{item.icon}</span>
                                 <span>{item.label}</span>
                                 {isActive && (
                                     <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-500" />
@@ -108,7 +107,6 @@ function AppLayout({
                                     : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
                                     }`}
                             >
-                                <span className="text-base">{item.icon}</span>
                                 <span>{item.label}</span>
                                 {isActive && (
                                     <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-500" />
