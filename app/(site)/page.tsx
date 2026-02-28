@@ -27,102 +27,65 @@ export default function Home() {
         }}
       />
 
-      {/* ═══════ HERO SECTION ═══════ */}
-      <section className="relative min-h-[100vh] flex flex-col justify-center px-6 overflow-hidden" ref={targetRef}>
+      {/* ═══════ HERO SECTION — FULL BLEED (Seedream 4.5 Style) ═══════ */}
+      <section className="relative h-screen w-full overflow-hidden" ref={targetRef}>
 
-        {/* Dynamic Video Banner Background */}
+        {/* Full-Bleed Background Image */}
         <motion.div
           className="absolute inset-0 z-0"
-          style={{ y: bannerY, opacity: bannerOpacity }}
+          style={{ scale: 1.05, opacity: bannerOpacity }}
         >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover opacity-40 mix-blend-screen scale-105"
-          >
-            {/* High quality cinematic placeholder */}
-            <source src="https://videos.pexels.com/video-files/3129595/3129595-uhd_3840_2160_30fps.mp4" type="video/mp4" />
-          </video>
-          {/* Intense vignette and bottom fade */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] opacity-80 pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
+          <Image
+            src="/arts/hero-bg.png"
+            alt="Nexora AI Showcase"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Bottom gradient fade to black */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          {/* Top subtle fade for navbar readability */}
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
         </motion.div>
 
-        <div className="relative z-10 max-w-[1400px] mx-auto w-full pt-32">
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left huge text */}
+        {/* Bottom-anchored Content (like Seedream 4.5) */}
+        <div className="absolute inset-x-0 bottom-0 z-10 px-6 pb-16 md:pb-20">
+          <div className="max-w-[1400px] mx-auto">
             <motion.div
-              className="lg:col-span-8"
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <h1 className="text-6xl sm:text-7xl md:text-[7rem] lg:text-[8.5rem] font-black tracking-tighter leading-[0.85] mb-8 text-white w-full uppercase">
-                Create Media <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/40">
-                  Without Limits
-                </span>
+              {/* Giant Title */}
+              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black tracking-tighter leading-[0.85] mb-6 text-white uppercase">
+                Nexora<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">.AI</span>
               </h1>
-              <p className="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed font-medium mb-12">
-                Generate high-quality cinematic videos and stunning images from simple prompts. Unmatched aesthetic control, powered by Seedance 2.0 and DALL-E 3.
+
+              {/* Description */}
+              <p className="text-base md:text-lg text-white/70 max-w-2xl leading-relaxed font-medium mb-8">
+                All-in-one AI creative studio. Generate cinematic videos with Seedance 2.0, photorealistic images with DALL-E 3, and direct Hollywood-grade scenes with Higgsfield Director — all from a single prompt.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Link
-                  href="/generate"
-                  className="group px-8 py-4 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.02] transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center gap-2"
-                >
-                  Start creating today
-                  <Sparkles className="w-4 h-4 ml-1" />
-                </Link>
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href="/studio"
-                  className="px-8 py-4 rounded-full text-sm font-bold text-white border border-white/20 hover:bg-white/10 transition-colors"
+                  className="px-7 py-3 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.03] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                 >
-                  Explore Video Studio
+                  Try Now
                 </Link>
-              </div>
-            </motion.div>
-
-            {/* Right side floating cards/UI mockups */}
-            <motion.div
-              className="lg:col-span-4 hidden lg:flex flex-col gap-6"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shrink-0">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
-                    <Video className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-white/50 font-bold uppercase tracking-wider">Now Available</p>
-                    <p className="text-sm font-bold text-white">Seedance 2.0 API</p>
-                  </div>
-                </div>
-                <p className="text-sm text-white/70 leading-relaxed">
-                  Experience director-level camera control and true native audio generation in one prompt.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shrink-0 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="flex items-center gap-3 mb-4 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                    <ImageIcon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-white/50 font-bold uppercase tracking-wider">Image Gen</p>
-                    <p className="text-sm font-bold text-white">DALL-E 3 Mastery</p>
-                  </div>
-                </div>
-                <p className="text-sm text-white/70 leading-relaxed relative z-10">
-                  Flawless prompt adherence and absolute fidelity for concept art, assets, and photography.
-                </p>
+                <Link
+                  href="/pricing"
+                  className="px-7 py-3 rounded-full text-sm font-bold text-white border border-white/30 hover:bg-white/10 transition-colors backdrop-blur-sm"
+                >
+                  View Plans
+                </Link>
+                <Link
+                  href="/director"
+                  className="px-7 py-3 rounded-full text-sm font-bold text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 transition-colors backdrop-blur-sm"
+                >
+                  Director Studio
+                </Link>
               </div>
             </motion.div>
           </div>
