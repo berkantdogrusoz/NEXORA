@@ -33,14 +33,16 @@ export default function Home() {
         {/* Full-Bleed Background Image */}
         <motion.div
           className="absolute inset-0 z-0"
-          style={{ scale: 1.05, opacity: bannerOpacity }}
+          style={{ opacity: bannerOpacity }}
         >
-          <Image
-            src="/arts/hero-bg.png"
-            alt="Nexora AI Showcase"
-            fill
-            className="object-cover"
-            priority
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url('/arts/hero-bg.png')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
           />
           {/* Bottom gradient fade to black */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
