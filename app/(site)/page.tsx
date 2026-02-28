@@ -31,24 +31,21 @@ export default function Home() {
       <section className="relative h-screen w-full overflow-hidden" ref={targetRef}>
 
         {/* Full-Bleed Background Image */}
-        <motion.div
-          className="absolute inset-0 z-0"
-          style={{ opacity: bannerOpacity }}
-        >
+        <div className="absolute inset-0 z-0">
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: `url('/arts/hero-bg.png')`,
+              backgroundImage: `url('/arts/nexora-1772283133285.png')`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundPosition: 'center top',
               backgroundRepeat: 'no-repeat',
             }}
           />
           {/* Bottom gradient fade to black */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
           {/* Top subtle fade for navbar readability */}
-          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/50 to-transparent" />
-        </motion.div>
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/40 to-transparent" />
+        </div>
 
         {/* Bottom-anchored Content (like Seedream 4.5) */}
         <div className="absolute inset-x-0 bottom-0 z-10 px-6 pb-16 md:pb-20">
