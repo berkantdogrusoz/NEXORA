@@ -95,7 +95,7 @@ export async function POST(req: Request) {
                 prompt,
                 n: 1,
                 size: openaiSize as "1024x1024" | "1792x1024" | "1024x1792",
-                quality: finalModel === "dall-e-3" ? "hd" : "standard",
+                ...(finalModel === "dall-e-3" ? { quality: "hd" } : {}),
             });
             imageUrl = response.data[0]?.url || "";
         } else if (finalModel === "flux-2-dev" || finalModel === "recraft-v3") {
