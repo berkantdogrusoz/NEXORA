@@ -141,7 +141,7 @@ export async function POST(req: Request) {
                 ? "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video"
                 : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
 
-            const falInput: any = { prompt: englishPrompt };
+            const falInput: any = { prompt: englishPrompt, duration: duration === "10s" || duration === "10" ? 10 : 5 };
             if (imageUrl) falInput.image_url = imageUrl;
 
             const result: any = await fal.subscribe(falModel, {

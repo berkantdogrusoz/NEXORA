@@ -268,14 +268,15 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Large Visual Model Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality. The gold standard for AI video.", gradient: "from-amber-500 to-orange-600", icon: "🎬" },
-              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning. Next-gen video creation by Kuaishou.", gradient: "from-cyan-500 to-blue-500", icon: "⚡" },
-              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation. Unreal fidelity & character consistency.", gradient: "from-purple-500 to-pink-500", icon: "🎥" },
-              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship. Perfect text rendering & character consistency.", gradient: "from-yellow-400 to-amber-500", icon: "🍌" },
-              { name: "DALL-E 3", type: "Image", desc: "OpenAI's best. Precise prompt adherence with HD output quality.", gradient: "from-emerald-500 to-teal-500", icon: "🖼️" },
-              { name: "Luma Ray 2", type: "Video", desc: "Dream Machine powered. Surreal visuals & fluid motion design.", gradient: "from-indigo-500 to-violet-500", icon: "✨" },
+              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality.", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
+              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning video creation.", img: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=800&q=80", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
+              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation & fidelity.", img: "https://images.unsplash.com/photo-1518676590747-1e3dcf5a0f85?w=800&q=80", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
+              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship image generation.", img: "https://images.unsplash.com/photo-1634926878768-2a5b3c42f139?w=800&q=80", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
+              { name: "DALL-E 3", type: "Image", desc: "Precise prompt adherence with HD quality.", img: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
+              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals & fluid motion design.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
             ].map((model, i) => (
               <motion.div
                 key={i}
@@ -283,20 +284,39 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group relative p-6 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:bg-white/[0.05] cursor-default"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${model.gradient} flex items-center justify-center text-xl shadow-lg`}>
-                    {model.icon}
+                <Link href={model.link} className="group block">
+                  {/* Image Card */}
+                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4">
+                    <Image
+                      src={model.img}
+                      alt={model.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    {/* Gradient overlay */}
+                    <div className={`absolute inset-0 bg-gradient-to-t ${model.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    {/* Type badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-[10px] font-bold uppercase tracking-widest text-white border border-white/20">
+                        {model.type}
+                      </span>
+                    </div>
+                    {/* Try button on hover */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm shadow-2xl">
+                        Try {model.name} →
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-2 py-1 rounded-full border border-white/10">
-                    {model.type}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/80 transition-all">
-                  {model.name}
-                </h3>
-                <p className="text-sm text-white/40 leading-relaxed">{model.desc}</p>
+                  {/* Model Info */}
+                  <div>
+                    <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors mb-1">
+                      {model.name}
+                    </h3>
+                    <p className="text-sm text-white/40">{model.desc}</p>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -306,11 +326,11 @@ export default function Home() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.5 }}
-            className="text-center mt-10"
+            className="text-center mt-12"
           >
             <Link
               href="/studio"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 text-sm font-bold text-white/70 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/5 border border-white/10 text-sm font-bold text-white hover:bg-white/10 hover:border-white/20 transition-all"
             >
               Explore All Models
               <Sparkles className="w-4 h-4" />
