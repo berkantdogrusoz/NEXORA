@@ -33,9 +33,9 @@ export async function POST(req: Request) {
         const finalSize = validSizes.includes(size) ? size : "1024x1024";
 
         // Validate Model & Cost
-        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3"];
+        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
         const finalModel = validModels.includes(modelId) ? modelId : "dall-e-2";
-        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : finalModel === "flux-2-dev" ? 6 : 5;
+        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "nano-banana-2" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : finalModel === "flux-2-dev" ? 6 : 5;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             planName = subData.plan_name;
         }
 
-        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && planName === "Free") {
+        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3" || finalModel === "nano-banana-2") && planName === "Free") {
             return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
         }
 
@@ -98,13 +98,13 @@ export async function POST(req: Request) {
                 ...(finalModel === "dall-e-3" ? { quality: "hd" } : {}),
             });
             imageUrl = response.data[0]?.url || "";
-        } else if (finalModel === "flux-2-dev" || finalModel === "recraft-v3") {
+        } else if (finalModel === "flux-2-dev" || finalModel === "recraft-v3" || finalModel === "nano-banana-2") {
             // Fal.ai models
             let aspect_ratio = "1:1";
             if (finalSize === "1024x1792") aspect_ratio = "9:16";
             if (finalSize === "1792x1024") aspect_ratio = "16:9";
 
-            const falModel = finalModel === "flux-2-dev" ? "fal-ai/flux/dev" : "fal-ai/recraft-v3";
+            const falModel = finalModel === "flux-2-dev" ? "fal-ai/flux/dev" : finalModel === "nano-banana-2" ? "fal-ai/nano-banana-2" : "fal-ai/recraft-v3";
 
             const result: any = await fal.subscribe(falModel, {
                 input: {

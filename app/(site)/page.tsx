@@ -212,7 +212,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="inline-flex px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white uppercase tracking-wider mb-3">
-                    Minimax HD
+                    Seedance 2.0
                   </div>
                   <h3 className="text-2xl font-bold text-white">Complex Character Motion</h3>
                 </div>
@@ -246,6 +246,76 @@ export default function Home() {
           >
             Boost resolution and clarity without sacrificing detail, preparing assets for print, high-resolution displays, and professional delivery.
           </motion.p>
+        </div>
+      </section>
+
+      {/* ═══════ TOP AI MODELS SHOWCASE ═══════ */}
+      <section className="px-6 py-24 md:py-32 border-t border-white/[0.05]">
+        <div className="max-w-[1400px] mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-4">Top-Tier AI Models</p>
+            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9] mb-6">
+              Powered By <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">The Best</span>
+            </h2>
+            <p className="text-white/50 max-w-2xl mx-auto text-lg">
+              Access the world&apos;s most advanced AI models — from cinematic video to photorealistic image generation.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality. The gold standard for AI video.", gradient: "from-amber-500 to-orange-600", icon: "🎬" },
+              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning. Next-gen video creation by Kuaishou.", gradient: "from-cyan-500 to-blue-500", icon: "⚡" },
+              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation. Unreal fidelity & character consistency.", gradient: "from-purple-500 to-pink-500", icon: "🎥" },
+              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship. Perfect text rendering & character consistency.", gradient: "from-yellow-400 to-amber-500", icon: "🍌" },
+              { name: "DALL-E 3", type: "Image", desc: "OpenAI's best. Precise prompt adherence with HD output quality.", gradient: "from-emerald-500 to-teal-500", icon: "🖼️" },
+              { name: "Luma Ray 2", type: "Video", desc: "Dream Machine powered. Surreal visuals & fluid motion design.", gradient: "from-indigo-500 to-violet-500", icon: "✨" },
+            ].map((model, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group relative p-6 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 hover:bg-white/[0.05] cursor-default"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${model.gradient} flex items-center justify-center text-xl shadow-lg`}>
+                    {model.icon}
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-2 py-1 rounded-full border border-white/10">
+                    {model.type}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/80 transition-all">
+                  {model.name}
+                </h3>
+                <p className="text-sm text-white/40 leading-relaxed">{model.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            className="text-center mt-10"
+          >
+            <Link
+              href="/studio"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 text-sm font-bold text-white/70 hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
+            >
+              Explore All Models
+              <Sparkles className="w-4 h-4" />
+            </Link>
+          </motion.div>
         </div>
       </section>
 
