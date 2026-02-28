@@ -136,11 +136,15 @@ export async function POST(req: Request) {
             }
 
         } else if (modelId === "seedance-2") {
-            console.log(`Generating video using fal.ai Seedance (image-to-video: ${!!imageUrl})`);
+            console.log(`Generating video using fal.ai Seedance 2.0 Pro (image-to-video: ${!!imageUrl})`);
+            const falModel = imageUrl
+                ? "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video"
+                : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
+
             const falInput: any = { prompt: englishPrompt };
             if (imageUrl) falInput.image_url = imageUrl;
 
-            const result: any = await fal.subscribe("fal-ai/seedance-2", {
+            const result: any = await fal.subscribe(falModel, {
                 input: falInput,
                 logs: true,
                 onQueueUpdate: (update) => {
