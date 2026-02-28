@@ -18,14 +18,16 @@ export const metadata: Metadata = {
     template: "%s | Nexora AI",
   },
   description:
-    "Generate cinematic AI videos and stunning images from simple text prompts. Powered by DALL-E 3, FLUX, Seedance 2.0, Runway Gen-4.5, and 10+ AI models. Free to start.",
+    "Generate cinematic AI videos and stunning images from simple text prompts. Powered by DALL-E 3, FLUX, Seedance 2.0, Runway Gen-4.5, and 10+ AI models. Metinden video oluşturma, yapay zeka görsel üretici ve AI stüdyo.",
   keywords: [
     "AI video generator",
     "AI image generator",
     "text to video",
     "text to image",
-    "AI art generator",
-    "video AI",
+    "yapay zeka video oluştur",
+    "yapay zeka resim çizme",
+    "metinden video yapma",
+    "ücretsiz yapay zeka",
     "Seedance",
     "DALL-E 3",
     "FLUX",
@@ -38,6 +40,9 @@ export const metadata: Metadata = {
   authors: [{ name: "Nexora AI" }],
   creator: "Nexora AI",
   publisher: "Nexora AI",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
   robots: {
     index: true,
     follow: true,
