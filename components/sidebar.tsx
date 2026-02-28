@@ -31,6 +31,12 @@ const routes = [
         color: "text-pink-700",
     },
     {
+        label: "Director Studio",
+        icon: Video,
+        href: "/director",
+        color: "text-cyan-500",
+    },
+    {
         label: "Settings",
         icon: Settings,
         href: "/settings",
