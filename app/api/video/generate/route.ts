@@ -140,7 +140,7 @@ export async function POST(req: Request) {
             const falInput: any = { prompt: englishPrompt };
             if (imageUrl) falInput.image_url = imageUrl;
 
-            const result: any = await fal.subscribe("fal-ai/seedance", {
+            const result: any = await fal.subscribe("fal-ai/seedance-2", {
                 input: falInput,
                 logs: true,
                 onQueueUpdate: (update) => {
