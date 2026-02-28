@@ -6,6 +6,7 @@ import { UserButton } from "@clerk/nextjs";
 
 const menuItems = [
     { href: "/studio", label: "Studio", icon: "✨" },
+    { href: "/director", label: "Director Studio", icon: "🎬" },
     { href: "/calendar", label: "Calendar", icon: "📅" },
     { href: "/campaigns", label: "Campaigns", icon: "🚀" },
     { href: "/dashboard", label: "Analytics", icon: "📊" },
@@ -40,8 +41,8 @@ export default function Sidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                                    ? "bg-cyan-600/10 text-cyan-400 border border-cyan-600/20"
-                                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                                ? "bg-cyan-600/10 text-cyan-400 border border-cyan-600/20"
+                                : "text-slate-400 hover:text-white hover:bg-white/5"
                                 }`}
                         >
                             <span className="text-lg">{item.icon}</span>
