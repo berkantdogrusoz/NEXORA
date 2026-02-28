@@ -271,12 +271,12 @@ export default function Home() {
           {/* Large Visual Model Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality.", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&q=80", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
-              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning video creation.", img: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=800&q=80", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
-              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation & fidelity.", img: "https://images.unsplash.com/photo-1518676590747-1e3dcf5a0f85?w=800&q=80", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
-              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship image generation.", img: "https://images.unsplash.com/photo-1634926878768-2a5b3c42f139?w=800&q=80", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
-              { name: "DALL-E 3", type: "Image", desc: "Precise prompt adherence with HD quality.", img: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
-              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals & fluid motion design.", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
+              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality.", img: "/arts/nexora-1772284253224.mp4", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
+              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning video creation.", img: "/arts/nexora-1772284437767.mp4", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
+              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation & fidelity.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
+              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship image generation.", img: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
+              { name: "DALL-E 3", type: "Image", desc: "Precise prompt adherence with HD quality.", img: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
+              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals & fluid motion design.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
             ].map((model, i) => (
               <motion.div
                 key={i}
@@ -286,14 +286,25 @@ export default function Home() {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
               >
                 <Link href={model.link} className="group block">
-                  {/* Image Card */}
-                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4">
-                    <Image
-                      src={model.img}
-                      alt={model.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
+                  {/* Media Card */}
+                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-white/5">
+                    {model.img.endsWith('.mp4') ? (
+                      <video
+                        src={model.img}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <Image
+                        src={model.img}
+                        alt={model.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    )}
                     {/* Gradient overlay */}
                     <div className={`absolute inset-0 bg-gradient-to-t ${model.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                     {/* Type badge */}
