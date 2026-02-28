@@ -50,7 +50,7 @@ function AppLayout({
             >
                 {/* Logo */}
                 <div className="p-5 border-b border-white/[0.06]">
-                    <Link href="/dashboard" className="flex items-center gap-3 group">
+                    <Link href="/" className="flex items-center gap-3 group">
                         <div className="relative w-9 h-9 flex items-center justify-center">
                             <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl blur-md opacity-40 group-hover:opacity-80 transition-opacity" />
                             <div className="relative w-full h-full bg-black border border-white/10 rounded-xl flex items-center justify-center">
@@ -194,7 +194,7 @@ function AppLayout({
                             />
                         </svg>
                     </button>
-                    <span className="font-bold text-white">Nexora</span>
+                    <Link href="/" className="font-bold text-white">Nexora</Link>
                     <UserButton
                         afterSignOutUrl="/"
                         appearance={{
