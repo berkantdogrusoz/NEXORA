@@ -191,10 +191,8 @@ export default function GeneratePage() {
                   />
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <a
-                      href={imageUrl}
+                      href={`/api/download?url=${encodeURIComponent(imageUrl)}`}
                       download
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur text-white text-xs font-medium border border-white/10 hover:bg-black/80 transition"
                     >
                       ↓ Download

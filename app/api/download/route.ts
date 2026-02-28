@@ -21,14 +21,20 @@ export async function GET(req: Request) {
         // Ensure we have a Blob/ArrayBuffer to send down
         const blob = await response.blob();
 
-        // Get the content type, default to mp4 if not provided
-        const contentType = response.headers.get("content-type") || "video/mp4";
+        // Get the content type and determine file extension
+        const contentType = response.headers.get("content-type") || "application/octet-stream";
+        let ext = "mp4";
+        if (contentType.includes("png")) ext = "png";
+        else if (contentType.includes("jpeg") || contentType.includes("jpg")) ext = "jpg";
+        else if (contentType.includes("webp")) ext = "webp";
+        else if (contentType.includes("gif")) ext = "gif";
+        else if (contentType.includes("svg")) ext = "svg";
 
         return new NextResponse(blob, {
             headers: {
                 "Content-Type": contentType,
                 // Force attachment download instead of inline display
-                "Content-Disposition": `attachment; filename="nexora-video-${Date.now()}.mp4"`,
+                "Content-Disposition": `attachment; filename="nexora-${Date.now()}.${ext}"`,
             },
         });
     } catch (error: any) {
