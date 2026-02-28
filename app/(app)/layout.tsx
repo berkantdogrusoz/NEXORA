@@ -9,6 +9,7 @@ import AnimatedShaderBackground from "@/app/components/ui/animated-shader-backgr
 const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: "📊", color: "text-sky-400" },
     { href: "/studio", label: "Video Studio", icon: "🎬", color: "text-pink-400" },
+    { href: "/director", label: "Director Studio", icon: "🎥", color: "text-cyan-500" },
     { href: "/generate", label: "Image Gen", icon: "🖼️", color: "text-cyan-400" },
     { href: "/assistant", label: "Assistant", icon: "🤖", color: "text-amber-400" },
 ];
