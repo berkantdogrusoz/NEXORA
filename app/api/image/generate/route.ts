@@ -49,6 +49,7 @@ export async function POST(req: Request) {
         if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
             planName = subData.plan_name;
         }
+        if (process.env.NODE_ENV === "development") planName = "Pro";
 
         if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3" || finalModel === "nano-banana-2") && planName === "Free") {
             return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
@@ -62,22 +63,27 @@ export async function POST(req: Request) {
             .single();
 
         const currentCredits = Number(creditData?.credits || 0);
+        const isDev = process.env.NODE_ENV === "development";
 
-        if (!creditData || currentCredits < cost) {
+        if (!isDev && (!creditData || currentCredits < cost)) {
             return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
         }
 
         // Deduct
-        const { error: deductError } = await supabase
-            .from("user_credits")
-            .update({ credits: currentCredits - cost })
-            .eq("user_id", userId);
+        let deductError = null;
+        if (!isDev) {
+            const { error } = await supabase
+                .from("user_credits")
+                .update({ credits: currentCredits - cost })
+                .eq("user_id", userId);
+            deductError = error;
+        }
 
         if (deductError) {
             return NextResponse.json({ error: "Failed to process credits" }, { status: 500 });
         }
 
-        creditDeducted = true;
+        creditDeducted = !isDev;
         deductedCost = cost;
 
         let imageUrl = "";

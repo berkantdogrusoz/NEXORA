@@ -28,6 +28,8 @@ export async function GET() {
             planName = subData.plan_name;
         }
 
+        if (process.env.NODE_ENV === "development") planName = "Pro";
+
         let maxCredits = 100;
         if (planName === "Growth") maxCredits = 500;
         else if (planName === "Pro") maxCredits = 1000;
@@ -39,10 +41,11 @@ export async function GET() {
             .eq("user_id", authResult.userId)
             .eq("role", "user");
 
+        const isDev = process.env.NODE_ENV === "development";
         return NextResponse.json({
             stats: {
-                credits: currentCredits,
-                maxCredits,
+                credits: isDev ? 999999 : currentCredits,
+                maxCredits: isDev ? 999999 : maxCredits,
                 planName,
                 totalMessages: totalMessages || 0,
             }

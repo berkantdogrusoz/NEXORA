@@ -31,6 +31,8 @@ export async function GET() {
             planName = subData.plan_name;
         }
 
+        if (process.env.NODE_ENV === "development") planName = "Pro";
+
         let maxCredits = 100;
         if (planName === "Growth") maxCredits = 500;
         else if (planName === "Pro") maxCredits = 1000;
@@ -53,9 +55,10 @@ export async function GET() {
 
         if (error) throw error;
 
+        const isDev = process.env.NODE_ENV === "development";
         return NextResponse.json({
-            credits: Number(data.credits),
-            maxCredits,
+            credits: isDev ? 999999 : Number(data.credits),
+            maxCredits: isDev ? 999999 : maxCredits,
             planName
         });
 
@@ -88,20 +91,25 @@ export async function POST(req: Request) {
 
         if (error) throw error;
 
-        if (Number(data.credits) < amount) {
+        const isDev = process.env.NODE_ENV === "development";
+        const currentCredits = isDev ? 999999 : Number(data.credits);
+
+        if (!isDev && currentCredits < amount) {
             return NextResponse.json({ error: "Insufficient credits", code: "INSUFFICIENT_CREDITS" }, { status: 402 });
         }
 
         // Update balance
-        const remaining = Number(data.credits) - amount;
-        const { error: updateError } = await supabase
-            .from("user_credits")
-            .update({ credits: remaining, updated_at: new Date().toISOString() })
-            .eq("user_id", authResult.userId);
+        const remaining = currentCredits - amount;
+        if (!isDev) {
+            const { error: updateError } = await supabase
+                .from("user_credits")
+                .update({ credits: remaining, updated_at: new Date().toISOString() })
+                .eq("user_id", authResult.userId);
 
-        if (updateError) throw updateError;
+            if (updateError) throw updateError;
+        }
 
-        return NextResponse.json({ success: true, remaining });
+        return NextResponse.json({ success: true, remaining: isDev ? 999999 : remaining });
 
     } catch (error: any) {
         console.error("Credits POST error:", error);
