@@ -19,12 +19,12 @@ const SIZES = [
 ];
 
 const IMAGE_MODELS = [
-  { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 6 },
-  { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 8 },
-  { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 12 },
-  { id: "nano-banana-2", name: "Nano Banana 2 🍌", tier: "Pro", cost: 15 },
-  { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 15 },
-  { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 20 },
+  { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 10 },
+  { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 15 },
+  { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 20 },
+  { id: "nano-banana-2", name: "Nano Banana 2 🍌", tier: "Pro", cost: 25 },
+  { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 25 },
+  { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 35 },
 ];
 
 export default function GeneratePage() {

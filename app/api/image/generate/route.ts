@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         // Validate Model & Cost
         const validModels = ["dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
         const finalModel = validModels.includes(modelId) ? modelId : "flux-2-dev";
-        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "nano-banana-2" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : 6;
+        const cost = finalModel === "flux-pro" ? 35 : finalModel === "dall-e-3" ? 25 : finalModel === "nano-banana-2" ? 25 : finalModel === "recraft-v3" ? 20 : finalModel === "flux-schnell" ? 15 : 10;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();

@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMIT_WINDOW_MS = 60_000;    // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10;     // 10 requests per minute
+const RATE_LIMIT_MAX_REQUESTS = 5;      // 5 requests per minute (tightened to control API costs)
 
 /**
  * Get the authenticated userId or return an error response

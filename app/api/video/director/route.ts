@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Director Studio is exclusively for Premium members." }, { status: 403 });
         }
 
-        const cost = 120; // 120 credits for Higgsfield Director Studio
+        const cost = 150; // 150 credits for Higgsfield Director Studio
 
         // Check balance
         const { data: creditData } = await supabase

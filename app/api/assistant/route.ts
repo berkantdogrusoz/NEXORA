@@ -69,7 +69,7 @@ export async function POST(req: Request) {
         const validModels = ["gpt-4o-mini", "gpt-4o", "gemini-1.5-pro"];
         const finalModel = validModels.includes(model) ? model : "gpt-4o-mini";
         const isProModel = finalModel !== "gpt-4o-mini";
-        const cost = isProModel ? 2.0 : 0.5;
+        const cost = isProModel ? 5 : 2;
 
         // Check user plan and credits
         const { createSupabaseServer } = await import("@/lib/supabase");

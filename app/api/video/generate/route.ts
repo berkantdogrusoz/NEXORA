@@ -43,13 +43,13 @@ export async function POST(req: Request) {
 
         // Cost mapping
         const costMap: Record<string, number> = {
-            "kling-3": 15,
-            "luma": 25,
-            "runway-gen4": 35,
-            "runway-gwm": 45,
-            "seedance-2": 50,
+            "kling-3": 25,
+            "luma": 40,
+            "runway-gen4": 55,
+            "runway-gwm": 65,
+            "seedance-2": 75,
         };
-        const cost = costMap[modelId] || 15;
+        const cost = costMap[modelId] || 25;
 
         // Block Pro models for Free users
         const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm"];

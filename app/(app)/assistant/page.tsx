@@ -17,9 +17,9 @@ const QUICK_ACTIONS = [
 ];
 
 const ASSISTANT_MODELS = [
-    { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false, cost: 0.5 },
-    { id: "gpt-4o", label: "GPT-4o", pro: true, cost: 2.0 },
-    { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true, cost: 2.0 },
+    { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false, cost: 2 },
+    { id: "gpt-4o", label: "GPT-4o", pro: true, cost: 5 },
+    { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true, cost: 5 },
 ];
 
 export default function AssistantPage() {
