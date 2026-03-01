@@ -66,7 +66,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Message required." }, { status: 400 });
         }
 
-        const validModels = ["gpt-4o-mini", "gpt-4o", "gemini-1.5-pro"];
+        const validModels = ["gpt-4o-mini", "gpt-4o", "gemini-2.5-flash"];
         const finalModel = validModels.includes(model) ? model : "gpt-4o-mini";
         const isProModel = finalModel !== "gpt-4o-mini";
         const cost = isProModel ? 5 : 2;
@@ -81,14 +81,14 @@ export async function POST(req: Request) {
             .single();
 
         let planName = "Free";
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
             planName = subData.plan_name;
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
         // Block Pro models for Free users
         if (isProModel && planName === "Free") {
-            return NextResponse.json({ error: "You need a Premium plan to use GPT-4o or Gemini 1.5 Pro." }, { status: 403 });
+            return NextResponse.json({ error: "You need a Premium plan to use GPT-4o or Gemini 2.5 Flash." }, { status: 403 });
         }
 
         // Check balance
@@ -176,26 +176,23 @@ export async function POST(req: Request) {
             });
             reply = response.choices[0].message?.content || "";
         } else if (finalModel.includes("gemini")) {
-            const { GoogleGenerativeAI } = await import("@google/generative-ai");
+            const { GoogleGenAI } = await import("@google/genai");
             if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
                 return NextResponse.json({ error: "GOOGLE_GENERATIVE_AI_API_KEY missing." }, { status: 500 });
             }
-            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-            const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+            const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
 
-            const chat = geminiModel.startChat({
-                history: [
-                    { role: "user", parts: [{ text: fullSystemPrompt + "\n\nUnderstood?" }] },
-                    { role: "model", parts: [{ text: "Yes, I am Nexora AI. How can I help?" }] },
-                    ...conversationHistory.map(m => ({
-                        role: m.role === "user" ? "user" : "model",
-                        parts: [{ text: m.content }],
-                    })),
-                ],
+            const chat = ai.chats.create({
+                model: finalModel,
+                config: { systemInstruction: fullSystemPrompt },
+                history: conversationHistory.map(m => ({
+                    role: m.role === "user" ? ("user" as const) : ("model" as const),
+                    parts: [{ text: m.content }],
+                })),
             });
 
-            const result = await chat.sendMessage(message);
-            reply = result.response.text();
+            const result = await chat.sendMessage({ message });
+            reply = result.text ?? "";
         }
 
         if (!reply) throw new Error("AI failed to reply.");

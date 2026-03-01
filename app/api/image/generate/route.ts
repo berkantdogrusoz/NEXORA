@@ -46,7 +46,7 @@ export async function POST(req: Request) {
             .single();
 
         let planName = "Free";
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
             planName = subData.plan_name;
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";

@@ -27,7 +27,7 @@ export async function GET() {
 
         let planName = "Free";
         // Ensure the subscription is active before applying higher limits
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
             planName = subData.plan_name;
         }
 

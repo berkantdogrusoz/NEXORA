@@ -24,7 +24,7 @@ export async function GET() {
             .single();
 
         let planName = "Free";
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "trialing")) {
+        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
             planName = subData.plan_name;
         }
 

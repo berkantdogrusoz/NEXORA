@@ -19,7 +19,7 @@ const QUICK_ACTIONS = [
 const ASSISTANT_MODELS = [
     { id: "gpt-4o-mini", label: "GPT-4o Mini", pro: false, cost: 2 },
     { id: "gpt-4o", label: "GPT-4o", pro: true, cost: 5 },
-    { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", pro: true, cost: 5 },
+    { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", pro: true, cost: 5 },
 ];
 
 export default function AssistantPage() {
@@ -62,7 +62,7 @@ export default function AssistantPage() {
             const errorMsg: Message = {
                 id: `e-${Date.now()}`,
                 role: "assistant",
-                content: "⚠️ You need a Premium plan to use GPT-4o or Gemini 1.5 Pro.",
+                content: "⚠️ You need a Premium plan to use GPT-4o or Gemini 2.5 Flash.",
                 timestamp: Date.now(),
             };
             setMessages(prev => [...prev, errorMsg]);

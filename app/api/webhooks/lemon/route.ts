@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
             await updateUserSubscription(userId, subscriptionData);
 
             // Give them credits if it's a new or active subscription
-            if (status === "active" || status === "past_due") {
+            if (status === "active" || status === "past_due" || status === "on_trial") {
                 const { createSupabaseServer } = await import("@/lib/supabase");
                 const supabase = createSupabaseServer();
 

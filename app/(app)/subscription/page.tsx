@@ -33,7 +33,7 @@ export default function SubscriptionPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const isPaid = sub && sub.plan_name !== "Free" && sub.status === "active";
+    const isPaid = sub && sub.plan_name !== "Free" && (sub.status === "active" || sub.status === "on_trial");
 
     return (
         <div className="p-6 md:p-10 max-w-3xl mx-auto">
@@ -66,9 +66,14 @@ export default function SubscriptionPage() {
                                 </p>
                                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                                     {sub.plan_name}
-                                    {isPaid && (
+                                    {isPaid && sub.status === "active" && (
                                         <span className="text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-black px-2.5 py-1 rounded-full uppercase">
                                             Active
+                                        </span>
+                                    )}
+                                    {isPaid && sub.status === "on_trial" && (
+                                        <span className="text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-2.5 py-1 rounded-full uppercase">
+                                            Trial
                                         </span>
                                     )}
                                     {sub.status === "cancelled" && (
