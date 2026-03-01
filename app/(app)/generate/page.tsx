@@ -19,7 +19,6 @@ const SIZES = [
 ];
 
 const IMAGE_MODELS = [
-  { id: "dall-e-2", name: "DALL-E 2 (Fast)", tier: "Standard", cost: 5 },
   { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 6 },
   { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 8 },
   { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 12 },
@@ -32,7 +31,7 @@ export default function GeneratePage() {
   const { credits, deductCredits, refundCredits, planName } = useCredits();
 
   const [prompt, setPrompt] = useState("");
-  const [model, setModel] = useState("dall-e-2");
+  const [model, setModel] = useState("flux-2-dev");
   const [style, setStyle] = useState("photographic");
   const [size, setSize] = useState("1024x1024");
   const [generating, setGenerating] = useState(false);

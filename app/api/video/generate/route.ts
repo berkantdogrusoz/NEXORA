@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, model: modelId = "wan-2.1", aspectRatio = "16:9", duration = "5", quality = "hd", imageUrl } = body;
+        const { prompt, model: modelId = "kling-3", aspectRatio = "16:9", duration = "5", quality = "hd", imageUrl } = body;
 
         if (!prompt && !imageUrl) {
             return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });
@@ -43,14 +43,13 @@ export async function POST(req: Request) {
 
         // Cost mapping
         const costMap: Record<string, number> = {
-            "wan-2.1": 8,
             "kling-3": 15,
             "luma": 25,
             "runway-gen4": 35,
             "runway-gwm": 45,
             "seedance-2": 50,
         };
-        const cost = costMap[modelId] || 8;
+        const cost = costMap[modelId] || 15;
 
         // Block Pro models for Free users
         const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm"];

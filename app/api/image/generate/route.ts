@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         userId = authResult.userId;
 
         const body = await req.json();
-        const { prompt, size = "1024x1024", model: modelId = "dall-e-2" } = body;
+        const { prompt, size = "1024x1024", model: modelId = "flux-2-dev" } = body;
 
         if (!prompt) {
             return NextResponse.json(
@@ -33,9 +33,9 @@ export async function POST(req: Request) {
         const finalSize = validSizes.includes(size) ? size : "1024x1024";
 
         // Validate Model & Cost
-        const validModels = ["dall-e-2", "dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
-        const finalModel = validModels.includes(modelId) ? modelId : "dall-e-2";
-        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "nano-banana-2" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : finalModel === "flux-2-dev" ? 6 : 5;
+        const validModels = ["dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
+        const finalModel = validModels.includes(modelId) ? modelId : "flux-2-dev";
+        const cost = finalModel === "flux-pro" ? 20 : finalModel === "dall-e-3" ? 15 : finalModel === "nano-banana-2" ? 15 : finalModel === "recraft-v3" ? 12 : finalModel === "flux-schnell" ? 8 : 6;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();

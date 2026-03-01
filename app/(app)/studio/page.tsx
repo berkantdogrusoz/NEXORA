@@ -15,7 +15,6 @@ const DURATIONS = [
 ];
 
 const VIDEO_MODELS = [
-    { id: "wan-2.1", name: "Wan-2.1 Turbo", tier: "Standard", cost: 8, supportsImage: true },
     { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 15, supportsImage: true },
     { id: "luma", name: "Luma Dream Machine Ray 2", tier: "Pro", cost: 25, supportsImage: true },
     { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 35, supportsImage: true },
@@ -27,7 +26,7 @@ export default function StudioPage() {
     const { credits, deductCredits, refundCredits, planName } = useCredits();
 
     const [prompt, setPrompt] = useState("");
-    const [model, setModel] = useState("wan-2.1");
+    const [model, setModel] = useState("kling-3");
     const [generating, setGenerating] = useState(false);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
