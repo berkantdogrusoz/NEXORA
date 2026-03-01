@@ -169,14 +169,15 @@ export async function POST(req: Request) {
         } else if (modelId === "wan-2.1") {
             console.log(`Generating video using fal.ai Wan-2.1 (image-to-video: ${!!imageUrl})`);
             const falModel = imageUrl
-                ? "fal-ai/wan/v2.1/turbo/image-to-video"
-                : "fal-ai/wan/v2.1/turbo/text-to-video";
+                ? "fal-ai/wan-i2v"
+                : "fal-ai/wan-t2v";
 
             const falInput: any = {
                 prompt: englishPrompt,
-                num_frames: duration === "10" ? 81 : 41,
+                num_frames: duration === "10" ? 81 : 81,
                 resolution: quality === "hd" ? "720p" : "480p",
-                aspect_ratio: aspectRatio,
+                aspect_ratio: aspectRatio === "1:1" ? "16:9" : aspectRatio,
+                turbo_mode: true,
             };
             if (imageUrl) falInput.image_url = imageUrl;
 
