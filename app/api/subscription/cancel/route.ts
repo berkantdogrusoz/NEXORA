@@ -10,7 +10,7 @@ export async function POST() {
         // Get the user's subscription to find the LemonSqueezy subscription ID
         const { data: sub, error: subError } = await supabase
             .from("user_subscriptions")
-            .select("subscription_id, status")
+            .select("lemon_subscription_id, status")
             .eq("user_id", authResult.userId)
             .single();
 
@@ -24,7 +24,7 @@ export async function POST() {
 
         // Cancel subscription via LemonSqueezy API
         const response = await fetch(
-            `https://api.lemonsqueezy.com/v1/subscriptions/${sub.subscription_id}`,
+            `https://api.lemonsqueezy.com/v1/subscriptions/${sub.lemon_subscription_id}`,
             {
                 method: "DELETE",
                 headers: {

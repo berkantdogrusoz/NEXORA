@@ -181,20 +181,12 @@ export default function SubscriptionPage() {
                                 {cancelling ? "Cancelling..." : "✕ Cancel Subscription"}
                             </button>
                         )}
-                        {!isPaid && (
+                        {(!isPaid || (sub.plan_name === "Growth" && isPaid)) && (
                             <Link
                                 href="/pricing"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
+                                className="flex-1 flex items-center justify-center py-3 px-6 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white text-sm font-semibold transition-all hover:scale-[1.01] active:scale-95"
                             >
-                                ⚡ Upgrade to Pro
-                            </Link>
-                        )}
-                        {sub.plan_name === "Growth" && isPaid && (
-                            <Link
-                                href="/pricing"
-                                className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
-                            >
-                                🚀 Upgrade to Pro — 1000 Credits & All Models
+                                Upgrade Plan
                             </Link>
                         )}
                     </div>
