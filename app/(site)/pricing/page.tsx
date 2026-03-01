@@ -154,13 +154,8 @@ export default function PricingPage() {
         </p>
 
         {/* Promo Banner */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <span className="text-lg">🎁</span>
-            <span className="text-sm font-semibold text-emerald-400">First 3 days FREE trial</span>
-          </div>
+        <div className="flex items-center justify-center mb-12">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-            <span className="text-lg">🏷️</span>
             <span className="text-sm text-cyan-300">Use code <span className="font-bold text-white bg-cyan-500/20 px-2 py-0.5 rounded ml-1">NEXORA20</span> for 20% off</span>
           </div>
         </div>
