@@ -21,14 +21,18 @@ export async function GET() {
         // Also fetch active subscription to determine max limits
         const { data: subData } = await supabase
             .from("user_subscriptions")
-            .select("plan_name, status")
+            .select("plan_name, status, ends_at")
             .eq("user_id", authResult.userId)
             .single();
 
         let planName = "Free";
-        // Ensure the subscription is active before applying higher limits
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
-            planName = subData.plan_name;
+        // Ensure the subscription is active (or cancelled but still within billing period)
+        if (subData) {
+            const isActive = subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial";
+            const isCancelledButValid = subData.status === "cancelled" && subData.ends_at && new Date(subData.ends_at) > new Date();
+            if (isActive || isCancelledButValid) {
+                planName = subData.plan_name;
+            }
         }
 
         if (process.env.NODE_ENV === "development") planName = "Pro";

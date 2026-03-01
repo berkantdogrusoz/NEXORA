@@ -41,13 +41,17 @@ export async function POST(req: Request) {
         const supabase = createSupabaseServer();
         const { data: subData } = await supabase
             .from("user_subscriptions")
-            .select("plan_name, status")
+            .select("plan_name, status, ends_at")
             .eq("user_id", userId)
             .single();
 
         let planName = "Free";
-        if (subData && (subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial")) {
-            planName = subData.plan_name;
+        if (subData) {
+            const isActive = subData.status === "active" || subData.status === "past_due" || subData.status === "on_trial";
+            const isCancelledButValid = subData.status === "cancelled" && subData.ends_at && new Date(subData.ends_at) > new Date();
+            if (isActive || isCancelledButValid) {
+                planName = subData.plan_name;
+            }
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
 

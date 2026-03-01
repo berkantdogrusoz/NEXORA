@@ -33,7 +33,8 @@ export default function SubscriptionPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const isPaid = sub && sub.plan_name !== "Free" && (sub.status === "active" || sub.status === "on_trial");
+    const isCancelledButValid = sub?.status === "cancelled" && sub?.ends_at && new Date(sub.ends_at) > new Date();
+    const isPaid = sub && sub.plan_name !== "Free" && (sub.status === "active" || sub.status === "on_trial" || isCancelledButValid);
 
     return (
         <div className="p-6 md:p-10 max-w-3xl mx-auto">
