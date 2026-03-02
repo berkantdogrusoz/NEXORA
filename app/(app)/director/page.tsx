@@ -38,12 +38,12 @@ export default function DirectorStudioPage() {
     const [cameraOpen, setCameraOpen] = useState(true);
     const [soulOpen, setSoulOpen] = useState(true);
 
-    // Redirect Free users to pricing
+    // Redirect Free users to pricing (only after credits have loaded)
     useEffect(() => {
-        if (planName === "Free") {
+        if (credits !== null && planName === "Free") {
             router.push("/pricing");
         }
-    }, [planName, router]);
+    }, [credits, planName, router]);
 
     // Load history
     useEffect(() => {
@@ -147,6 +147,15 @@ export default function DirectorStudioPage() {
     };
 
     const selectedCameraLabel = CAMERA_TYPES.find(c => c.value === cameraMode)?.label || "Auto";
+
+    // Show loading while credits are being fetched
+    if (credits === null) {
+        return (
+            <div className="flex-1 p-6 md:p-8 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
+            </div>
+        );
+    }
 
     if (planName === "Free") {
         return (

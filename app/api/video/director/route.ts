@@ -138,13 +138,18 @@ export async function POST(req: Request) {
             }
         }
 
+        // Upload to Supabase Storage for permanent URL
+        const { uploadVideoFromUrl } = await import("@/lib/storage");
+        const permanentUrl = await uploadVideoFromUrl(finalUrl, "director");
+        const returnUrl = permanentUrl || finalUrl;
+
         // Save generation to history
         await supabase.from("generations").insert({
             user_id: userId,
             model_id: "higgsfield-director",
             prompt: prompt || "Soul Mode Gen",
             type: "director",
-            output_url: finalUrl,
+            output_url: returnUrl,
             cost: cost,
         });
 
@@ -153,12 +158,12 @@ export async function POST(req: Request) {
             user_id: userId,
             type: "video",
             prompt: prompt || "Soul Mode Gen",
-            output_url: finalUrl,
+            output_url: returnUrl,
             model: "higgsfield-director",
             created_at: new Date().toISOString()
         });
 
-        return NextResponse.json({ url: finalUrl, success: true });
+        return NextResponse.json({ url: returnUrl, success: true });
 
     } catch (error: any) {
         console.error("Director Studio Error:", error);

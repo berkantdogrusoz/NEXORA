@@ -1,5 +1,44 @@
 import { createSupabaseServer } from "./supabase";
 
+export async function uploadVideoFromUrl(videoUrl: string, folder = "videos"): Promise<string | null> {
+    try {
+        console.log("Downloading video from:", videoUrl);
+        const response = await fetch(videoUrl);
+        if (!response.ok) throw new Error(`Failed to download video: ${response.statusText}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const contentType = response.headers.get("content-type") || "video/mp4";
+        const ext = contentType.includes("webm") ? "webm" : "mp4";
+        const filename = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+        const supabase = createSupabaseServer();
+        const bucket = "generations";
+
+        const { error: uploadError } = await supabase.storage
+            .from(bucket)
+            .upload(filename, buffer, {
+                contentType,
+                upsert: false,
+            });
+
+        if (uploadError) {
+            console.error("Video upload failed:", uploadError);
+            throw uploadError;
+        }
+
+        const { data } = supabase.storage
+            .from(bucket)
+            .getPublicUrl(filename);
+
+        console.log("Video uploaded to Supabase:", data.publicUrl);
+        return data.publicUrl;
+    } catch (error) {
+        console.error("Error uploading video to Supabase:", error);
+        return null;
+    }
+}
+
 export async function uploadImageFromUrl(imageUrl: string, folder = "generated"): Promise<string | null> {
     try {
         console.log("Downloading image from:", imageUrl);

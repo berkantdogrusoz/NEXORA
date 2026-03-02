@@ -250,7 +250,12 @@ export async function POST(req: Request) {
             throw new Error(`Invalid output from provider`);
         }
 
-        return NextResponse.json({ success: true, videoUrl: finalUrl });
+        // Upload to Supabase Storage for permanent URL
+        const { uploadVideoFromUrl } = await import("@/lib/storage");
+        const permanentUrl = await uploadVideoFromUrl(finalUrl);
+        const returnUrl = permanentUrl || finalUrl;
+
+        return NextResponse.json({ success: true, videoUrl: returnUrl });
 
     } catch (error: any) {
         console.error("Video generation error:", error);
