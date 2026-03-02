@@ -13,9 +13,9 @@ const STYLES = [
 ];
 
 const SIZES = [
-  { label: "1:1", value: "1024x1024" },
-  { label: "16:9", value: "1792x1024" },
-  { label: "9:16", value: "1024x1792" },
+  { label: "1:1 (Square)", value: "1024x1024" },
+  { label: "16:9 (Wide)", value: "1792x1024" },
+  { label: "9:16 (Vertical)", value: "1024x1792" },
 ];
 
 const IMAGE_MODELS = [

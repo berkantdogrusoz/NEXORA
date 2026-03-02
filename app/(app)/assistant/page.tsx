@@ -11,9 +11,9 @@ type Message = {
 };
 
 const QUICK_ACTIONS = [
-    { label: "📸 Generate Instagram post ideas", prompt: "Generate 5 creative Instagram post ideas for my brand this week" },
-    { label: "📊 Marketing strategy tips", prompt: "Give me 5 actionable marketing strategy tips to grow my Instagram following" },
-    { label: "📝 Write a caption", prompt: "Write an engaging Instagram caption for a product launch announcement" },
+    { label: "📸 Generate content ideas", prompt: "Generate 5 creative content ideas for my brand this week" },
+    { label: "🎬 Short-form video hooks", prompt: "Give me 10 short, punchy hook lines for short-form videos in my niche" },
+    { label: "📝 Write a caption", prompt: "Write an engaging caption for a product launch announcement" },
 ];
 
 const ASSISTANT_MODELS = [
@@ -136,8 +136,8 @@ export default function AssistantPage() {
                 {/* Header */}
                 <div className="mb-6 animate-fade-in-up flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div className="text-center md:text-left">
-                        <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Marketing Assistant</h1>
-                        <p className="text-sm text-slate-400">Your personal marketing expert. Ask anything.</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-white mb-1">AI Creative Assistant</h1>
+                        <p className="text-sm text-slate-400">Optional helper for ideas, hooks and captions. The main magic happens in the Studio.</p>
                     </div>
 
                     {/* Model Selector */}
@@ -244,7 +244,7 @@ export default function AssistantPage() {
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask about marketing, content ideas, or Instagram growth..."
+                            placeholder="Ask for ideas, hooks or captions for your content..."
                             rows={1}
                             className="flex-1 resize-none bg-transparent text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none p-3 max-h-32"
                         />

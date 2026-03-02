@@ -4,9 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 
 const ASPECT_RATIOS = [
-    { label: "16:9", value: "16:9" },
-    { label: "9:16", value: "9:16" },
-    { label: "1:1", value: "1:1" },
+    { label: "16:9 (Wide)", value: "16:9" },
+    { label: "9:16 (Vertical)", value: "9:16" },
+    { label: "1:1 (Square)", value: "1:1" },
 ];
 
 const DURATIONS = [

@@ -19,7 +19,7 @@ export default function TermsPage() {
                 <section className="mb-8">
                     <h2 className="text-xl font-semibold mb-4 text-slate-800">2. Use of Service</h2>
                     <div className="text-slate-600 leading-relaxed">
-                        Nexora provides AI-powered marketing tools and Instagram automation. You agree to use our service:
+                        Nexora provides AI-powered creative tools for generating videos and images, especially social media-ready content for platforms like Instagram and TikTok. You agree to use our service:
                         <ul className="list-disc pl-6 mt-2 space-y-1">
                             <li>In compliance with all applicable laws.</li>
                             <li>In compliance with Instagram's Terms of Use and Community Guidelines.</li>

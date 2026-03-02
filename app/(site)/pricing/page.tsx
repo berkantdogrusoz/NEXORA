@@ -70,7 +70,7 @@ const PLANS = [
     badge: null,
     features: [
       { text: "1,000 AI credits / month", has: true },
-      { text: "All AI Models (Runway Gen-4.5, Seedance, Kling 3.0)", has: true },
+      { text: "All AI Models (Runway Gen-4.5, Seedance, Kling 3.0, Higgsfield Director)", has: true },
       { text: "Cinematic Video (Highest quality)", has: true },
       { text: "Premium Image Generation (DALL-E 3, FLUX 2, Recraft)", has: true },
       { text: "Image-to-Video + All Pro Features", has: true },
@@ -280,7 +280,7 @@ export default function PricingPage() {
               },
               {
                 q: "Which AI models are used?",
-                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, FLUX 2, Recraft V3 (images), Wan-2.1, Kling 3.0, Luma Ray 2, Seedance 2.0, Runway Gen-4.5 (video)."
+                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, FLUX 2, Recraft V3 (images), Wan-2.1, Kling 3.0, Luma Ray 2, Seedance 2.0, Runway Gen-4.5, Higgsfield Director Studio (video)."
               },
             ].map((faq, i) => (
               <div key={i} className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.06]">

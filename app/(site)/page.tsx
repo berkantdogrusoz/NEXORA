@@ -62,7 +62,7 @@ export default function Home() {
 
               {/* Description */}
               <p className="text-base md:text-lg text-white/70 max-w-2xl leading-relaxed font-medium mb-8">
-                All-in-one AI creative studio. Generate cinematic videos with Seedance 2.0, photorealistic images with DALL-E 3, and direct Hollywood-grade scenes with Higgsfield Director — all from a single prompt.
+                AI-native creative studio for images and video. Generate cinematic ads, product visuals, trailers and social content with top-tier video and image models — all from a single prompt.
               </p>
 
               {/* CTA Buttons */}
@@ -71,7 +71,7 @@ export default function Home() {
                   href="/studio"
                   className="px-7 py-3 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.03] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                 >
-                  Try Now
+                  Open Studio
                 </Link>
                 <Link
                   href="/pricing"
@@ -115,7 +115,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-lg text-white/60 leading-relaxed max-w-md mb-10"
               >
-                Turn static ideas into dynamic video content with AI-driven animation and motion tools designed for storytelling and cinematic experiences.
+                Turn static ideas into dynamic videos, ad creatives, and social content with AI-driven motion tools built for storytelling and performance.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -226,19 +226,19 @@ export default function Home() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">The Best</span>
             </h2>
             <p className="text-white/50 max-w-2xl mx-auto text-lg">
-              Access the world&apos;s most advanced AI models — from cinematic video to photorealistic image generation.
+              Access the world&apos;s most advanced AI models — from cinematic video to photorealistic image generation — all inside a single studio.
             </p>
           </motion.div>
 
           {/* Large Visual Model Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion, unmatched quality.", img: "/arts/nexora-1772284253224.mp4", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
-              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp, and stunning video creation.", img: "/arts/nexora-1772284437767.mp4", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
-              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade generation & fidelity.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
-              { name: "Nano Banana 2", type: "Image", desc: "Google's flagship image generation.", img: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
-              { name: "DALL-E 3", type: "Image", desc: "Precise prompt adherence with HD quality.", img: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
-              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals & fluid motion design.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
+              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion for powerful intros and hooks.", img: "/arts/nexora-1772284253224.mp4", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
+              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp edits with clean motion.", img: "/arts/nexora-1772284437767.mp4", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
+              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade visuals for ads, trailers and campaigns.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
+              { name: "Nano Banana 2", type: "Image", desc: "Hero visuals for posts, thumbnails and key visuals.", img: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
+              { name: "DALL-E 3", type: "Image", desc: "High-fidelity visuals for ads, UGC-style content and more.", img: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
+              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals for standout content.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
             ].map((model, i) => (
               <motion.div
                 key={i}
@@ -323,10 +323,10 @@ export default function Home() {
               viewport={{ once: true }}
             >
               <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-4">
-                Image <br />Generation
+                Image <br />Creatives
               </h2>
               <p className="text-white/50 max-w-md text-lg">
-                DALL-E 3 unlocks unprecedented prompt adherence and lighting control.
+                Generate ready-to-use visuals for feeds, stories, thumbnails, ads and more with DALL-E 3 and other top-tier models.
               </p>
             </motion.div>
             <motion.div
