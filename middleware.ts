@@ -11,6 +11,10 @@ const isPublicRoute = createRouteMatcher([
     "/api/webhooks(.*)",
     "/privacy(.*)",
     "/terms(.*)",
+    "/sitemap.xml",
+    "/robots.txt",
+    "/icon.svg",
+    "/opengraph-image(.*)",
 ]);
 
 const hasClerkKeys =
