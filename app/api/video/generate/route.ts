@@ -92,6 +92,28 @@ export async function POST(req: Request) {
         creditDeducted = !isDev;
         deductedCost = cost;
 
+        // If imageUrl is base64, upload to Supabase first so providers get a real URL
+        let resolvedImageUrl = imageUrl;
+        if (imageUrl && imageUrl.startsWith("data:")) {
+            try {
+                const { createSupabaseServer: createSB } = await import("@/lib/supabase");
+                const sb = createSB();
+                const base64Data = imageUrl.split(",")[1];
+                const buffer = Buffer.from(base64Data, "base64");
+                const ext = imageUrl.includes("png") ? "png" : "jpg";
+                const filename = `reference/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+                await sb.storage.from("generations").upload(filename, buffer, {
+                    contentType: `image/${ext === "jpg" ? "jpeg" : ext}`,
+                    upsert: false,
+                });
+                const { data: pubData } = sb.storage.from("generations").getPublicUrl(filename);
+                resolvedImageUrl = pubData.publicUrl;
+                console.log("Reference image uploaded:", resolvedImageUrl);
+            } catch (uploadErr) {
+                console.error("Failed to upload reference image, using base64:", uploadErr);
+            }
+        }
+
         // Translate prompt to English for better model adherence
         let englishPrompt = prompt || "Animate this image with smooth cinematic motion";
         try {
@@ -116,8 +138,8 @@ export async function POST(req: Request) {
         // ═══════════════════════════════════════════
 
         if (modelId === "kling-3") {
-            console.log(`Generating video using fal.ai Kling 3.0 (image-to-video: ${!!imageUrl})`);
-            const falModel = imageUrl
+            console.log(`Generating video using fal.ai Kling 3.0 (image-to-video: ${!!resolvedImageUrl})`);
+            const falModel = resolvedImageUrl
                 ? "fal-ai/kling-video/v2/master/image-to-video"
                 : "fal-ai/kling-video/v2/master/text-to-video";
 
@@ -126,7 +148,7 @@ export async function POST(req: Request) {
                 aspect_ratio: aspectRatio,
                 duration: duration === "10" ? "10" : "5",
             };
-            if (imageUrl) falInput.image_url = imageUrl;
+            if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
             const result: any = await fal.subscribe(falModel, {
                 input: falInput,
@@ -145,13 +167,13 @@ export async function POST(req: Request) {
             }
 
         } else if (modelId === "seedance-2") {
-            console.log(`Generating video using fal.ai Seedance 2.0 Pro (image-to-video: ${!!imageUrl})`);
-            const falModel = imageUrl
+            console.log(`Generating video using fal.ai Seedance 2.0 Pro (image-to-video: ${!!resolvedImageUrl})`);
+            const falModel = resolvedImageUrl
                 ? "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video"
                 : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
 
             const falInput: any = { prompt: englishPrompt, duration: duration === "10s" || duration === "10" ? 10 : 5 };
-            if (imageUrl) falInput.image_url = imageUrl;
+            if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
             const result: any = await fal.subscribe(falModel, {
                 input: falInput,
@@ -170,8 +192,8 @@ export async function POST(req: Request) {
             }
 
         } else if (modelId === "wan-2.1") {
-            console.log(`Generating video using fal.ai Wan-2.1 (image-to-video: ${!!imageUrl})`);
-            const falModel = imageUrl
+            console.log(`Generating video using fal.ai Wan-2.1 (image-to-video: ${!!resolvedImageUrl})`);
+            const falModel = resolvedImageUrl
                 ? "fal-ai/wan-i2v"
                 : "fal-ai/wan-t2v";
 
@@ -182,7 +204,7 @@ export async function POST(req: Request) {
                 aspect_ratio: aspectRatio === "1:1" ? "16:9" : aspectRatio,
                 turbo_mode: true,
             };
-            if (imageUrl) falInput.image_url = imageUrl;
+            if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
             const result: any = await fal.subscribe(falModel, {
                 input: falInput,
@@ -209,9 +231,9 @@ export async function POST(req: Request) {
                 prompt: englishPrompt,
                 aspect_ratio: aspectRatio,
             };
-            if (imageUrl) input.start_image_url = imageUrl;
+            if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
 
-            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!imageUrl})`);
+            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!resolvedImageUrl})`);
             const output = await replicate.run("luma/ray-2-720p" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
 
@@ -220,7 +242,7 @@ export async function POST(req: Request) {
                 prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity) ${englishPrompt}`,
                 aspect_ratio: aspectRatio,
             };
-            if (imageUrl) input.start_image_url = imageUrl;
+            if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
 
             console.log(`Generating video using Replicate (Runway Gen-4.5 equivalent)`);
             const output = await replicate.run("luma/ray-2-720p" as any, { input });
