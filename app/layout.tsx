@@ -2,7 +2,11 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Metadata } from "next";
+import Script from "next/script";
 import JsonLd from "@/app/components/JsonLd";
+import CookieConsent from "@/app/components/CookieConsent";
+
+const GA_ID = "G-6Y87W7H5CY";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,9 +44,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Nexora AI" }],
   creator: "Nexora AI",
   publisher: "Nexora AI",
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-  },
   robots: {
     index: true,
     follow: true,
@@ -94,9 +95,28 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/dashboard"
     >
       <html lang="en" className={inter.variable} suppressHydrationWarning>
+        <head>
+          {/* Google Analytics — consent mode default: denied */}
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                analytics_storage: 'denied',
+              });
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}');
+            `}
+          </Script>
+        </head>
         <body className="font-sans bg-black text-slate-100 antialiased min-h-screen selection:bg-cyan-500/30">
           <JsonLd />
           {children}
+          <CookieConsent />
         </body>
       </html>
     </ClerkProvider>
