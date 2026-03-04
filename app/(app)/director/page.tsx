@@ -63,6 +63,28 @@ export default function DirectorStudioPage() {
 
     const [uploading, setUploading] = useState(false);
 
+    const resizeAndCompress = (file: File): Promise<{ base64: string; contentType: string }> => {
+        return new Promise((resolve) => {
+            const img = new window.Image();
+            img.onload = () => {
+                const MAX = 1536;
+                let w = img.width, h = img.height;
+                if (w > MAX || h > MAX) {
+                    const ratio = Math.min(MAX / w, MAX / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+                const canvas = document.createElement("canvas");
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+                resolve({ base64: dataUrl.split(",")[1], contentType: "image/jpeg" });
+            };
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -77,13 +99,16 @@ export default function DirectorStudioPage() {
         reader.onload = () => setReferencePreview(reader.result as string);
         reader.readAsDataURL(file);
 
-        // Upload to Supabase via API
+        // Resize, compress, and upload to Supabase
         setUploading(true);
         setError(null);
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            const { base64, contentType } = await resizeAndCompress(file);
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ base64, contentType }),
+            });
             const data = await res.json();
             if (res.ok && data.url) {
                 setReferenceImage(data.url);
