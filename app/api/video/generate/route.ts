@@ -110,7 +110,8 @@ export async function POST(req: Request) {
                 resolvedImageUrl = pubData.publicUrl;
                 console.log("Reference image uploaded:", resolvedImageUrl);
             } catch (uploadErr) {
-                console.error("Failed to upload reference image, using base64:", uploadErr);
+                console.error("Failed to upload reference image:", uploadErr);
+                return NextResponse.json({ error: "Failed to process reference image. Please try again." }, { status: 500 });
             }
         }
 
