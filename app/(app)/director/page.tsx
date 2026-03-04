@@ -61,7 +61,9 @@ export default function DirectorStudioPage() {
             .catch(() => { });
     }, []);
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -70,14 +72,32 @@ export default function DirectorStudioPage() {
             return;
         }
 
+        // Show preview immediately
         const reader = new FileReader();
-        reader.onload = () => {
-            const base64 = reader.result as string;
-            setReferenceImage(base64);
-            setReferencePreview(base64);
-            setSoulMode(true);
-        };
+        reader.onload = () => setReferencePreview(reader.result as string);
         reader.readAsDataURL(file);
+
+        // Upload to Supabase via API
+        setUploading(true);
+        setError(null);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            const data = await res.json();
+            if (res.ok && data.url) {
+                setReferenceImage(data.url);
+                setSoulMode(true);
+            } else {
+                setError(data.error || "Failed to upload image.");
+                setReferencePreview(null);
+            }
+        } catch {
+            setError("Failed to upload image.");
+            setReferencePreview(null);
+        } finally {
+            setUploading(false);
+        }
     };
 
     const removeImage = () => {
@@ -211,7 +231,7 @@ export default function DirectorStudioPage() {
 
                             <button
                                 onClick={generateVideo}
-                                disabled={generating || (!prompt && !referenceImage)}
+                                disabled={generating || uploading || (!prompt && !referenceImage)}
                                 className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white px-8 py-3 rounded-sm font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-wider text-sm"
                             >
                                 {generating ? (
@@ -356,11 +376,11 @@ export default function DirectorStudioPage() {
 
                                     {!referencePreview ? (
                                         <div
-                                            className="border-2 border-dashed border-white/[0.08] rounded-sm p-8 text-center hover:border-cyan-500/40 hover:bg-cyan-500/[0.03] transition-all cursor-pointer group"
+                                            className={`border-2 border-dashed border-white/[0.08] rounded-sm p-8 text-center hover:border-cyan-500/40 hover:bg-cyan-500/[0.03] transition-all cursor-pointer group ${uploading ? "opacity-50 pointer-events-none" : ""}`}
                                             onClick={() => fileInputRef.current?.click()}
                                         >
                                             <Upload className="w-7 h-7 text-white/30 mx-auto mb-3 group-hover:text-cyan-400 transition-colors" />
-                                            <p className="text-xs text-white/50 font-medium uppercase tracking-wider">Click to upload face reference</p>
+                                            <p className="text-xs text-white/50 font-medium uppercase tracking-wider">{uploading ? "Uploading..." : "Click to upload face reference"}</p>
                                             <p className="text-[10px] text-white/30 mt-1">JPG, PNG up to 10MB</p>
                                         </div>
                                     ) : (

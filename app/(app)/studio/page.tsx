@@ -58,7 +58,9 @@ export default function StudioPage() {
             .catch(() => { });
     }, []);
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -67,13 +69,31 @@ export default function StudioPage() {
             return;
         }
 
+        // Show preview immediately
         const reader = new FileReader();
-        reader.onload = () => {
-            const base64 = reader.result as string;
-            setReferenceImage(base64);
-            setReferencePreview(base64);
-        };
+        reader.onload = () => setReferencePreview(reader.result as string);
         reader.readAsDataURL(file);
+
+        // Upload to Supabase via API (avoids Vercel 4.5MB body limit)
+        setUploading(true);
+        setError(null);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetch("/api/upload", { method: "POST", body: formData });
+            const data = await res.json();
+            if (res.ok && data.url) {
+                setReferenceImage(data.url);
+            } else {
+                setError(data.error || "Failed to upload image.");
+                setReferencePreview(null);
+            }
+        } catch {
+            setError("Failed to upload image.");
+            setReferencePreview(null);
+        } finally {
+            setUploading(false);
+        }
     };
 
     const removeImage = () => {
@@ -348,13 +368,14 @@ export default function StudioPage() {
                                         />
                                         <button
                                             onClick={() => fileInputRef.current?.click()}
+                                            disabled={uploading}
                                             className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${referenceImage
                                                 ? "bg-cyan-500/20 border-cyan-500/30 text-cyan-400"
                                                 : "bg-white/[0.04] border-white/[0.06] text-slate-500 hover:text-slate-300"
-                                                }`}
+                                                } disabled:opacity-50`}
                                             title="Upload reference image for image-to-video"
                                         >
-                                            🖼️ {referenceImage ? "Image Added" : "Add Image"}
+                                            🖼️ {uploading ? "Uploading..." : referenceImage ? "Image Added" : "Add Image"}
                                         </button>
 
                                         {/* Aspect Ratio */}
@@ -406,7 +427,7 @@ export default function StudioPage() {
                                     {/* Generate Button */}
                                     <button
                                         onClick={generateVideo}
-                                        disabled={generating || (!prompt && !referenceImage)}
+                                        disabled={generating || uploading || (!prompt && !referenceImage)}
                                         className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/20"
                                     >
                                         {generating ? (
