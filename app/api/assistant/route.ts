@@ -173,7 +173,7 @@ export async function POST(req: Request) {
                 messages: [
                     { role: "system", content: fullSystemPrompt },
                     ...conversationHistory.map(m => ({
-                        role: m.role as "user" | "system",
+                        role: m.role as "user" | "assistant",
                         content: m.content,
                     })),
                     { role: "user", content: message },
@@ -187,7 +187,7 @@ export async function POST(req: Request) {
             }
             const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
 
-            const chat = ai.chats.create({
+            const chat = await ai.chats.create({
                 model: finalModel,
                 config: { systemInstruction: fullSystemPrompt },
                 history: conversationHistory.map(m => ({

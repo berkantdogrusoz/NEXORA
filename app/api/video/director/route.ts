@@ -153,16 +153,6 @@ export async function POST(req: Request) {
             cost: cost,
         });
 
-        // Add history record for profile tracking
-        await supabase.from("history").insert({
-            user_id: userId,
-            type: "video",
-            prompt: prompt || "Soul Mode Gen",
-            output_url: returnUrl,
-            model: "higgsfield-director",
-            created_at: new Date().toISOString()
-        });
-
         return NextResponse.json({ url: returnUrl, success: true });
 
     } catch (error: any) {

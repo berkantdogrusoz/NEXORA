@@ -122,7 +122,7 @@ export async function POST(req: Request) {
                 if (!checkRes.ok) {
                     console.error(`Image URL not accessible: ${checkRes.status} - ${resolvedImageUrl}`);
                     return NextResponse.json({
-                        error: `Reference image is not publicly accessible (${checkRes.status}). Please ensure the 'generations' bucket in Supabase Storage is set to PUBLIC.`,
+                        error: `Reference image is not publicly accessible (${checkRes.status}). Please ensure the 'instagram-images' bucket in Supabase Storage is set to PUBLIC.`,
                     }, { status: 400 });
                 }
                 console.log(`Image URL verified accessible: ${resolvedImageUrl}`);
@@ -298,6 +298,8 @@ export async function POST(req: Request) {
                 finalUrl = finalUrl.url().toString();
             } else if (typeof finalUrl.url === "string") {
                 finalUrl = finalUrl.url;
+            } else if (finalUrl.toString && typeof finalUrl.toString === "function") {
+                finalUrl = finalUrl.toString();
             }
         }
 
