@@ -47,7 +47,7 @@ export default function DirectorStudioPage() {
 
     // Load history
     useEffect(() => {
-        fetch("/api/generations?type=video")
+        fetch("/api/generations?type=director")
             .then(r => r.json())
             .then(data => {
                 if (data.generations?.length) {

@@ -244,14 +244,14 @@ export async function POST(req: Request) {
 
         } else if (modelId === "runway-gen4") {
             const input: any = {
-                prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity) ${englishPrompt}`,
+                prompt: englishPrompt,
                 aspect_ratio: aspectRatio,
-                duration: duration === "10" ? "10s" : "5s",
+                duration: duration === "10" ? 10 : 5,
             };
-            if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
+            if (resolvedImageUrl) input.image = resolvedImageUrl;
 
-            console.log(`Generating video using Replicate (Runway Gen-4.5 equivalent, duration: ${duration}s)`);
-            const output = await replicate.run("luma/ray-2-720p" as any, { input });
+            console.log(`Generating video using Replicate Runway Gen-4 Turbo (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
+            const output = await replicate.run("runwayml/gen4-turbo" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
 
         } else if (modelId === "runway-gwm") {
