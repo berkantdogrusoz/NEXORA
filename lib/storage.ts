@@ -13,7 +13,7 @@ export async function uploadVideoFromUrl(videoUrl: string, folder = "videos"): P
         const filename = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
         const supabase = createSupabaseServer();
-        const bucket = "generations";
+        const bucket = "instagram-images";
 
         const { error: uploadError } = await supabase.storage
             .from(bucket)

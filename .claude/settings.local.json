@@ -6,7 +6,9 @@
       "Bash(npm run build)",
       "Bash(npx next build)",
       "Bash(find \"c:\\\\Users\\\\berka\\\\OneDrive\\\\Masaüstü\\\\NEXORA\\\\app\\\\\\(app\\)\\\\director\" -type f)",
-      "WebFetch(domain:getnexorai.com)"
+      "WebFetch(domain:getnexorai.com)",
+      "Bash(npx vercel logs getnexorai.com --limit 20)",
+      "WebFetch(domain:replicate.com)"
     ]
   }
 }

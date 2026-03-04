@@ -102,11 +102,11 @@ export async function POST(req: Request) {
                 const buffer = Buffer.from(base64Data, "base64");
                 const ext = imageUrl.includes("png") ? "png" : "jpg";
                 const filename = `reference/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-                await sb.storage.from("generations").upload(filename, buffer, {
+                await sb.storage.from("instagram-images").upload(filename, buffer, {
                     contentType: `image/${ext === "jpg" ? "jpeg" : ext}`,
                     upsert: false,
                 });
-                const { data: pubData } = sb.storage.from("generations").getPublicUrl(filename);
+                const { data: pubData } = sb.storage.from("instagram-images").getPublicUrl(filename);
                 resolvedImageUrl = pubData.publicUrl;
                 console.log("Reference image uploaded:", resolvedImageUrl);
             } catch (uploadErr) {

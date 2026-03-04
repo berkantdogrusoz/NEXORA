@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
         const supabase = createSupabaseServer();
         const { error: uploadError } = await supabase.storage
-            .from("generations")
+            .from("instagram-images")
             .upload(filename, buffer, {
                 contentType: contentType || "image/jpeg",
                 upsert: false,
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: `Storage error: ${uploadError.message}` }, { status: 500 });
         }
 
-        const { data } = supabase.storage.from("generations").getPublicUrl(filename);
+        const { data } = supabase.storage.from("instagram-images").getPublicUrl(filename);
 
         return NextResponse.json({ url: data.publicUrl });
     } catch (error: any) {
