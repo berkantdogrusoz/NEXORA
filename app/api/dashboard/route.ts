@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabase";
 
 export async function GET() {
     try {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
+
+        const supabase = createSupabaseServer();
 
         // Fetch User Credits
         const { data: creditData } = await supabase
@@ -34,7 +36,7 @@ export async function GET() {
 
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
-        let maxCredits = 100;
+        let maxCredits = 50;
         if (planName === "Growth") maxCredits = 500;
         else if (planName === "Pro") maxCredits = 1000;
 
@@ -56,7 +58,7 @@ export async function GET() {
         });
     } catch {
         return NextResponse.json({
-            stats: { credits: 0, maxCredits: 100, planName: "Free", totalMessages: 0 }
+            stats: { credits: 0, maxCredits: 50, planName: "Free", totalMessages: 0 }
         });
     }
 }

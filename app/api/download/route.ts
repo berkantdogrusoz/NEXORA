@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { getAuthUserId } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
     try {
+        const authResult = await getAuthUserId();
+        if ("error" in authResult) return authResult.error;
         const { searchParams } = new URL(req.url);
         const url = searchParams.get("url");
 

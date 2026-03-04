@@ -21,6 +21,12 @@ export default function SubscriptionPage() {
     const [error, setError] = useState<string | null>(null);
     const [cancelling, setCancelling] = useState(false);
     const [cancelSuccess, setCancelSuccess] = useState<string | null>(null);
+    const [buyingCredits, setBuyingCredits] = useState<string | null>(null);
+
+    const CREDIT_PACKS = [
+        { id: "300", name: "Starter Pack", credits: 300, price: "$10", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
+        { id: "750", name: "Mega Pack", credits: 750, price: "$20", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "25% Bonus" },
+    ];
 
     useEffect(() => {
         fetch("/api/subscription")
@@ -198,6 +204,62 @@ export default function SubscriptionPage() {
                         </div>
                     )}
 
+                    {/* Buy Credits Section */}
+                    <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6">
+                        <div className="flex items-center justify-between mb-5">
+                            <div>
+                                <h3 className="text-sm font-semibold text-white">Buy Credits</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">One-time purchase, credits never expire</p>
+                            </div>
+                            <span className="text-xs text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-full font-medium">
+                                ⚡ Instant Delivery
+                            </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {CREDIT_PACKS.map((pack) => (
+                                <div
+                                    key={pack.id}
+                                    className="relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] border border-white/[0.08] rounded-xl p-5 hover:border-cyan-500/30 transition-all group"
+                                >
+                                    {pack.badge && (
+                                        <span className="absolute -top-2.5 right-4 text-[10px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-black px-2.5 py-0.5 rounded-full uppercase">
+                                            {pack.badge}
+                                        </span>
+                                    )}
+                                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{pack.name}</p>
+                                    <div className="flex items-baseline gap-2 mt-2 mb-1">
+                                        <span className="text-3xl font-bold text-white">{pack.credits}</span>
+                                        <span className="text-sm text-slate-400">credits</span>
+                                    </div>
+                                    <p className="text-lg font-semibold text-cyan-400 mb-4">{pack.price}</p>
+                                    <button
+                                        onClick={async () => {
+                                            setBuyingCredits(pack.id);
+                                            try {
+                                                const res = await fetch("/api/lemon/checkout", {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ variantId: pack.variantId }),
+                                                });
+                                                const data = await res.json();
+                                                if (data.url) window.open(data.url, "_blank");
+                                                else alert(data.error || "Failed to start checkout.");
+                                            } catch {
+                                                alert("Something went wrong.");
+                                            } finally {
+                                                setBuyingCredits(null);
+                                            }
+                                        }}
+                                        disabled={buyingCredits === pack.id}
+                                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white text-sm font-semibold transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/10"
+                                    >
+                                        {buyingCredits === pack.id ? "Opening..." : `Buy ${pack.credits} Credits`}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Plan Features */}
                     <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6">
                         <h3 className="text-sm font-semibold text-white mb-4">Plan Includes</h3>
@@ -221,7 +283,7 @@ export default function SubscriptionPage() {
                             )}
                             {sub.plan_name === "Free" && (
                                 <>
-                                    <Feature text="100 credits (one-time)" />
+                                    <Feature text="50 credits (one-time)" />
                                     <Feature text="Standard AI models only" />
                                     <Feature text="Standard quality" />
                                 </>

@@ -9,11 +9,11 @@ export async function GET() {
 
         const supabase = createSupabaseServer();
 
-        // Give the user 100 free credits for testing
+        // Give the user 50 free credits for testing
         const { error } = await supabase
             .from("user_credits")
             .upsert(
-                { user_id: authResult.userId, credits: 100, updated_at: new Date().toISOString() },
+                { user_id: authResult.userId, credits: 50, updated_at: new Date().toISOString() },
                 { onConflict: "user_id" }
             );
 

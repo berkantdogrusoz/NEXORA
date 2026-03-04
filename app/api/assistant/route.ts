@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabase";
 
 const ASSISTANT_SYSTEM_PROMPT = `You are Nexora AI — a high-level Creative Studio Assistant.
 Your goal is to help the user create better videos and images for their online channels (social, ads, website, etc.) while keeping things simple and fast.
@@ -26,6 +26,7 @@ export async function GET() {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
 
+        const supabase = createSupabaseServer();
         const { data } = await supabase
             .from("assistant_messages")
             .select("*")

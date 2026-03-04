@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabase";
 
 export async function POST() {
     try {
@@ -8,6 +8,7 @@ export async function POST() {
         if ("error" in authResult) return authResult.error;
 
         // Get the user's subscription to find the LemonSqueezy subscription ID
+        const supabase = createSupabaseServer();
         const { data: sub, error: subError } = await supabase
             .from("user_subscriptions")
             .select("lemon_subscription_id, status")

@@ -25,7 +25,7 @@ const PLANS = [
     highlight: false,
     badge: null,
     features: [
-      { text: "100 AI credits (One-time)", has: true },
+      { text: "50 AI credits (One-time)", has: true },
       { text: "GPT-4o Mini (Chat)", has: true },
       { text: "Wan-2.1 + Kling 3.0 (Video)", has: true },
       { text: "DALL-E 3 (Image Generation)", has: true },
@@ -90,8 +90,14 @@ const PLAN_RANK: Record<string, number> = { Free: 0, Growth: 1, Pro: 2 };
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [buyingCredits, setBuyingCredits] = useState<string | null>(null);
   const [userPlan, setUserPlan] = useState<string>("Free");
   const router = useRouter();
+
+  const CREDIT_PACKS = [
+    { id: "300", name: "Starter Pack", credits: 300, price: "$10", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
+    { id: "750", name: "Mega Pack", credits: 750, price: "$20", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "25% Bonus" },
+  ];
 
   useEffect(() => {
     fetch("/api/credits")
@@ -265,6 +271,62 @@ export default function PricingPage() {
           ))}
         </div>
 
+        {/* Credit Packs Section */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-xs font-semibold text-amber-400 uppercase tracking-widest mb-2">Need More Credits?</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Buy Credit Packs</h2>
+            <p className="text-sm text-slate-400">One-time purchase. Credits never expire. Works with any plan.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {CREDIT_PACKS.map((pack) => (
+              <div
+                key={pack.id}
+                className="relative bg-white/[0.03] border border-white/[0.08] rounded-2xl p-8 text-left hover:border-amber-500/30 transition-all group"
+              >
+                {pack.badge && (
+                  <span className="absolute -top-3 right-6 text-[11px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-black px-3 py-1 rounded-full uppercase shadow-lg shadow-amber-500/20">
+                    {pack.badge}
+                  </span>
+                )}
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-3">{pack.name}</p>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-4xl font-black text-white">{pack.credits}</span>
+                  <span className="text-sm text-slate-400">credits</span>
+                </div>
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-2xl font-bold text-amber-400">{pack.price}</span>
+                  <span className="text-xs text-slate-500">{pack.priceNote}</span>
+                </div>
+                <button
+                  onClick={async () => {
+                    setBuyingCredits(pack.id);
+                    try {
+                      const res = await fetch("/api/lemon/checkout", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ variantId: pack.variantId }),
+                      });
+                      const data = await res.json();
+                      if (data.url) window.location.href = data.url;
+                      else if (res.status === 401) router.push("/sign-up");
+                      else alert(data.error || "Failed to start checkout.");
+                    } catch {
+                      alert("Something went wrong.");
+                    } finally {
+                      setBuyingCredits(null);
+                    }
+                  }}
+                  disabled={buyingCredits === pack.id}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-sm transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20"
+                >
+                  {buyingCredits === pack.id ? "Opening Checkout..." : `Buy ${pack.credits} Credits`}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* FAQ */}
         <div className="mt-20 max-w-2xl mx-auto text-center">
           <h3 className="text-xl font-bold text-white mb-6">Frequently Asked Questions</h3>
@@ -272,7 +334,7 @@ export default function PricingPage() {
             {[
               {
                 q: "What are credits?",
-                a: "Each AI generation uses credits. For example: 1 image = 5 credits, 1 video = 12.5 credits, 1 chat message = 0.5 credits."
+                a: "Each AI generation uses credits. For example: 1 image costs 15-45 credits depending on model, 1 video costs 50-150 credits, 1 chat message costs 2-5 credits."
               },
               {
                 q: "Can I cancel anytime?",

@@ -47,11 +47,11 @@ export async function POST(req: Request) {
 
         // Cost mapping
         const costMap: Record<string, number> = {
-            "kling-3": 25,
-            "luma": 40,
-            "runway-gen4": 55,
-            "runway-gwm": 65,
-            "seedance-2": 75,
+            "kling-3": 50,
+            "luma": 60,
+            "runway-gen4": 75,
+            "runway-gwm": 85,
+            "seedance-2": 100,
         };
         const cost = costMap[modelId] || 25;
 
@@ -172,7 +172,11 @@ export async function POST(req: Request) {
                 ? "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video"
                 : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
 
-            const falInput: any = { prompt: englishPrompt, duration: duration === "10s" || duration === "10" ? 10 : 5 };
+            const falInput: any = {
+                prompt: englishPrompt,
+                duration: duration === "10s" || duration === "10" ? 10 : 5,
+                aspect_ratio: aspectRatio,
+            };
             if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
             const result: any = await fal.subscribe(falModel, {
@@ -199,7 +203,7 @@ export async function POST(req: Request) {
 
             const falInput: any = {
                 prompt: englishPrompt,
-                num_frames: duration === "10" ? 81 : 81,
+                num_frames: duration === "10" ? 161 : 81,
                 resolution: quality === "hd" ? "720p" : "480p",
                 aspect_ratio: aspectRatio === "1:1" ? "16:9" : aspectRatio,
                 turbo_mode: true,
@@ -230,10 +234,11 @@ export async function POST(req: Request) {
             const input: any = {
                 prompt: englishPrompt,
                 aspect_ratio: aspectRatio,
+                duration: duration === "10" ? "10s" : "5s",
             };
             if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
 
-            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!resolvedImageUrl})`);
+            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
             const output = await replicate.run("luma/ray-2-720p" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
 
@@ -241,21 +246,23 @@ export async function POST(req: Request) {
             const input: any = {
                 prompt: `(Top-tier cinematic motion quality, Gen-4.5 visual fidelity) ${englishPrompt}`,
                 aspect_ratio: aspectRatio,
+                duration: duration === "10" ? "10s" : "5s",
             };
             if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
 
-            console.log(`Generating video using Replicate (Runway Gen-4.5 equivalent)`);
+            console.log(`Generating video using Replicate (Runway Gen-4.5 equivalent, duration: ${duration}s)`);
             const output = await replicate.run("luma/ray-2-720p" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
 
         } else if (modelId === "runway-gwm") {
-            console.log(`Generating video using Replicate (GWM-1 equivalent)`);
-            const output = await replicate.run("minimax/video-01" as any, {
-                input: {
-                    prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${englishPrompt} (Length: ${duration} seconds, Ratio: ${aspectRatio})`,
-                    prompt_optimizer: true
-                }
-            });
+            console.log(`Generating video using Replicate (GWM-1 equivalent, image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
+            const input: any = {
+                prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${englishPrompt}`,
+                prompt_optimizer: true,
+            };
+            if (resolvedImageUrl) input.first_frame_image = resolvedImageUrl;
+
+            const output = await replicate.run("minimax/video-01" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
         }
 

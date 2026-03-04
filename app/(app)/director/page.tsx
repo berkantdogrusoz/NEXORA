@@ -47,7 +47,7 @@ export default function DirectorStudioPage() {
 
     // Load history
     useEffect(() => {
-        fetch("/api/generations?type=director")
+        fetch("/api/generations?type=video")
             .then(r => r.json())
             .then(data => {
                 if (data.generations?.length) {
@@ -99,7 +99,7 @@ export default function DirectorStudioPage() {
             return;
         }
 
-        const cost = 120;
+        const cost = 150;
 
         if (credits !== null && credits < cost) {
             setError(`Insufficient credits. You need ${cost} credits.`);
@@ -206,7 +206,7 @@ export default function DirectorStudioPage() {
 
                         <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
                             <div className="text-xs text-white/40 uppercase tracking-wider font-medium">
-                                <span className="font-bold text-cyan-400">120</span> credits / run
+                                <span className="font-bold text-cyan-400">150</span> credits / run
                             </div>
 
                             <button

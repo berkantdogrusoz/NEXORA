@@ -37,15 +37,15 @@ export async function GET() {
 
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
-        let maxCredits = 100;
+        let maxCredits = 50;
         if (planName === "Growth") maxCredits = 500;
         else if (planName === "Pro") maxCredits = 1000;
 
         if (error && error.code === "PGRST116") {
-            // User not found, initialize with 100 credits (Tiered system: Free starts small)
+            // User not found, initialize with 50 credits (Free tier)
             const { data: newData, error: initError } = await supabase
                 .from("user_credits")
-                .insert([{ user_id: authResult.userId, credits: 100 }])
+                .insert([{ user_id: authResult.userId, credits: 50 }])
                 .select("credits")
                 .single();
 

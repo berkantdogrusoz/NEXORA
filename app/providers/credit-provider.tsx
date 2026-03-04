@@ -13,7 +13,7 @@ interface CreditContextType {
 
 const CreditContext = createContext<CreditContextType>({
     credits: null,
-    maxCredits: 15,
+    maxCredits: 50,
     planName: "Free",
     refreshCredits: async () => { },
     deductCredits: () => { },
@@ -26,7 +26,7 @@ export function useCredits() {
 
 export function CreditProvider({ children }: { children: React.ReactNode }) {
     const [credits, setCredits] = useState<number | null>(null);
-    const [maxCredits, setMaxCredits] = useState<number>(15);
+    const [maxCredits, setMaxCredits] = useState<number>(50);
     const [planName, setPlanName] = useState<string>("Free");
 
     const refreshCredits = async () => {

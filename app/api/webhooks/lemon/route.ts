@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
             // Determine plan name and credit amount based on variant ID
             let planName = "Free";
-            let newCredits = 100;
+            let newCredits = 50;
 
             if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
                 planName = "Growth";
@@ -80,6 +80,53 @@ export async function POST(req: NextRequest) {
                         { user_id: userId, credits: newCredits, updated_at: new Date().toISOString() },
                         { onConflict: "user_id" }
                     );
+            }
+        }
+
+        // ═══════════════════════════════════════
+        //   ONE-TIME CREDIT PACK PURCHASES
+        // ═══════════════════════════════════════
+        if (eventType === "order_created") {
+            const attributes = data.attributes;
+            // Try multiple paths to find variant_id from order data
+            const variantId = String(
+                attributes.first_order_item?.variant_id
+                || attributes.variant_id
+                || ""
+            );
+
+            // Determine credit amount from variant ID
+            let creditAmount = 0;
+            if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_300) {
+                creditAmount = 300;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_750) {
+                creditAmount = 750;
+            }
+
+            if (creditAmount > 0) {
+                console.log(`Credit pack purchased: ${creditAmount} credits for user ${userId}`);
+                const { createSupabaseServer } = await import("@/lib/supabase");
+                const supabase = createSupabaseServer();
+
+                // Get current balance
+                const { data: currentData } = await supabase
+                    .from("user_credits")
+                    .select("credits")
+                    .eq("user_id", userId)
+                    .single();
+
+                const currentCredits = Number(currentData?.credits || 0);
+                const newTotal = currentCredits + creditAmount;
+
+                // Add credits to existing balance (not replace)
+                await supabase
+                    .from("user_credits")
+                    .upsert(
+                        { user_id: userId, credits: newTotal, updated_at: new Date().toISOString() },
+                        { onConflict: "user_id" }
+                    );
+
+                console.log(`Credits updated: ${currentCredits} + ${creditAmount} = ${newTotal} for user ${userId}`);
             }
         }
 
