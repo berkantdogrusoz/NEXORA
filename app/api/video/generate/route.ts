@@ -263,12 +263,18 @@ export async function POST(req: Request) {
             finalUrl = Array.isArray(output) ? output[0] : output;
 
         } else if (modelId === "runway-gen4") {
+            // Runway ratio format: "1280:720", "720:1280", "1080:1080"
+            const ratioMap: Record<string, string> = {
+                "16:9": "1280:720",
+                "9:16": "720:1280",
+                "1:1": "1080:1080",
+            };
             const input: any = {
-                prompt: englishPrompt,
-                aspect_ratio: aspectRatio,
+                prompt_text: englishPrompt,
+                ratio: ratioMap[aspectRatio] || "1280:720",
                 duration: duration === "10" ? 10 : 5,
             };
-            if (resolvedImageUrl) input.image = resolvedImageUrl;
+            if (resolvedImageUrl) input.prompt_image = resolvedImageUrl;
 
             console.log(`Generating video using Replicate Runway Gen-4 Turbo (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
             const output = await replicate.run("runwayml/gen4-turbo" as any, { input });
