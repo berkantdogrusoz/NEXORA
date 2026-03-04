@@ -166,7 +166,15 @@ export default function StudioPage() {
                 }),
             });
 
-            const data = await res.json();
+            let data: any;
+            try {
+                data = await res.json();
+            } catch {
+                const text = await res.text().catch(() => "");
+                setError(`Server error (${res.status}): ${text.slice(0, 200) || "No response"}`);
+                refundCredits(selectedModelConfig.cost);
+                return;
+            }
 
             if (res.ok && data.success) {
                 setVideoUrl(data.videoUrl);
@@ -187,11 +195,11 @@ export default function StudioPage() {
                 }).catch(() => { });
             } else {
                 setError(data.error || "Failed to generate video.");
-                refundCredits(selectedModelConfig.cost); // refund on error
+                refundCredits(selectedModelConfig.cost);
             }
-        } catch {
-            setError("Something went wrong.");
-            refundCredits(selectedModelConfig.cost); // refund on error
+        } catch (err: any) {
+            setError(`Error: ${err.message || "Connection failed"}`);
+            refundCredits(selectedModelConfig.cost);
         } finally {
             setGenerating(false);
         }
