@@ -115,6 +115,25 @@ export async function POST(req: Request) {
             }
         }
 
+        // Verify image URL is publicly accessible before sending to providers
+        if (resolvedImageUrl && resolvedImageUrl.startsWith("http")) {
+            try {
+                const checkRes = await fetch(resolvedImageUrl, { method: "HEAD" });
+                if (!checkRes.ok) {
+                    console.error(`Image URL not accessible: ${checkRes.status} - ${resolvedImageUrl}`);
+                    return NextResponse.json({
+                        error: `Reference image is not publicly accessible (${checkRes.status}). Please ensure the 'generations' bucket in Supabase Storage is set to PUBLIC.`,
+                    }, { status: 400 });
+                }
+                console.log(`Image URL verified accessible: ${resolvedImageUrl}`);
+            } catch (checkErr) {
+                console.error("Image URL check failed:", checkErr);
+                return NextResponse.json({
+                    error: "Could not verify reference image URL. Please try again.",
+                }, { status: 400 });
+            }
+        }
+
         // Translate prompt to English for better model adherence
         let englishPrompt = prompt || "Animate this image with smooth cinematic motion";
         try {
