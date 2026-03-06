@@ -37,9 +37,14 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
                 setCredits(data.credits);
                 if (data.maxCredits) setMaxCredits(data.maxCredits);
                 if (data.planName) setPlanName(data.planName);
+            } else {
+                // Retry after 2s on auth failure (transient Clerk issue)
+                console.warn("Credits fetch failed, retrying in 2s...", res.status);
+                setTimeout(refreshCredits, 2000);
             }
         } catch (error) {
             console.error("Failed to fetch credits", error);
+            setTimeout(refreshCredits, 3000);
         }
     };
 

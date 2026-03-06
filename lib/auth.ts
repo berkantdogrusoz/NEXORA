@@ -32,7 +32,8 @@ export async function getAuthUserId(): Promise<{ userId: string } | { error: Nex
             };
         }
         return { userId };
-    } catch (e) {
+    } catch (e: any) {
+        console.error("Auth error details:", e?.message || e, "CLERK_SECRET_KEY set:", !!process.env.CLERK_SECRET_KEY);
         return {
             error: NextResponse.json(
                 { error: "Authentication failed." },
