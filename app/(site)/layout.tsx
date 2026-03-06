@@ -4,7 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton, SignInButton, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { ChevronDown, Video, Image as ImageIcon, Sparkles, BookOpen, GraduationCap, PlayCircle } from "lucide-react";
+import {
+    ChevronDown,
+    Video,
+    Image as ImageIcon,
+    Sparkles,
+    BookOpen,
+    GraduationCap,
+    PlayCircle,
+    Menu,
+    X,
+} from "lucide-react";
 
 export default function SiteLayout({
     children,
@@ -15,12 +25,18 @@ export default function SiteLayout({
     const { isSignedIn, isLoaded } = useUser();
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    // Close mobile menu on route change
+    useEffect(() => {
+        setMobileOpen(false);
+    }, [pathname]);
 
     const handleMouseEnter = (menu: string) => setActiveDropdown(menu);
     const handleMouseLeave = () => setActiveDropdown(null);
@@ -29,7 +45,7 @@ export default function SiteLayout({
         <div className="min-h-screen bg-black text-white font-sans selection:bg-cyan-500/30">
             {/* Navbar */}
             <nav
-                className={`w-full z-[100] transition-all duration-300 py-4 px-6 fixed top-0 left-0 right-0 ${scrolled
+                className={`w-full z-[100] transition-all duration-300 py-4 px-6 fixed top-0 left-0 right-0 ${scrolled || mobileOpen
                     ? "bg-black/95 backdrop-blur-2xl border-b border-white/[0.06] shadow-xl shadow-black/50"
                     : "bg-transparent"
                     }`}
@@ -137,46 +153,167 @@ export default function SiteLayout({
                         </div>
                     </div>
 
-                    {/* Auth */}
+                    {/* Right side: Auth + Mobile hamburger */}
                     <div className="flex items-center gap-4 shrink-0">
-                        {!isLoaded ? (
-                            <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
-                        ) : isSignedIn ? (
-                            <div className="flex items-center gap-4">
+                        {/* Desktop Auth */}
+                        <div className="hidden md:flex items-center gap-4">
+                            {!isLoaded ? (
+                                <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                            ) : isSignedIn ? (
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        href="/dashboard"
+                                        className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-200 transition-colors"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <UserButton
+                                        afterSignOutUrl="/"
+                                        appearance={{
+                                            elements: {
+                                                avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors",
+                                            },
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <SignInButton mode="modal">
+                                        <button className="text-sm font-bold text-white/90 hover:text-white transition-colors">
+                                            Log in
+                                        </button>
+                                    </SignInButton>
+                                    <Link
+                                        href="/sign-up"
+                                        className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2"
+                                    >
+                                        Start Free
+                                        <Sparkles className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mobile: CTA + Hamburger */}
+                        <div className="flex md:hidden items-center gap-3">
+                            {!isLoaded ? (
+                                <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+                            ) : isSignedIn ? (
                                 <Link
-                                    href="/generate"
-                                    className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-200 transition-colors"
+                                    href="/dashboard"
+                                    className="px-4 py-2 rounded-full bg-white text-black text-xs font-bold"
                                 >
-                                    App
+                                    Dashboard
                                 </Link>
-                                <UserButton
-                                    afterSignOutUrl="/"
-                                    appearance={{
-                                        elements: {
-                                            avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors",
-                                        },
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-4">
-                                <SignInButton mode="modal">
-                                    <button className="text-sm font-bold text-white/90 hover:text-white transition-colors">
-                                        Log in
-                                    </button>
-                                </SignInButton>
+                            ) : (
                                 <Link
                                     href="/sign-up"
-                                    className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2"
+                                    className="px-4 py-2 rounded-full bg-white text-black text-xs font-bold flex items-center gap-1.5"
                                 >
-                                    Start now
-                                    <Sparkles className="w-4 h-4" />
+                                    Start Free
+                                    <Sparkles className="w-3 h-3" />
                                 </Link>
-                            </div>
-                        )}
+                            )}
+                            <button
+                                onClick={() => setMobileOpen(!mobileOpen)}
+                                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                            >
+                                {mobileOpen ? (
+                                    <X className="w-6 h-6 text-white" />
+                                ) : (
+                                    <Menu className="w-6 h-6 text-white" />
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </nav>
+
+            {/* ═══════════════════════════════════════════ */}
+            {/*   MOBILE MENU                               */}
+            {/* ═══════════════════════════════════════════ */}
+            {mobileOpen && (
+                <div className="fixed inset-x-0 top-[65px] bottom-0 z-[99] bg-black/98 backdrop-blur-xl md:hidden overflow-y-auto">
+                    <div className="px-6 py-6 space-y-2">
+                        {/* Create Section */}
+                        <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.25em] px-3 pt-2 pb-3">
+                            Create
+                        </p>
+                        <Link
+                            href="/generate"
+                            className="flex items-center gap-4 px-4 py-4 rounded-sm bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-all"
+                        >
+                            <div className="w-10 h-10 rounded-sm bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                                <ImageIcon className="w-5 h-5 text-cyan-400" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-bold text-white">AI Image Generator</div>
+                                <div className="text-[11px] text-white/40">DALL-E 3, FLUX, Recraft</div>
+                            </div>
+                        </Link>
+                        <Link
+                            href="/studio"
+                            className="flex items-center gap-4 px-4 py-4 rounded-sm bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-all"
+                        >
+                            <div className="w-10 h-10 rounded-sm bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                <Video className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-bold text-white">AI Video Studio</div>
+                                <div className="text-[11px] text-white/40">Kling 3.0, Seedance, Runway</div>
+                            </div>
+                        </Link>
+
+                        {/* Links Section */}
+                        <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.25em] px-3 pt-6 pb-3">
+                            More
+                        </p>
+                        <Link href="/pricing" className="block px-4 py-3.5 text-sm font-bold text-white/70 hover:text-white rounded-sm hover:bg-white/[0.04] transition-all">
+                            Pricing
+                        </Link>
+                        <Link href="/director" className="block px-4 py-3.5 text-sm font-bold text-white/70 hover:text-white rounded-sm hover:bg-white/[0.04] transition-all">
+                            Director Studio
+                        </Link>
+
+                        {/* Auth Section */}
+                        <div className="pt-6 border-t border-white/[0.06] mt-6 space-y-3">
+                            {!isLoaded ? (
+                                <div className="h-12 bg-white/5 rounded-sm animate-pulse" />
+                            ) : isSignedIn ? (
+                                <div className="flex items-center gap-4 px-4 py-3">
+                                    <UserButton
+                                        afterSignOutUrl="/"
+                                        appearance={{
+                                            elements: {
+                                                avatarBox: "w-10 h-10 border-2 border-white/20",
+                                            },
+                                        }}
+                                    />
+                                    <div>
+                                        <div className="text-sm font-bold text-white">My Account</div>
+                                        <Link href="/dashboard" className="text-xs text-cyan-400 font-medium">Go to Dashboard →</Link>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/sign-up"
+                                        className="flex items-center justify-center gap-2 w-full py-3.5 rounded-sm bg-white text-black text-sm font-bold hover:bg-slate-200 transition-all"
+                                    >
+                                        <Sparkles className="w-4 h-4" />
+                                        Start Free — No Credit Card
+                                    </Link>
+                                    <SignInButton mode="modal">
+                                        <button className="w-full py-3.5 rounded-sm border border-white/10 text-sm font-bold text-white/80 hover:bg-white/[0.04] transition-all">
+                                            Already have an account? Log in
+                                        </button>
+                                    </SignInButton>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <main>{children}</main>
         </div>

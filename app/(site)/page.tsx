@@ -67,9 +67,18 @@ export default function Home() {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-3">
+                {/* Mobile-first: Start Free (visible on all, primary on mobile) */}
+                <Link
+                  href="/sign-up"
+                  className="px-7 py-3 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.03] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center gap-2 md:hidden"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Start Free
+                </Link>
+                {/* Desktop: Open Studio */}
                 <Link
                   href="/studio"
-                  className="px-7 py-3 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.03] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+                  className="hidden md:inline-flex px-7 py-3 rounded-full bg-white text-black font-bold text-sm hover:scale-[1.03] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)]"
                 >
                   Open Studio
                 </Link>
@@ -81,7 +90,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/director"
-                  className="px-7 py-3 rounded-full text-sm font-bold text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 transition-colors backdrop-blur-sm"
+                  className="hidden md:inline-flex px-7 py-3 rounded-full text-sm font-bold text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 transition-colors backdrop-blur-sm"
                 >
                   Director Studio
                 </Link>
