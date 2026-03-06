@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthUserId } from "@/lib/auth";
+import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import OpenAI from "openai";
 import * as fal from "@fal-ai/serverless-client";
 import { createSupabaseServer } from "@/lib/supabase";
@@ -17,6 +17,10 @@ export async function POST(req: Request) {
         const authResult = await getAuthUserId();
         if ("error" in authResult) return authResult.error;
         userId = authResult.userId;
+
+        // Rate Limiting
+        const rateError = checkRateLimit(userId, "image-generate");
+        if (rateError) return rateError;
 
         const body = await req.json();
         const { prompt, size = "1024x1024", model: modelId = "flux-2-dev" } = body;
