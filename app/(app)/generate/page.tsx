@@ -23,7 +23,7 @@ const IMAGE_MODELS = [
   { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 15 },
   { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 15 },
   { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 30 },
-  { id: "nano-banana-2", name: "Nano Banana 2 🍌", tier: "Pro", cost: 30 },
+  { id: "nano-banana-2", name: "Nano Banana 2 🍌", tier: "Free", cost: 20 },
   { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 35 },
   { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 45 },
 ];

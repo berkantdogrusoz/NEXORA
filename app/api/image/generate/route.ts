@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         // Validate Model & Cost
         const validModels = ["dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
         const finalModel = validModels.includes(modelId) ? modelId : "flux-2-dev";
-        const cost = finalModel === "flux-pro" ? 45 : finalModel === "dall-e-3" ? 35 : finalModel === "nano-banana-2" ? 30 : finalModel === "recraft-v3" ? 30 : finalModel === "flux-schnell" ? 15 : 15;
+        const cost = finalModel === "flux-pro" ? 45 : finalModel === "dall-e-3" ? 35 : finalModel === "recraft-v3" ? 30 : finalModel === "nano-banana-2" ? 20 : finalModel === "flux-schnell" ? 15 : 15;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
-        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3" || finalModel === "nano-banana-2") && planName === "Free") {
+        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && planName === "Free") {
             return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
         }
 
