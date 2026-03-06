@@ -215,37 +215,6 @@ export async function POST(req: Request) {
                 throw new Error("Invalid output from fal.ai Seedance");
             }
 
-        } else if (modelId === "wan-2.1") {
-            console.log(`Generating video using fal.ai Wan-2.1 (image-to-video: ${!!resolvedImageUrl})`);
-            const falModel = resolvedImageUrl
-                ? "fal-ai/wan-i2v"
-                : "fal-ai/wan-t2v";
-
-            const falInput: any = {
-                prompt: englishPrompt,
-                num_frames: duration === "10" ? 161 : 81,
-                resolution: quality === "hd" ? "720p" : "480p",
-                aspect_ratio: aspectRatio === "1:1" ? "16:9" : aspectRatio,
-                turbo_mode: true,
-            };
-            if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
-
-            const result: any = await fal.subscribe(falModel, {
-                input: falInput,
-                logs: true,
-                onQueueUpdate: (update) => {
-                    if (update.status === "IN_PROGRESS") {
-                        update.logs.map((log: any) => log.message).forEach(console.log);
-                    }
-                },
-            });
-
-            if (result?.video?.url) {
-                finalUrl = result.video.url;
-            } else {
-                throw new Error("Invalid output from fal.ai Wan-2.1");
-            }
-
             // ═══════════════════════════════════════════
             //   REPLICATE MODELS (Luma, Runway)
             // ═══════════════════════════════════════════
