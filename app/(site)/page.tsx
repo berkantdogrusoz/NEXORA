@@ -3,8 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Sparkles, Video, Image as ImageIcon, Zap, Layers, Wand2, PlayCircle } from "lucide-react";
+
+// Hero background media carousel items
+const HERO_MEDIA = [
+  { type: "video" as const, src: "/arts/nexora-1772315602835.mp4" },
+  { type: "video" as const, src: "/arts/uzay.mp4" },
+  { type: "image" as const, src: "/arts/nexora-1772283133285.png" },
+];
+const IMAGE_DISPLAY_DURATION = 6000; // 6 seconds for static images
 
 export default function Home() {
   const targetRef = useRef<HTMLDivElement>(null);
@@ -15,6 +23,46 @@ export default function Home() {
 
   const bannerY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const bannerOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  // Hero background carousel state
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [nextIndex, setNextIndex] = useState<number | null>(null);
+  const [isFading, setIsFading] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const nextVideoRef = useRef<HTMLVideoElement>(null);
+
+  const goToNext = useCallback(() => {
+    const next = (activeIndex + 1) % HERO_MEDIA.length;
+    setNextIndex(next);
+    setIsFading(true);
+
+    // If next is a video, start preloading
+    if (HERO_MEDIA[next].type === "video" && nextVideoRef.current) {
+      nextVideoRef.current.currentTime = 0;
+      nextVideoRef.current.play().catch(() => { });
+    }
+
+    // Crossfade duration
+    setTimeout(() => {
+      setActiveIndex(next);
+      setNextIndex(null);
+      setIsFading(false);
+    }, 1200);
+  }, [activeIndex]);
+
+  // Handle video ended → go to next
+  const handleVideoEnded = useCallback(() => {
+    goToNext();
+  }, [goToNext]);
+
+  // Handle image timer
+  useEffect(() => {
+    const current = HERO_MEDIA[activeIndex];
+    if (current.type === "image") {
+      const timer = setTimeout(goToNext, IMAGE_DISPLAY_DURATION);
+      return () => clearTimeout(timer);
+    }
+  }, [activeIndex, goToNext]);
 
   return (
     <div className="relative min-h-screen bg-[#000000] text-white selection:bg-blue-500/30 overflow-hidden font-sans">
@@ -27,20 +75,60 @@ export default function Home() {
         }}
       />
 
-      {/* ═══════ HERO SECTION — FULL BLEED (Seedream 4.5 Style) ═══════ */}
+      {/* ═══════ HERO SECTION — FULL BLEED ═══════ */}
       <section className="relative h-screen w-full overflow-hidden" ref={targetRef}>
 
-        {/* Full-Bleed Background Image */}
+        {/* Rotating Background Carousel */}
         <div className="absolute inset-0 z-0">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url('/arts/nexora-1772283133285.png')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center top',
-              backgroundRepeat: 'no-repeat',
-            }}
-          />
+          {/* Active layer */}
+          {HERO_MEDIA[activeIndex].type === "video" ? (
+            <video
+              ref={videoRef}
+              key={`active-${activeIndex}`}
+              src={HERO_MEDIA[activeIndex].src}
+              autoPlay
+              muted
+              playsInline
+              onEnded={handleVideoEnded}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
+            />
+          ) : (
+            <div
+              key={`active-img-${activeIndex}`}
+              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
+              style={{
+                backgroundImage: `url('${HERO_MEDIA[activeIndex].src}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center top",
+              }}
+            />
+          )}
+
+          {/* Next layer (fading in) */}
+          {nextIndex !== null && (
+            HERO_MEDIA[nextIndex].type === "video" ? (
+              <video
+                ref={nextVideoRef}
+                key={`next-${nextIndex}`}
+                src={HERO_MEDIA[nextIndex].src}
+                autoPlay
+                muted
+                playsInline
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
+              />
+            ) : (
+              <div
+                key={`next-img-${nextIndex}`}
+                className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
+                style={{
+                  backgroundImage: `url('${HERO_MEDIA[nextIndex].src}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center top",
+                }}
+              />
+            )
+          )}
+
           {/* Bottom gradient fade to black */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
           {/* Top subtle fade for navbar readability */}
