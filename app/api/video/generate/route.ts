@@ -265,22 +265,28 @@ export async function POST(req: Request) {
             // ═══════════════════════════════════════════
             //   OPENAI SORA 2 (async polling)
             // ═══════════════════════════════════════════
-            console.log(`Generating video using OpenAI Sora 2 (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
+            console.log(`Generating video using OpenAI Sora 2 Pro (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
 
-            // Map aspect ratio to size format
+            // Map aspect ratio to size format (upgraded to 1080p for Pro)
             const sizeMap: Record<string, string> = {
-                "16:9": "1280x720",
-                "9:16": "720x1280",
+                "16:9": "1920x1080",
+                "9:16": "1080x1920",
                 "1:1": "1080x1080",
             };
-            const videoSize = sizeMap[aspectRatio] || "1280x720";
+            const videoSize = sizeMap[aspectRatio] || "1920x1080";
 
-            // Map duration to seconds (Sora supports 4, 8, 12)
-            const soraSeconds = duration === "10" ? "12" : "4";
+            // Map duration to seconds (Sora supports 4, 8, 12... using 12 for 10s setting, 5 for 5s)
+            // Sora API typically prefers even numbers or specific targets like 5, 10
+            const soraSeconds = duration === "10" ? "10" : "5";
+
+            // Enforce cinematic quality in prompt implicitly to ensure good results
+            const enhancedPrompt = englishPrompt.toLowerCase().includes("cinematic")
+                ? englishPrompt
+                : englishPrompt + " - ultra cinematic, 8k resolution, highly detailed, photorealistic, premium quality";
 
             const soraBody: any = {
-                model: "sora-2",
-                prompt: englishPrompt,
+                model: "sora-2-pro",
+                prompt: enhancedPrompt,
                 seconds: soraSeconds,
                 size: videoSize,
             };
