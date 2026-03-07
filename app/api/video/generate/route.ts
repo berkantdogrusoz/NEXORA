@@ -267,13 +267,14 @@ export async function POST(req: Request) {
             // ═══════════════════════════════════════════
             console.log(`Generating video using OpenAI Sora 2 Pro (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
 
-            // Map aspect ratio to size format (upgraded to 1080p for Pro)
+            // Map aspect ratio to size format (strictly allowed values by OpenAI)
+            // Allowed: '720x1280', '1280x720', '1024x1792', '1792x1024'
             const sizeMap: Record<string, string> = {
-                "16:9": "1920x1080",
-                "9:16": "1080x1920",
-                "1:1": "1080x1080",
+                "16:9": "1792x1024", // Max landscape
+                "9:16": "1024x1792", // Max portrait
+                "1:1": "1280x720",   // No native 1:1, fallback to landscape
             };
-            const videoSize = sizeMap[aspectRatio] || "1920x1080";
+            const videoSize = sizeMap[aspectRatio] || "1792x1024";
 
             // Map duration to seconds. The OpenAI Sora API strictly supports "4", "8", or "12".
             // Since NEXORA UI sends "5" or "10", we map them to the closest supported Sora duration.
