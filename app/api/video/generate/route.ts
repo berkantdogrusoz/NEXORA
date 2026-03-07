@@ -275,9 +275,9 @@ export async function POST(req: Request) {
             };
             const videoSize = sizeMap[aspectRatio] || "1920x1080";
 
-            // Map duration to seconds (Sora supports 4, 8, 12... using 12 for 10s setting, 5 for 5s)
-            // Sora API typically prefers even numbers or specific targets like 5, 10
-            const soraSeconds = duration === "10" ? "10" : "5";
+            // Map duration to seconds. The OpenAI Sora API strictly supports "4", "8", or "12".
+            // Since NEXORA UI sends "5" or "10", we map them to the closest supported Sora duration.
+            const soraSeconds = duration === "10" ? "8" : "4";
 
             // Enforce cinematic quality in prompt implicitly to ensure good results
             const enhancedPrompt = englishPrompt.toLowerCase().includes("cinematic")
