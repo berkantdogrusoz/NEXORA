@@ -267,21 +267,26 @@ export async function POST(req: Request) {
             // ═══════════════════════════════════════════
             console.log(`Generating video using OpenAI Sora 2 (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
 
+            // Map aspect ratio to size format
+            const sizeMap: Record<string, string> = {
+                "16:9": "1280x720",
+                "9:16": "720x1280",
+                "1:1": "1080x1080",
+            };
+            const videoSize = sizeMap[aspectRatio] || "1280x720";
+
+            // Map duration to seconds (Sora supports 4, 8, 12)
+            const soraSeconds = duration === "10" ? "12" : "4";
+
             const soraBody: any = {
                 model: "sora-2",
-                input: {
-                    prompt: englishPrompt,
-                    duration: duration === "10" ? 10 : 5,
-                    resolution: "1080p",
-                    aspect_ratio: aspectRatio === "9:16" ? "9:16" : aspectRatio === "1:1" ? "1:1" : "16:9",
-                },
+                prompt: englishPrompt,
+                seconds: soraSeconds,
+                size: videoSize,
             };
-            if (resolvedImageUrl) {
-                soraBody.input.image_url = resolvedImageUrl;
-            }
 
-            // Step 1: Create generation
-            const createRes = await fetch("https://api.openai.com/v1/videos/generations", {
+            // Step 1: Create video generation job
+            const createRes = await fetch("https://api.openai.com/v1/videos", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -297,18 +302,18 @@ export async function POST(req: Request) {
             }
 
             const createData = await createRes.json();
-            const generationId = createData.id;
-            console.log(`Sora 2 generation created: ${generationId}`);
+            const videoId = createData.id;
+            console.log(`Sora 2 video job created: ${videoId}`);
 
-            // Step 2: Poll for completion
+            // Step 2: Poll for completion via GET /v1/videos/{id}
             const maxPolls = 120; // 120 * 3s = 6 minutes max
             const pollInterval = 3000;
-            let soraResult: any = null;
+            let soraCompleted = false;
 
             for (let i = 0; i < maxPolls; i++) {
                 await new Promise((r) => setTimeout(r, pollInterval));
 
-                const pollRes = await fetch(`https://api.openai.com/v1/videos/generations/${generationId}`, {
+                const pollRes = await fetch(`https://api.openai.com/v1/videos/${videoId}`, {
                     headers: {
                         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
                     },
@@ -323,36 +328,48 @@ export async function POST(req: Request) {
                 console.log(`Sora 2 poll ${i + 1}: status=${pollData.status}`);
 
                 if (pollData.status === "completed" || pollData.status === "succeeded") {
-                    soraResult = pollData;
+                    soraCompleted = true;
+                    // Check if video URL is directly in the response
+                    if (pollData.video?.url) {
+                        finalUrl = pollData.video.url;
+                    } else if (pollData.output?.url) {
+                        finalUrl = pollData.output.url;
+                    } else if (pollData.url) {
+                        finalUrl = pollData.url;
+                    }
                     break;
                 } else if (pollData.status === "failed" || pollData.status === "cancelled") {
-                    throw new Error(`Sora 2 generation failed: ${pollData.error || pollData.status}`);
+                    throw new Error(`Sora 2 generation failed: ${pollData.error?.message || pollData.failure_reason || pollData.status}`);
                 }
                 // else still processing, continue polling
             }
 
-            if (!soraResult) {
+            if (!soraCompleted) {
                 throw new Error("Sora 2 generation timed out after 6 minutes");
             }
 
-            // Extract video URL from result
-            const videoOutput = soraResult.output?.video || soraResult.video || soraResult.result?.url || soraResult.output?.url;
-            if (typeof videoOutput === "string") {
-                finalUrl = videoOutput;
-            } else if (videoOutput?.url) {
-                finalUrl = videoOutput.url;
-            } else if (soraResult.output && typeof soraResult.output === "string") {
-                finalUrl = soraResult.output;
-            } else {
-                // Try to find any URL in the response
-                const resultStr = JSON.stringify(soraResult);
-                const urlMatch = resultStr.match(/https?:\/\/[^"\s]+\.mp4[^"\s]*/i);
-                if (urlMatch) {
-                    finalUrl = urlMatch[0];
-                } else {
-                    console.error("Sora 2 unexpected result structure:", JSON.stringify(soraResult));
-                    throw new Error("Could not extract video URL from Sora 2 response");
+            // Step 3: If no URL yet, fetch content via GET /v1/videos/{id}/content
+            if (!finalUrl) {
+                const contentRes = await fetch(`https://api.openai.com/v1/videos/${videoId}/content`, {
+                    headers: {
+                        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                    },
+                });
+
+                if (contentRes.ok) {
+                    const contentType = contentRes.headers.get("content-type") || "";
+                    if (contentType.includes("application/json")) {
+                        const contentData = await contentRes.json();
+                        finalUrl = contentData.url || contentData.video?.url || contentData.download_url;
+                    } else if (contentType.includes("video/")) {
+                        // Direct binary — the URL itself is the content
+                        finalUrl = `https://api.openai.com/v1/videos/${videoId}/content`;
+                    }
                 }
+            }
+
+            if (!finalUrl) {
+                throw new Error("Could not extract video URL from Sora 2 response");
             }
 
             console.log(`Sora 2 video URL: ${finalUrl}`);
