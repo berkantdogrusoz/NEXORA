@@ -22,6 +22,7 @@ const VIDEO_MODELS = [
     { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 75, supportsImage: true },
     { id: "runway-gwm", name: "GWM-1", tier: "Pro", cost: 85, supportsImage: true },
     { id: "seedance-2", name: "Seedance 2.0", tier: "Pro", cost: 100, supportsImage: true },
+    { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true },
 ];
 
 export default function StudioPage() {

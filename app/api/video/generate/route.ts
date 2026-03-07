@@ -52,11 +52,12 @@ export async function POST(req: Request) {
             "runway-gen4": 75,
             "runway-gwm": 85,
             "seedance-2": 100,
+            "sora-2": 120,
         };
         const cost = costMap[modelId] || 25;
 
         // Block Pro models for Free users
-        const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm"];
+        const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm", "sora-2"];
         if (proModels.includes(modelId) && planName === "Free") {
             return NextResponse.json({ error: "You need a Premium plan to use Pro models." }, { status: 403 });
         }
@@ -259,6 +260,102 @@ export async function POST(req: Request) {
 
             const output = await replicate.run("minimax/video-01" as any, { input });
             finalUrl = Array.isArray(output) ? output[0] : output;
+
+        } else if (modelId === "sora-2") {
+            // ═══════════════════════════════════════════
+            //   OPENAI SORA 2 (async polling)
+            // ═══════════════════════════════════════════
+            console.log(`Generating video using OpenAI Sora 2 (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
+
+            const soraBody: any = {
+                model: "sora-2",
+                input: {
+                    prompt: englishPrompt,
+                    duration: duration === "10" ? 10 : 5,
+                    resolution: "1080p",
+                    aspect_ratio: aspectRatio === "9:16" ? "9:16" : aspectRatio === "1:1" ? "1:1" : "16:9",
+                },
+            };
+            if (resolvedImageUrl) {
+                soraBody.input.image_url = resolvedImageUrl;
+            }
+
+            // Step 1: Create generation
+            const createRes = await fetch("https://api.openai.com/v1/videos/generations", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(soraBody),
+            });
+
+            if (!createRes.ok) {
+                const errBody = await createRes.text();
+                console.error("Sora 2 create error:", createRes.status, errBody);
+                throw new Error(`Sora 2 API error: ${createRes.status} — ${errBody}`);
+            }
+
+            const createData = await createRes.json();
+            const generationId = createData.id;
+            console.log(`Sora 2 generation created: ${generationId}`);
+
+            // Step 2: Poll for completion
+            const maxPolls = 120; // 120 * 3s = 6 minutes max
+            const pollInterval = 3000;
+            let soraResult: any = null;
+
+            for (let i = 0; i < maxPolls; i++) {
+                await new Promise((r) => setTimeout(r, pollInterval));
+
+                const pollRes = await fetch(`https://api.openai.com/v1/videos/generations/${generationId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                    },
+                });
+
+                if (!pollRes.ok) {
+                    console.error(`Sora 2 poll error: ${pollRes.status}`);
+                    continue;
+                }
+
+                const pollData = await pollRes.json();
+                console.log(`Sora 2 poll ${i + 1}: status=${pollData.status}`);
+
+                if (pollData.status === "completed" || pollData.status === "succeeded") {
+                    soraResult = pollData;
+                    break;
+                } else if (pollData.status === "failed" || pollData.status === "cancelled") {
+                    throw new Error(`Sora 2 generation failed: ${pollData.error || pollData.status}`);
+                }
+                // else still processing, continue polling
+            }
+
+            if (!soraResult) {
+                throw new Error("Sora 2 generation timed out after 6 minutes");
+            }
+
+            // Extract video URL from result
+            const videoOutput = soraResult.output?.video || soraResult.video || soraResult.result?.url || soraResult.output?.url;
+            if (typeof videoOutput === "string") {
+                finalUrl = videoOutput;
+            } else if (videoOutput?.url) {
+                finalUrl = videoOutput.url;
+            } else if (soraResult.output && typeof soraResult.output === "string") {
+                finalUrl = soraResult.output;
+            } else {
+                // Try to find any URL in the response
+                const resultStr = JSON.stringify(soraResult);
+                const urlMatch = resultStr.match(/https?:\/\/[^"\s]+\.mp4[^"\s]*/i);
+                if (urlMatch) {
+                    finalUrl = urlMatch[0];
+                } else {
+                    console.error("Sora 2 unexpected result structure:", JSON.stringify(soraResult));
+                    throw new Error("Could not extract video URL from Sora 2 response");
+                }
+            }
+
+            console.log(`Sora 2 video URL: ${finalUrl}`);
         }
 
         // Handle Replicate FileOutput objects
