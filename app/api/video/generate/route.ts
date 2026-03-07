@@ -348,31 +348,77 @@ export async function POST(req: Request) {
                 throw new Error("Sora 2 generation timed out after 6 minutes");
             }
 
-            // Step 3: If no URL yet, fetch content via GET /v1/videos/{id}/content
-            if (!finalUrl) {
+            // Step 3: Download video content and upload to Supabase
+            // Sora videos require auth headers, so we must download server-side
+            let soraVideoBuffer: Buffer | null = null;
+
+            // Try to download from the URL we got in polling
+            if (finalUrl && !finalUrl.includes("api.openai.com")) {
+                // Public URL from polling response — try direct download
+                try {
+                    const dlRes = await fetch(finalUrl);
+                    if (dlRes.ok) {
+                        soraVideoBuffer = Buffer.from(await dlRes.arrayBuffer());
+                    }
+                } catch (e) {
+                    console.error("Failed to download from polling URL:", e);
+                }
+            }
+
+            // If no buffer yet, fetch via authenticated content endpoint
+            if (!soraVideoBuffer) {
                 const contentRes = await fetch(`https://api.openai.com/v1/videos/${videoId}/content`, {
                     headers: {
                         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
                     },
                 });
 
-                if (contentRes.ok) {
-                    const contentType = contentRes.headers.get("content-type") || "";
-                    if (contentType.includes("application/json")) {
-                        const contentData = await contentRes.json();
-                        finalUrl = contentData.url || contentData.video?.url || contentData.download_url;
-                    } else if (contentType.includes("video/")) {
-                        // Direct binary — the URL itself is the content
-                        finalUrl = `https://api.openai.com/v1/videos/${videoId}/content`;
+                if (!contentRes.ok) {
+                    throw new Error(`Failed to download Sora 2 video: ${contentRes.status}`);
+                }
+
+                const contentType = contentRes.headers.get("content-type") || "";
+                if (contentType.includes("application/json")) {
+                    // JSON response with a download URL
+                    const contentData = await contentRes.json();
+                    const downloadUrl = contentData.url || contentData.video?.url || contentData.download_url;
+                    if (downloadUrl) {
+                        const dlRes = await fetch(downloadUrl);
+                        if (dlRes.ok) {
+                            soraVideoBuffer = Buffer.from(await dlRes.arrayBuffer());
+                        }
                     }
+                } else {
+                    // Direct binary video content
+                    soraVideoBuffer = Buffer.from(await contentRes.arrayBuffer());
                 }
             }
 
-            if (!finalUrl) {
-                throw new Error("Could not extract video URL from Sora 2 response");
+            if (!soraVideoBuffer || soraVideoBuffer.length < 1000) {
+                throw new Error("Failed to download Sora 2 video content");
             }
 
-            console.log(`Sora 2 video URL: ${finalUrl}`);
+            // Upload directly to Supabase with proper content type
+            const soraFilename = `videos/${Date.now()}-sora2-${Math.random().toString(36).substring(7)}.mp4`;
+            const soraSupabase = createSupabaseServer();
+            const { error: soraUploadError } = await soraSupabase.storage
+                .from("instagram-images")
+                .upload(soraFilename, soraVideoBuffer, {
+                    contentType: "video/mp4",
+                    upsert: false,
+                });
+
+            if (soraUploadError) {
+                console.error("Sora 2 Supabase upload failed:", soraUploadError);
+                throw new Error("Failed to save Sora 2 video");
+            }
+
+            const { data: soraPublicData } = soraSupabase.storage
+                .from("instagram-images")
+                .getPublicUrl(soraFilename);
+
+            finalUrl = soraPublicData.publicUrl;
+            console.log(`Sora 2 video uploaded to Supabase: ${finalUrl}`);
         }
 
         // Handle Replicate FileOutput objects
