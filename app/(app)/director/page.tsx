@@ -82,9 +82,9 @@ export default function DirectorStudioPage() {
     // History
     const [history, setHistory] = useState<{ url: string; prompt: string; model: string; createdAt: number }[]>([]);
 
-    // Redirect Free users
+    // Redirect non-eligible users
     useEffect(() => {
-        if (credits !== null && planName === "Free") {
+        if (credits !== null && (planName === "Free" || planName === "Standard")) {
             router.push("/pricing");
         }
     }, [credits, planName, router]);
@@ -99,7 +99,7 @@ export default function DirectorStudioPage() {
                         data.generations.map((g: any) => ({
                             url: g.output_url,
                             prompt: g.prompt,
-                            model: g.model_id,
+                            model: g.model,
                             createdAt: new Date(g.created_at).getTime(),
                         }))
                     );

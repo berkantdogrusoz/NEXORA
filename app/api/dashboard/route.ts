@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
+import { getPlanMaxCredits } from "@/lib/plans";
 
 export async function GET() {
     try {
@@ -36,9 +37,7 @@ export async function GET() {
 
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
-        let maxCredits = 50;
-        if (planName === "Growth") maxCredits = 500;
-        else if (planName === "Pro") maxCredits = 1000;
+        const maxCredits = getPlanMaxCredits(planName);
 
         // Fetch total assistant messages
         const { count: totalMessages } = await supabase

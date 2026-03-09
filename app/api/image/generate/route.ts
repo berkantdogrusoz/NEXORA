@@ -3,6 +3,7 @@ import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import OpenAI from "openai";
 import * as fal from "@fal-ai/serverless-client";
 import { createSupabaseServer } from "@/lib/supabase";
+import { hasProModelAccess, STANDARD_DAILY_GENERATION_LIMIT } from "@/lib/plans";
 
 export const maxDuration = 60;
 
@@ -58,9 +59,33 @@ export async function POST(req: Request) {
             }
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
+        const isDev = process.env.NODE_ENV === "development";
 
-        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && planName === "Free") {
+        if ((finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && !hasProModelAccess(planName)) {
             return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
+        }
+
+        // Daily generation cap for Standard plan
+        if (!isDev && planName === "Standard") {
+            const now = new Date();
+            const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            const dayEnd = new Date(dayStart);
+            dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+            const { count: todayGenerationCount } = await supabase
+                .from("generations")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", userId)
+                .in("type", ["video", "image", "director"])
+                .gte("created_at", dayStart.toISOString())
+                .lt("created_at", dayEnd.toISOString());
+
+            if ((todayGenerationCount || 0) >= STANDARD_DAILY_GENERATION_LIMIT) {
+                return NextResponse.json(
+                    { error: `Standard plan daily limit reached (${STANDARD_DAILY_GENERATION_LIMIT} generations/day). Upgrade to continue.` },
+                    { status: 429 }
+                );
+            }
         }
 
         // Check balance
@@ -71,7 +96,6 @@ export async function POST(req: Request) {
             .single();
 
         const currentCredits = Number(creditData?.credits || 0);
-        const isDev = process.env.NODE_ENV === "development";
 
         if (!isDev && (!creditData || currentCredits < cost)) {
             return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
@@ -173,9 +197,30 @@ export async function POST(req: Request) {
         try {
             const { uploadImageFromUrl } = await import("@/lib/storage");
             const permanentUrl = await uploadImageFromUrl(imageUrl);
-            return NextResponse.json({ imageUrl: permanentUrl });
+            const returnUrl = permanentUrl || imageUrl;
+            const { error: saveError } = await supabase.from("generations").insert({
+                user_id: userId,
+                type: "image",
+                prompt,
+                model: finalModel,
+                output_url: returnUrl,
+            });
+            if (saveError) {
+                console.error("Failed to save image generation history:", saveError);
+            }
+            return NextResponse.json({ imageUrl: returnUrl });
         } catch {
             // Fallback to direct URL if storage fails
+            const { error: saveError } = await supabase.from("generations").insert({
+                user_id: userId,
+                type: "image",
+                prompt,
+                model: finalModel,
+                output_url: imageUrl,
+            });
+            if (saveError) {
+                console.error("Failed to save image generation history:", saveError);
+            }
             return NextResponse.json({ imageUrl });
         }
     } catch (error: any) {

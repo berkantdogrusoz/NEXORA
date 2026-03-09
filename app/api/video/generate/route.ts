@@ -3,6 +3,7 @@ import { replicate } from "@/lib/replicate";
 import * as fal from "@fal-ai/serverless-client";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
+import { hasProModelAccess, STANDARD_DAILY_GENERATION_LIMIT } from "@/lib/plans";
 
 export const maxDuration = 300; // 5 minutes for video generation
 
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
             }
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
+        const isDev = process.env.NODE_ENV === "development";
 
         // Cost mapping
         const costMap: Record<string, number> = {
@@ -56,10 +58,33 @@ export async function POST(req: Request) {
         };
         const cost = costMap[modelId] || 25;
 
-        // Block Pro models for Free users
+        // Block Pro models for non-premium users
         const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm", "sora-2"];
-        if (proModels.includes(modelId) && planName === "Free") {
+        if (proModels.includes(modelId) && !hasProModelAccess(planName)) {
             return NextResponse.json({ error: "You need a Premium plan to use Pro models." }, { status: 403 });
+        }
+
+        // Daily generation cap for Standard plan
+        if (!isDev && planName === "Standard") {
+            const now = new Date();
+            const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            const dayEnd = new Date(dayStart);
+            dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+            const { count: todayGenerationCount } = await supabase
+                .from("generations")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", userId)
+                .in("type", ["video", "image", "director"])
+                .gte("created_at", dayStart.toISOString())
+                .lt("created_at", dayEnd.toISOString());
+
+            if ((todayGenerationCount || 0) >= STANDARD_DAILY_GENERATION_LIMIT) {
+                return NextResponse.json(
+                    { error: `Standard plan daily limit reached (${STANDARD_DAILY_GENERATION_LIMIT} generations/day). Upgrade to continue.` },
+                    { status: 429 }
+                );
+            }
         }
 
         // Check balance
@@ -70,7 +95,6 @@ export async function POST(req: Request) {
             .single();
 
         const currentCredits = Number(creditData?.credits || 0);
-        const isDev = process.env.NODE_ENV === "development";
 
         if (!isDev && (!creditData || currentCredits < cost)) {
             return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
@@ -447,6 +471,17 @@ export async function POST(req: Request) {
         const { uploadVideoFromUrl } = await import("@/lib/storage");
         const permanentUrl = await uploadVideoFromUrl(finalUrl);
         const returnUrl = permanentUrl || finalUrl;
+
+        const { error: saveError } = await supabase.from("generations").insert({
+            user_id: userId,
+            type: "video",
+            prompt: prompt || "",
+            model: modelId,
+            output_url: returnUrl,
+        });
+        if (saveError) {
+            console.error("Failed to save video generation history:", saveError);
+        }
 
         return NextResponse.json({ success: true, videoUrl: returnUrl });
 

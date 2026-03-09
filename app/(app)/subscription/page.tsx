@@ -188,7 +188,7 @@ export default function SubscriptionPage() {
                                 {cancelling ? "Cancelling..." : "✕ Cancel Subscription"}
                             </button>
                         )}
-                        {(!isPaid || (sub.plan_name === "Growth" && isPaid)) && (
+                        {(!isPaid || (sub.plan_name !== "Pro" && isPaid)) && (
                             <Link
                                 href="/pricing"
                                 className="flex-1 flex items-center justify-center py-3 px-6 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white text-sm font-semibold transition-all hover:scale-[1.01] active:scale-95"
@@ -279,6 +279,14 @@ export default function SubscriptionPage() {
                                     <Feature text="Standard AI models" />
                                     <Feature text="HD video generation" />
                                     <Feature text="Commercial usage rights" />
+                                </>
+                            )}
+                            {sub.plan_name === "Standard" && (
+                                <>
+                                    <Feature text="200 credits per month" />
+                                    <Feature text="Daily generation cap (6/day)" />
+                                    <Feature text="Core image and video models" />
+                                    <Feature text="No Pro/Director model access" />
                                 </>
                             )}
                             {sub.plan_name === "Free" && (

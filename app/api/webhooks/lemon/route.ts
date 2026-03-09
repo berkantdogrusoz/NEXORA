@@ -49,7 +49,10 @@ export async function POST(req: NextRequest) {
             let planName = "Free";
             let newCredits = 50;
 
-            if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
+            if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_STANDARD) {
+                planName = "Standard";
+                newCredits = 200;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH) {
                 planName = "Growth";
                 newCredits = 500;
             } else if (variantId === process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO) {

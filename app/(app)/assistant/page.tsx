@@ -58,7 +58,7 @@ export default function AssistantPage() {
 
         const selectedModelConfig = ASSISTANT_MODELS.find(m => m.id === model) || ASSISTANT_MODELS[0];
 
-        if (selectedModelConfig.pro && planName === "Free") {
+        if (selectedModelConfig.pro && (planName === "Free" || planName === "Standard")) {
             const errorMsg: Message = {
                 id: `e-${Date.now()}`,
                 role: "assistant",

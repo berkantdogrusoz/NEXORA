@@ -138,8 +138,8 @@ export default function StudioPage() {
     const generateVideo = async () => {
         if (!prompt && !referenceImage) return;
 
-        // Block Pro models if user is on Free plan
-        if (selectedModelConfig.tier === "Pro" && planName === "Free") {
+        // Block Pro models if user is on Free or Standard plan
+        if (selectedModelConfig.tier === "Pro" && (planName === "Free" || planName === "Standard")) {
             setError(`You need a Premium plan to use ${selectedModelConfig.name}.`);
             return;
         }
@@ -190,17 +190,6 @@ export default function StudioPage() {
                     { url: data.videoUrl, prompt, createdAt: Date.now() },
                     ...prev.slice(0, 9),
                 ]);
-                // Save to database
-                fetch("/api/generations", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        type: "video",
-                        prompt,
-                        model,
-                        outputUrl: data.videoUrl,
-                    }),
-                }).catch(() => { });
             } else {
                 setError(data.error || "Failed to generate video.");
                 refundCredits(selectedModelConfig.cost);

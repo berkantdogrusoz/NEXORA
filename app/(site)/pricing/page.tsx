@@ -40,6 +40,28 @@ const PLANS = [
     planKey: "Free",
   },
   {
+    name: "Standard",
+    price: "$9",
+    period: "/mo",
+    subtitle: "For regular creators",
+    highlight: false,
+    badge: null,
+    features: [
+      { text: "200 AI credits / month", has: true },
+      { text: "Daily generation cap (6/day)", has: true },
+      { text: "Kling 3.0 + Wan 2.1 (Video)", has: true },
+      { text: "FLUX 2 Dev + Nano Banana 2 (Image)", has: true },
+      { text: "AI Assistant (GPT-4o Mini)", has: true },
+      { text: "Pro Video Models (Runway, Seedance, Sora)", has: false },
+      { text: "Director Studio (Higgsfield)", has: false },
+      { text: "Priority Queue", has: false },
+    ],
+    cta: "Start Standard",
+    ctaStyle: "border",
+    checkoutPlan: "Standard" as const,
+    planKey: "Standard",
+  },
+  {
     name: "Nexora",
     price: "$29",
     period: "/mo",
@@ -86,7 +108,7 @@ const PLANS = [
 ];
 
 // Plan hierarchy for comparison
-const PLAN_RANK: Record<string, number> = { Free: 0, Growth: 1, Pro: 2 };
+const PLAN_RANK: Record<string, number> = { Free: 0, Standard: 1, Growth: 2, Pro: 3 };
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -106,12 +128,14 @@ export default function PricingPage() {
       .catch(() => { });
   }, []);
 
-  const handleCheckout = async (plan: "Growth" | "Pro") => {
+  const handleCheckout = async (plan: "Standard" | "Growth" | "Pro") => {
     setLoading(plan);
     try {
-      const variantId = plan === "Growth"
-        ? process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH
-        : process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO;
+      const variantId = plan === "Standard"
+        ? process.env.NEXT_PUBLIC_LEMON_VARIANT_STANDARD
+        : plan === "Growth"
+          ? process.env.NEXT_PUBLIC_LEMON_VARIANT_GROWTH
+          : process.env.NEXT_PUBLIC_LEMON_VARIANT_PRO;
 
       if (!variantId) {
         alert("Pricing configuration missing. Please contact support.");
@@ -167,7 +191,7 @@ export default function PricingPage() {
         </div>
 
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {PLANS.map((plan, i) => (
             <div
               key={i}

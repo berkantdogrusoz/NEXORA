@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
+import { hasDirectorAccess } from "@/lib/plans";
 
 export const maxDuration = 300; // 5 minutes
 
@@ -117,9 +118,10 @@ export async function POST(req: Request) {
             }
         }
         if (process.env.NODE_ENV === "development") planName = "Pro";
+        const isDev = process.env.NODE_ENV === "development";
 
         // Director Studio is Premium ONLY
-        if (planName === "Free") {
+        if (!hasDirectorAccess(planName)) {
             return NextResponse.json({ error: "Director Studio is exclusively for Premium members." }, { status: 403 });
         }
 
@@ -131,7 +133,6 @@ export async function POST(req: Request) {
             .single();
 
         const currentCredits = Number(creditData?.credits || 0);
-        const isDev = process.env.NODE_ENV === "development";
 
         if (!isDev && (!creditData || currentCredits < cost)) {
             return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
@@ -268,11 +269,10 @@ export async function POST(req: Request) {
 
                 await supabase.from("generations").insert({
                     user_id: userId,
-                    model_id: `higgsfield-${finalModel}`,
+                    model: `higgsfield-${finalModel}`,
                     prompt: prompt || "Cinema Studio",
                     type: "director",
                     output_url: returnUrl,
-                    cost,
                 });
 
                 return NextResponse.json({ url: returnUrl, success: true, model: finalModel });
@@ -292,11 +292,10 @@ export async function POST(req: Request) {
         // ── Save to History ──
         await supabase.from("generations").insert({
             user_id: userId,
-            model_id: `higgsfield-${finalModel}`,
+            model: `higgsfield-${finalModel}`,
             prompt: prompt || "Cinema Studio",
             type: "director",
             output_url: returnUrl,
-            cost,
         });
 
         return NextResponse.json({ url: returnUrl, success: true, model: finalModel });

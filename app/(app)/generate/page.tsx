@@ -66,7 +66,7 @@ export default function GeneratePage() {
   const generateImage = async () => {
     if (!prompt) return;
 
-    if (selectedModelConfig.tier === "Pro" && planName === "Free") {
+    if (selectedModelConfig.tier === "Pro" && (planName === "Free" || planName === "Standard")) {
       setError("You need a Premium plan to use Pro models.");
       return;
     }
@@ -96,17 +96,6 @@ export default function GeneratePage() {
       if (res.ok && data.imageUrl) {
         setImageUrl(data.imageUrl);
         setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev.slice(0, 9)]);
-        // Save to database
-        fetch("/api/generations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "image",
-            prompt,
-            model,
-            outputUrl: data.imageUrl,
-          }),
-        }).catch(() => { });
       } else {
         setError(data.error || "Failed to generate image.");
         refundCredits(selectedModelConfig.cost);

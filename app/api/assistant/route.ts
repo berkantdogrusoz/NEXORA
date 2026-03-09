@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
         // Block Pro models for Free users
-        if (isProModel && planName === "Free") {
+        if (isProModel && (planName === "Free" || planName === "Standard")) {
             return NextResponse.json({ error: "You need a Premium plan to use GPT-4o or Gemini 2.5 Flash." }, { status: 403 });
         }
 

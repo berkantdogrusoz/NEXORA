@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServer } from "@/lib/supabase";
 import { getAuthUserId } from "@/lib/auth";
+import { getPlanMaxCredits } from "@/lib/plans";
 
 /**
  * GET: Fetch current credit balance
@@ -37,9 +38,7 @@ export async function GET() {
 
         if (process.env.NODE_ENV === "development") planName = "Pro";
 
-        let maxCredits = 50;
-        if (planName === "Growth") maxCredits = 500;
-        else if (planName === "Pro") maxCredits = 1000;
+        const maxCredits = getPlanMaxCredits(planName);
 
         if (error && error.code === "PGRST116") {
             // User not found, initialize with 50 credits (Free tier)
