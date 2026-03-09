@@ -85,13 +85,17 @@ export default function Home() {
             <video
               ref={videoRef}
               key={`active-${activeIndex}`}
-              src={HERO_MEDIA[activeIndex].src}
               autoPlay
               muted
               playsInline
+              controls={false}
+              preload="auto"
+              disablePictureInPicture
               onEnded={handleVideoEnded}
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
-            />
+            >
+              <source src={HERO_MEDIA[activeIndex].src} type="video/mp4" />
+            </video>
           ) : (
             <div
               key={`active-img-${activeIndex}`}
@@ -110,12 +114,16 @@ export default function Home() {
               <video
                 ref={nextVideoRef}
                 key={`next-${nextIndex}`}
-                src={HERO_MEDIA[nextIndex].src}
                 autoPlay
                 muted
                 playsInline
+                controls={false}
+                preload="metadata"
+                disablePictureInPicture
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
-              />
+              >
+                <source src={HERO_MEDIA[nextIndex].src} type="video/mp4" />
+              </video>
             ) : (
               <div
                 key={`next-img-${nextIndex}`}
@@ -349,13 +357,17 @@ export default function Home() {
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-white/5">
                     {model.img.endsWith('.mp4') ? (
                       <video
-                        src={model.img}
                         autoPlay
                         loop
                         muted
                         playsInline
+                        controls={false}
+                        preload="metadata"
+                        disablePictureInPicture
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
+                      >
+                        <source src={model.img} type="video/mp4" />
+                      </video>
                     ) : (
                       <Image
                         src={model.img}

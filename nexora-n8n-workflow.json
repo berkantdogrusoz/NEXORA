@@ -1,0 +1,152 @@
+{
+    "name": "NEXORA Email Marketing Campaign",
+    "nodes": [
+        {
+            "parameters": {},
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                200,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "table": "users",
+                "limit": 50,
+                "columns": "email, name"
+            },
+            "name": "Supabase - Get Users",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "SUPABASE_CREDENTIALS_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "batchSize": 1,
+                "options": {}
+            },
+            "name": "Split in Batches",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 2,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "model": "gpt-4o-mini",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "content": "Sen NEXORA (getnexorai.com) platformunun pazarlama müdürüsün. Aşağıdaki kullanıcıya hitap eden, samimi, kısa ve dikkat çekici bir e-posta hazırla.\n\nE-posta konusu: Bizi unutmadın umarım 🤔\nİçerik: Bugün platforma eklenen 'Kling 3.0' ve 'Sora 2 Pro' modellerinden bahset. AI ile saniyeler içinde harika filmler çıkarabileceğini söyle. \n\nCall to action: 'Hemen tıkla ve ücretsiz ilk videonu oluştur: https://getnexorai.com'\n\nMüşteri Adı: {{ $json.name || 'NEXORA Ailesi' }}"
+                        }
+                    ]
+                }
+            },
+            "name": "OpenAI - Generate Personalized Email",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                900,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "OPENAI_CREDENTIALS_ID",
+                    "name": "OpenAI account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "fromEmail": "YOUR_GMAIL_OR_COMPANY_EMAIL@gmail.com",
+                "toEmail": "={{ $('Split in Batches').item.json.email }}",
+                "subject": "Yapay Zeka Video Üretiminde Yeni Çağ Başladı! 🎬",
+                "html": "={{ $json.message.content.replace(/\\n/g, '<br>') }}"
+            },
+            "name": "Send Email",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2,
+            "position": [
+                1150,
+                300
+            ],
+            "credentials": {
+                "smtp": {
+                    "id": "SMTP_CREDENTIALS_ID",
+                    "name": "SMTP account"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Manual Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Supabase - Get Users",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Supabase - Get Users": {
+            "main": [
+                [
+                    {
+                        "node": "Split in Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Split in Batches": {
+            "main": [
+                [
+                    {
+                        "node": "OpenAI - Generate Personalized Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI - Generate Personalized Email": {
+            "main": [
+                [
+                    {
+                        "node": "Send Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Email": {
+            "main": [
+                [
+                    {
+                        "node": "Split in Batches",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
