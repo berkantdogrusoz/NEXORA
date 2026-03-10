@@ -3,18 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    LayoutDashboard,
+    Sparkles,
     Coins,
     MessageSquare,
     Crown,
-    BarChart3,
-    Zap,
-    Clapperboard,
+    WandSparkles,
     ImagePlus,
-    Film,
+    Video,
+    Scaling,
+    Palette,
+    ArrowRight,
+    Send,
+    Search,
     Bot,
-    ChevronRight,
-    ArrowUpRight,
+    Library,
 } from "lucide-react";
 
 type DashboardData = {
@@ -50,230 +52,189 @@ export default function DashboardPage() {
     const creditsAvailable = Math.floor(stats?.credits || 0);
     const creditsMax = stats?.maxCredits || 50;
     const creditsUsed = creditsMax - creditsAvailable;
-    const creditsPercent = Math.min((creditsUsed / creditsMax) * 100, 100);
     const planName = stats?.planName || "Free";
 
     const quickActions = [
         {
-            href: "/studio",
-            icon: Clapperboard,
-            label: "Video Studio",
-            desc: "Kling 3.0, Luma, Runway",
-            accent: "cyan",
-        },
-        {
             href: "/generate",
             icon: ImagePlus,
-            label: "Image Gen",
-            desc: "DALL-E 3, FLUX, Recraft",
-            accent: "blue",
+            label: "Image",
+        },
+        {
+            href: "/studio",
+            icon: Video,
+            label: "Video",
         },
         {
             href: "/director",
-            icon: Film,
-            label: "Director Studio",
-            desc: "Higgsfield AI Cinema",
-            accent: "violet",
+            icon: WandSparkles,
+            label: "Blueprints",
+        },
+        {
+            href: "/generate",
+            icon: Scaling,
+            label: "Upscaler",
+        },
+        {
+            href: "/director",
+            icon: Palette,
+            label: "Canvas",
         },
         {
             href: "/assistant",
             icon: Bot,
-            label: "AI Assistant",
-            desc: "GPT-4o, Gemini 2.5",
-            accent: "amber",
+            label: "Draw",
+        },
+    ];
+
+    const featuredBlueprints = [
+        {
+            title: "Consistent Character",
+            subtitle: "Keep the same identity in every frame",
+            href: "/director",
+        },
+        {
+            title: "Product Photography",
+            subtitle: "Studio quality product scenes in seconds",
+            href: "/generate",
+        },
+        {
+            title: "Instant Ads",
+            subtitle: "Generate social ad packs for mobile feeds",
+            href: "/studio",
+        },
+        {
+            title: "Fashion Editorial",
+            subtitle: "Creative campaigns with cinematic style",
+            href: "/generate",
         },
     ];
 
     return (
-        <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
-            {/* Header */}
-            <div className="mb-10">
-                <h1 className="text-4xl font-black text-white flex items-center gap-3 tracking-tight">
-                    <LayoutDashboard className="w-8 h-8 text-cyan-500" />
-                    Dashboard
-                </h1>
-                <p className="text-white/40 mt-2 text-sm font-medium tracking-wide uppercase">
-                    Account Overview & Quick Actions
-                </p>
+        <div className="flex-1 p-0 md:p-3 w-full">
+            <div className="relative overflow-hidden border-y md:border border-white/[0.08] md:rounded-3xl min-h-[340px] md:min-h-[420px]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.35),transparent_38%),radial-gradient(circle_at_75%_18%,rgba(20,184,166,0.3),transparent_33%),linear-gradient(170deg,#1a1d21_0%,#101113_55%,#070709_100%)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+
+                <div className="relative z-10 px-5 md:px-10 pt-8 md:pt-14 pb-8 md:pb-12">
+                    <p className="text-white/60 text-xs uppercase tracking-[0.24em] mb-4 flex items-center gap-2">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Create
+                    </p>
+                    <h1 className="text-4xl md:text-7xl leading-[0.92] font-black tracking-tight text-white max-w-5xl">
+                        YOURS TO CREATE
+                    </h1>
+
+                    <div className="mt-8 md:mt-12 max-w-5xl bg-[#111215]/85 border border-white/10 rounded-3xl p-3 md:p-4 backdrop-blur-xl shadow-2xl shadow-black/40">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <button className="w-10 h-10 rounded-2xl bg-white/[0.08] border border-white/10 flex items-center justify-center text-white/70">
+                                <ImagePlus className="w-4 h-4" />
+                            </button>
+                            <div className="flex-1 h-10 rounded-2xl bg-transparent text-white/80 flex items-center text-base md:text-2xl font-medium">
+                                Type a prompt...
+                            </div>
+                            <button className="w-10 h-10 rounded-2xl bg-white/[0.08] border border-white/10 flex items-center justify-center text-white/70">
+                                <Search className="w-4 h-4" />
+                            </button>
+                            <Link href="/generate" className="h-10 px-5 md:px-8 rounded-2xl bg-white/10 border border-white/10 text-white/60 hover:text-white hover:bg-white/15 transition-all inline-flex items-center gap-2 font-bold">
+                                Generate
+                                <Send className="w-4 h-4" />
+                            </Link>
+                        </div>
+
+                        <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                            {quickActions.map((action) => {
+                                const Icon = action.icon;
+                                return (
+                                    <Link
+                                        key={action.label}
+                                        href={action.href}
+                                        className="shrink-0 px-4 py-2 rounded-full border border-white/15 bg-black/30 hover:bg-white/10 text-white/90 text-sm font-medium inline-flex items-center gap-2 transition-colors"
+                                    >
+                                        <Icon className="w-4 h-4 text-white/70" />
+                                        {action.label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((i) => (
-                        <div
-                            key={i}
-                            className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-cyan-500/30 rounded-sm p-5 h-28 animate-pulse"
-                        >
-                            <div className="h-4 bg-white/[0.06] rounded-sm w-20 mb-3" />
-                            <div className="h-7 bg-white/[0.04] rounded-sm w-16" />
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <>
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                        {/* Credits Card */}
-                        <div className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-cyan-500/60 rounded-sm p-5 group hover:border-t-cyan-400 transition-all">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Coins className="w-4 h-4 text-cyan-400" />
-                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
-                                    Credits Available
-                                </span>
-                            </div>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-white tabular-nums">
-                                    {creditsAvailable}
-                                </span>
-                                <span className="text-xs text-white/20 font-medium">/ {creditsMax}</span>
-                            </div>
-                            {/* Progress bar */}
-                            <div className="mt-4 w-full h-1 bg-white/[0.06] rounded-sm overflow-hidden">
-                                <div
-                                    className={`h-full rounded-sm transition-all duration-700 ${creditsPercent >= 90
-                                        ? "bg-red-500"
-                                        : creditsPercent >= 60
-                                            ? "bg-amber-500"
-                                            : "bg-gradient-to-r from-cyan-500 to-cyan-400"
-                                        }`}
-                                    style={{ width: `${Math.max(100 - creditsPercent, 2)}%` }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Messages Card */}
-                        <div className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-blue-500/60 rounded-sm p-5 group hover:border-t-blue-400 transition-all">
-                            <div className="flex items-center gap-2 mb-4">
-                                <MessageSquare className="w-4 h-4 text-blue-400" />
-                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
-                                    Assistant Messages
-                                </span>
-                            </div>
-                            <span className="text-4xl font-black text-white tabular-nums">
-                                {stats?.totalMessages || 0}
-                            </span>
-                        </div>
-
-                        {/* Plan Card */}
-                        <div className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-amber-500/60 rounded-sm p-5 group hover:border-t-amber-400 transition-all">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Crown className="w-4 h-4 text-amber-400" />
-                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
-                                    Current Plan
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <span className="text-4xl font-black text-white">
-                                    {planName}
-                                </span>
-                                {planName === "Free" && (
-                                    <Link
-                                        href="/pricing"
-                                        className="text-[9px] px-2 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-bold uppercase tracking-wider hover:bg-cyan-500/20 transition-colors"
-                                    >
-                                        Upgrade
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
+            <div className="px-5 md:px-8 pt-8 md:pt-10 pb-8 space-y-8">
+                {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-24 rounded-2xl bg-white/[0.04] border border-white/[0.08] animate-pulse" />
+                        ))}
                     </div>
-
-                    {/* Usage + Quick Actions Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        {/* Usage Panel */}
-                        <div className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-cyan-500/60 rounded-sm p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-2">
-                                    <BarChart3 className="w-4 h-4 text-cyan-400" />
-                                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">
-                                        Usage
-                                    </h3>
-                                </div>
-                                <span className="text-[10px] px-2.5 py-1 bg-white/[0.04] text-white/50 border border-white/[0.06] rounded-sm font-bold uppercase tracking-wider">
-                                    {planName} Plan
-                                </span>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="rounded-2xl bg-[#101216] border border-white/[0.08] p-4">
+                                <p className="text-[11px] uppercase tracking-[0.18em] text-white/45 flex items-center gap-2">
+                                    <Coins className="w-3.5 h-3.5" /> Credits
+                                </p>
+                                <p className="text-3xl font-black mt-2 tabular-nums text-white">{creditsAvailable}</p>
                             </div>
+                            <div className="rounded-2xl bg-[#101216] border border-white/[0.08] p-4">
+                                <p className="text-[11px] uppercase tracking-[0.18em] text-white/45 flex items-center gap-2">
+                                    <MessageSquare className="w-3.5 h-3.5" /> Messages
+                                </p>
+                                <p className="text-3xl font-black mt-2 tabular-nums text-white">{stats?.totalMessages || 0}</p>
+                            </div>
+                            <div className="rounded-2xl bg-[#101216] border border-white/[0.08] p-4">
+                                <p className="text-[11px] uppercase tracking-[0.18em] text-white/45 flex items-center gap-2">
+                                    <Crown className="w-3.5 h-3.5" /> Plan
+                                </p>
+                                <p className="text-3xl font-black mt-2 text-white">{planName}</p>
+                            </div>
+                        </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <div className="flex justify-between mb-2">
-                                        <span className="text-[11px] text-white/40 uppercase tracking-wider font-medium">
-                                            Credits consumed
-                                        </span>
-                                        <span className="text-[11px] font-bold text-white tabular-nums">
-                                            {creditsUsed} <span className="text-white/30">/ {creditsMax}</span>
-                                        </span>
-                                    </div>
-                                    <div className="w-full h-2 bg-white/[0.04] rounded-sm overflow-hidden">
-                                        <div
-                                            className={`h-full rounded-sm transition-all duration-700 ${creditsPercent >= 90
-                                                ? "bg-gradient-to-r from-red-600 to-red-500"
-                                                : creditsPercent >= 60
-                                                    ? "bg-gradient-to-r from-amber-600 to-amber-500"
-                                                    : "bg-gradient-to-r from-cyan-600 to-cyan-400"
-                                                }`}
-                                            style={{ width: `${creditsPercent}%` }}
-                                        />
-                                    </div>
-                                </div>
-
-                                {creditsPercent >= 80 && (
-                                    <div className="bg-amber-500/5 border border-amber-500/10 rounded-sm p-3 flex items-center gap-3">
-                                        <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                                        <p className="text-[11px] text-amber-400/80">
-                                            Running low on credits — upgrade or purchase a credit pack.
-                                        </p>
-                                    </div>
-                                )}
-
-                                <Link
-                                    href="/pricing"
-                                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-sm bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white text-xs font-bold uppercase tracking-[0.15em] transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-cyan-500/10 mt-2"
-                                >
-                                    <Zap className="w-3.5 h-3.5" />
-                                    {planName === "Free" ? "Upgrade Plan" : "Buy Credits"}
+                        <section>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-3xl font-black tracking-tight text-white">Featured Blueprints</h2>
+                                <Link href="/director" className="text-white/70 hover:text-white text-base inline-flex items-center gap-2">
+                                    View More <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>
-                        </div>
-
-                        {/* Quick Actions */}
-                        <div className="bg-[#0a0a0a] border border-white/[0.06] border-t-2 border-t-cyan-500/60 rounded-sm p-6">
-                            <div className="flex items-center gap-2 mb-6">
-                                <Zap className="w-4 h-4 text-cyan-400" />
-                                <h3 className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">
-                                    Quick Actions
-                                </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                                {featuredBlueprints.map((item, index) => (
+                                    <Link
+                                        key={item.title}
+                                        href={item.href}
+                                        className="group min-h-[190px] rounded-3xl border border-white/10 p-5 flex flex-col justify-end relative overflow-hidden bg-[#121419]"
+                                    >
+                                        <div className={`absolute inset-0 opacity-80 ${index % 4 === 0
+                                            ? "bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.4),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(249,115,22,0.3),transparent_35%)]"
+                                            : index % 4 === 1
+                                                ? "bg-[radial-gradient(circle_at_70%_15%,rgba(16,185,129,0.35),transparent_45%),radial-gradient(circle_at_20%_80%,rgba(99,102,241,0.28),transparent_38%)]"
+                                                : index % 4 === 2
+                                                    ? "bg-[radial-gradient(circle_at_80%_20%,rgba(236,72,153,0.33),transparent_42%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.28),transparent_40%)]"
+                                                    : "bg-[radial-gradient(circle_at_20%_25%,rgba(251,191,36,0.3),transparent_42%),radial-gradient(circle_at_82%_80%,rgba(20,184,166,0.25),transparent_38%)]"
+                                            }`} />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                                        <div className="relative z-10">
+                                            <h3 className="text-2xl leading-[1.02] font-black text-white max-w-[14ch]">{item.title}</h3>
+                                            <p className="text-white/70 text-sm mt-2 max-w-[22ch]">{item.subtitle}</p>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
+                        </section>
 
-                            <div className="space-y-2">
-                                {quickActions.map((action) => {
-                                    const Icon = action.icon;
-                                    return (
-                                        <Link
-                                            key={action.href}
-                                            href={action.href}
-                                            className="group flex items-center gap-4 p-3.5 rounded-sm bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.04] hover:border-cyan-500/20 transition-all"
-                                        >
-                                            <div className="w-9 h-9 rounded-sm bg-cyan-500/5 border border-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/10 group-hover:border-cyan-500/30 transition-all">
-                                                <Icon className="w-4 h-4 text-cyan-400" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[12px] font-bold text-white uppercase tracking-wider">
-                                                    {action.label}
-                                                </div>
-                                                <div className="text-[10px] text-white/30 uppercase tracking-wider mt-0.5">
-                                                    {action.desc}
-                                                </div>
-                                            </div>
-                                            <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-cyan-400 transition-colors" />
-                                        </Link>
-                                    );
-                                })}
+                        <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#101216] p-4">
+                            <div className="flex items-center gap-3">
+                                <Library className="w-4 h-4 text-white/70" />
+                                <p className="text-white/80 text-sm">Usage: {creditsUsed} / {creditsMax} credits used this cycle.</p>
                             </div>
+                            <Link href="/pricing" className="text-sm text-sky-300 hover:text-sky-200 font-semibold">
+                                {planName === "Free" ? "Upgrade" : "Manage"}
+                            </Link>
                         </div>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }
