@@ -129,14 +129,14 @@ export default function GeneratePage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr,340px] gap-4">
         {/* Main Content Area */}
-        <div className="space-y-5 order-2 xl:order-1">
+        <div className="space-y-5 order-1">
           {/* Prompt Box */}
-          <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm p-4">
+          <div className="neon-frame rounded-2xl p-4 md:p-5">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe your image... e.g., 'A neon-lit Tokyo street at night, cinematic rain reflections, 8k resolution'"
-              className="w-full h-24 bg-transparent text-white placeholder-white/30 resize-none outline-none border-none text-sm leading-relaxed"
+              className="w-full h-28 md:h-32 bg-transparent text-white placeholder-white/35 resize-none outline-none border-none text-sm md:text-base leading-relaxed"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -145,15 +145,15 @@ export default function GeneratePage() {
               }}
             />
 
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
-              <div className="text-xs text-white/40 uppercase tracking-wider font-medium">
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.08]">
+              <div className="text-xs text-white/45 uppercase tracking-wider font-medium">
                 <span className="font-bold text-cyan-400">{selectedModelConfig.cost}</span> credits / image
               </div>
 
               <button
                 onClick={generateImage}
                 disabled={generating || !prompt}
-                className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white px-8 py-3 rounded-sm font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-wider text-sm"
+                className="bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white px-6 md:px-8 py-3 rounded-xl font-bold shadow-lg shadow-cyan-500/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-wider text-sm"
               >
                 {generating ? (
                   <>
@@ -171,7 +171,7 @@ export default function GeneratePage() {
           </div>
 
           {/* Output Area */}
-          <div className="aspect-square bg-black/80 border border-white/[0.06] rounded-sm overflow-hidden relative flex items-center justify-center group">
+          <div className="aspect-square bg-black/80 border border-white/[0.08] rounded-2xl overflow-hidden relative flex items-center justify-center group">
             {generating ? (
               <div className="text-center space-y-4">
                 <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mx-auto" />
@@ -215,7 +215,7 @@ export default function GeneratePage() {
         </div>
 
         {/* Sidebar Controls */}
-        <div className="space-y-3 order-1 xl:order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
+        <div className="space-y-3 order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
           {/* Settings Header */}
           <div className="flex items-center gap-2 px-1">
             <Settings2 className="w-4 h-4 text-cyan-400" />
@@ -223,7 +223,7 @@ export default function GeneratePage() {
           </div>
 
           {/* Model Selection — Collapsible */}
-          <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
             <button
               onClick={() => setModelOpen(!modelOpen)}
               className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
@@ -271,7 +271,7 @@ export default function GeneratePage() {
           </div>
 
           {/* Style Selection — Collapsible */}
-          <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
             <button
               onClick={() => setStyleOpen(!styleOpen)}
               className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
@@ -365,7 +365,7 @@ export default function GeneratePage() {
           </div>
 
           {/* Aspect Ratio */}
-          <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm p-4">
+          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl p-4">
             <p className="text-xs font-bold text-white/80 uppercase tracking-[0.15em] mb-3">Aspect Ratio</p>
             <div className="grid grid-cols-3 gap-2">
               {SIZES.map(sz => (

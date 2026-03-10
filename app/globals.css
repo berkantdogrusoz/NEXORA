@@ -53,3 +53,61 @@ canvas {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes slow-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes neon-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.neon-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-frame::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 165%;
+  height: 165%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(34, 211, 238, 0),
+    rgba(34, 211, 238, 0.45),
+    rgba(56, 189, 248, 0.2),
+    rgba(34, 211, 238, 0)
+  );
+  animation: slow-spin 9s linear infinite;
+  pointer-events: none;
+}
+
+.neon-frame::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: rgba(10, 12, 15, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.1), 0 0 36px rgba(34, 211, 238, 0.08);
+  animation: neon-breathe 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.neon-frame > * {
+  position: relative;
+  z-index: 1;
+}
