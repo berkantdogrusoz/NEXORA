@@ -268,11 +268,11 @@ export default function DirectorStudioPage() {
                 </p>
             </div>
 
-            <div className="grid lg:grid-cols-[1fr,380px] gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr,340px] gap-4">
                 {/* ═══ Main Content ═══ */}
-                <div className="space-y-6">
+                <div className="space-y-5 order-2 xl:order-1">
                     {/* Prompt Box */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm p-5">
+                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm p-4">
                         {/* Reference Image Preview */}
                         {referencePreview && (
                             <div className="mb-4 relative inline-block">
@@ -300,7 +300,7 @@ export default function DirectorStudioPage() {
                                 ? "Describe how to animate this image with cinematic camera motion..."
                                 : "Describe your cinematic scene... e.g., 'A dramatic tracking shot through a neon-lit city at night, rain reflecting off cobblestones'"
                             }
-                            className="w-full h-28 bg-transparent text-white placeholder-white/30 resize-none outline-none border-none text-sm leading-relaxed"
+                            className="w-full h-24 bg-transparent text-white placeholder-white/30 resize-none outline-none border-none text-sm leading-relaxed"
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && !e.shiftKey) {
                                     e.preventDefault();
@@ -442,7 +442,7 @@ export default function DirectorStudioPage() {
                 </div>
 
                 {/* ═══ Sidebar Controls ═══ */}
-                <div className="space-y-4">
+                <div className="space-y-3 order-1 xl:order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
                     {/* Settings Header */}
                     <div className="flex items-center gap-2 px-1">
                         <Settings2 className="w-4 h-4 text-cyan-400" />
@@ -453,7 +453,7 @@ export default function DirectorStudioPage() {
                     <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
                         <button
                             onClick={() => setModelOpen(!modelOpen)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">DOP Model</span>
@@ -465,12 +465,12 @@ export default function DirectorStudioPage() {
                         </button>
                         <div className={`grid transition-all duration-300 ease-in-out ${modelOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                             <div className="overflow-hidden">
-                                <div className="px-4 pb-4 space-y-2">
+                                <div className="px-3 pb-3 space-y-1.5">
                                     {DOP_MODELS.map((m) => (
                                         <button
                                             key={m.id}
                                             onClick={() => setModel(m.id)}
-                                            className={`w-full px-3 py-2.5 text-xs rounded-sm border text-left transition-all font-medium uppercase tracking-wider flex items-center justify-between ${model === m.id
+                                            className={`w-full px-2.5 py-2 text-[11px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
                                                 ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                                                 : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                                                 }`}
@@ -491,7 +491,7 @@ export default function DirectorStudioPage() {
                     <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
                         <button
                             onClick={() => setStyleOpen(!styleOpen)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style Preset</span>
@@ -521,12 +521,12 @@ export default function DirectorStudioPage() {
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-1 gap-2 max-h-52 overflow-auto pr-1">
+                                    <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-auto pr-1">
                                         {filteredPresets.map((preset) => (
                                             <button
                                                 key={preset.id}
                                                 onClick={() => setStylePreset(preset.id)}
-                                                className={`px-3 py-2.5 text-left rounded-sm border transition-all ${stylePreset === preset.id ? "bg-cyan-500/15 border-cyan-500/50" : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"}`}
+                                                className={`px-2.5 py-2 text-left rounded-sm border transition-all ${stylePreset === preset.id ? "bg-cyan-500/15 border-cyan-500/50" : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"}`}
                                             >
                                                 <p className="text-xs font-semibold uppercase tracking-wider text-white">{preset.name}</p>
                                                 <p className="text-[10px] text-white/45 mt-1 normal-case">{preset.description}</p>
@@ -541,7 +541,7 @@ export default function DirectorStudioPage() {
                     <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
                         <button
                             onClick={() => setCameraOpen(!cameraOpen)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Camera</span>
@@ -553,7 +553,7 @@ export default function DirectorStudioPage() {
                         </button>
                         <div className={`grid transition-all duration-300 ease-in-out ${cameraOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                             <div className="overflow-hidden">
-                                <div className="px-4 pb-4">
+                                <div className="px-3 pb-3">
                                     <div className="grid grid-cols-3 gap-1.5">
                                         {CAMERA_MOVEMENTS.map((cam) => (
                                             <button
@@ -577,7 +577,7 @@ export default function DirectorStudioPage() {
                     <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
                         <button
                             onClick={() => setMotionOpen(!motionOpen)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
                         >
                             <div className="flex items-center gap-3">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Motion & Genre</span>
@@ -589,7 +589,7 @@ export default function DirectorStudioPage() {
                         </button>
                         <div className={`grid transition-all duration-300 ease-in-out ${motionOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                             <div className="overflow-hidden">
-                                <div className="px-4 pb-4 space-y-4">
+                                <div className="px-3 pb-3 space-y-3">
                                     {/* Intensity Slider */}
                                     <div>
                                         <div className="flex items-center justify-between mb-2">
@@ -658,7 +658,7 @@ export default function DirectorStudioPage() {
                                                 <button
                                                     key={q}
                                                     onClick={() => setQuality(q)}
-                                                    className={`px-3 py-2.5 text-xs rounded-sm border text-center transition-all font-medium uppercase tracking-wider ${quality === q
+                                                    className={`px-2.5 py-2 text-[11px] rounded-sm border text-center transition-all font-medium ${quality === q
                                                         ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                                                         : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                                                         }`}
