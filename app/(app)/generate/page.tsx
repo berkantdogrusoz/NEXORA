@@ -41,8 +41,8 @@ export default function GeneratePage() {
   >([]);
 
   // Collapsible panels
-  const [styleOpen, setStyleOpen] = useState(true);
-  const [modelOpen, setModelOpen] = useState(true);
+  const [styleOpen, setStyleOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
   const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];

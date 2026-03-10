@@ -81,9 +81,9 @@ export default function DirectorStudioPage() {
     const [seed, setSeed] = useState("");
 
     // Collapsible sidebar panels
-    const [modelOpen, setModelOpen] = useState(true);
-    const [styleOpen, setStyleOpen] = useState(true);
-    const [cameraOpen, setCameraOpen] = useState(true);
+    const [modelOpen, setModelOpen] = useState(false);
+    const [styleOpen, setStyleOpen] = useState(false);
+    const [cameraOpen, setCameraOpen] = useState(false);
     const [motionOpen, setMotionOpen] = useState(false);
     const [advancedOpen, setAdvancedOpen] = useState(false);
 

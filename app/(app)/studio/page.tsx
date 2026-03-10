@@ -52,10 +52,10 @@ export default function StudioPage() {
     >([]);
 
     // Collapsible panels
-    const [modelOpen, setModelOpen] = useState(true);
-    const [presetOpen, setPresetOpen] = useState(true);
-    const [settingsOpen, setSettingsOpen] = useState(true);
-    const [refOpen, setRefOpen] = useState(true);
+    const [modelOpen, setModelOpen] = useState(false);
+    const [presetOpen, setPresetOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [refOpen, setRefOpen] = useState(false);
 
     const selectedModelConfig = VIDEO_MODELS.find(m => m.id === model) || VIDEO_MODELS[0];
     const selectedPreset = VIDEO_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || VIDEO_STYLE_PRESETS[0];
