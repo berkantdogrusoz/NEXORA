@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getDefaultStylePresetId, getStylePresetsForMode, STYLE_PRESET_CATEGORIES } from "@/lib/style-presets";
 
 // ═══════════════════════════════════════
 //   CINEMA STUDIO CONFIGURATION
@@ -47,6 +48,8 @@ const GENRES = [
     { id: "documentary", label: "Documentary" },
 ];
 
+const DIRECTOR_STYLE_PRESETS = getStylePresetsForMode("director");
+
 export default function DirectorStudioPage() {
     const { credits, deductCredits, refundCredits, planName } = useCredits();
     const router = useRouter();
@@ -70,11 +73,16 @@ export default function DirectorStudioPage() {
     const [genre, setGenre] = useState("cinematic");
     const [quality, setQuality] = useState<"720p" | "1080p">("720p");
     const [enhancePrompt, setEnhancePrompt] = useState(true);
+    const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("director"));
+    const [presetCategory, setPresetCategory] = useState<"all" | (typeof STYLE_PRESET_CATEGORIES)[number]>("all");
+    const [promptIntensity, setPromptIntensity] = useState(75);
+    const [customDirection, setCustomDirection] = useState("");
     const [soulMode, setSoulMode] = useState(false);
     const [seed, setSeed] = useState("");
 
     // Collapsible sidebar panels
     const [modelOpen, setModelOpen] = useState(true);
+    const [styleOpen, setStyleOpen] = useState(true);
     const [cameraOpen, setCameraOpen] = useState(true);
     const [motionOpen, setMotionOpen] = useState(false);
     const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -109,6 +117,8 @@ export default function DirectorStudioPage() {
     }, []);
 
     const selectedModel = DOP_MODELS.find((m) => m.id === model) || DOP_MODELS[1];
+    const selectedPreset = DIRECTOR_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || DIRECTOR_STYLE_PRESETS[0];
+    const filteredPresets = DIRECTOR_STYLE_PRESETS.filter((preset) => presetCategory === "all" || preset.category === presetCategory);
     const cost = selectedModel.cost;
 
     const resizeAndCompress = (file: File): Promise<{ base64: string; contentType: string }> => {
@@ -198,6 +208,9 @@ export default function DirectorStudioPage() {
                     genre,
                     quality,
                     enhancePrompt,
+                    stylePreset,
+                    intensity: promptIntensity,
+                    customDirection,
                     soulMode,
                     seed: seed || undefined,
                 }),
@@ -477,6 +490,56 @@ export default function DirectorStudioPage() {
                     {/* Camera Movement */}
                     <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
                         <button
+                            onClick={() => setStyleOpen(!styleOpen)}
+                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style Preset</span>
+                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                                    {selectedPreset?.name || "Preset"}
+                                </span>
+                            </div>
+                            {styleOpen ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                        </button>
+                        <div className={`grid transition-all duration-300 ease-in-out ${styleOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                            <div className="overflow-hidden">
+                                <div className="px-4 pb-4 space-y-3">
+                                    <div className="flex flex-wrap gap-1.5">
+                                        <button
+                                            onClick={() => setPresetCategory("all")}
+                                            className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === "all" ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
+                                        >
+                                            All
+                                        </button>
+                                        {STYLE_PRESET_CATEGORIES.map((category) => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setPresetCategory(category)}
+                                                className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === category ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-2 max-h-52 overflow-auto pr-1">
+                                        {filteredPresets.map((preset) => (
+                                            <button
+                                                key={preset.id}
+                                                onClick={() => setStylePreset(preset.id)}
+                                                className={`px-3 py-2.5 text-left rounded-sm border transition-all ${stylePreset === preset.id ? "bg-cyan-500/15 border-cyan-500/50" : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"}`}
+                                            >
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-white">{preset.name}</p>
+                                                <p className="text-[10px] text-white/45 mt-1 normal-case">{preset.description}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                        <button
                             onClick={() => setCameraOpen(!cameraOpen)}
                             className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
                         >
@@ -615,6 +678,31 @@ export default function DirectorStudioPage() {
                                         >
                                             <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-sm shadow transition-transform ${enhancePrompt ? "left-[18px]" : "left-0.5"}`} />
                                         </button>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Prompt Intensity</p>
+                                            <span className="text-[10px] font-bold text-cyan-400">{promptIntensity}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={promptIntensity}
+                                            onChange={(e) => setPromptIntensity(Number(e.target.value))}
+                                            className="w-full h-1 bg-white/[0.06] rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Custom Direction</p>
+                                        <textarea
+                                            value={customDirection}
+                                            onChange={(e) => setCustomDirection(e.target.value.slice(0, 240))}
+                                            placeholder="Optional: add custom direction for style, mood, or pacing"
+                                            className="w-full h-20 px-3 py-2 bg-black/40 border border-white/[0.06] rounded-sm text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 transition-colors resize-none"
+                                        />
                                     </div>
 
                                     {/* Seed */}

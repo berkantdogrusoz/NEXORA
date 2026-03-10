@@ -3,15 +3,9 @@
 import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Download, Loader2, ImageIcon, Settings2, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { getDefaultStylePresetId, getStylePresetsForMode, STYLE_PRESET_CATEGORIES } from "@/lib/style-presets";
 
-const STYLES = [
-  { label: "Photographic", value: "photographic" },
-  { label: "Cinematic", value: "cinematic" },
-  { label: "Illustration", value: "illustration" },
-  { label: "3D Render", value: "3d-render" },
-  { label: "Minimal", value: "minimal" },
-  { label: "Abstract", value: "abstract" },
-];
+const IMAGE_STYLE_PRESETS = getStylePresetsForMode("image");
 
 const SIZES = [
   { label: "1:1 (Square)", value: "1024x1024" },
@@ -33,7 +27,11 @@ export default function GeneratePage() {
 
   const [prompt, setPrompt] = useState("");
   const [model, setModel] = useState("flux-2-dev");
-  const [style, setStyle] = useState("photographic");
+  const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("image"));
+  const [presetCategory, setPresetCategory] = useState<"all" | (typeof STYLE_PRESET_CATEGORIES)[number]>("all");
+  const [enhancePrompt, setEnhancePrompt] = useState(true);
+  const [intensity, setIntensity] = useState(70);
+  const [customDirection, setCustomDirection] = useState("");
   const [size, setSize] = useState("1024x1024");
   const [generating, setGenerating] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -47,6 +45,8 @@ export default function GeneratePage() {
   const [modelOpen, setModelOpen] = useState(true);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
+  const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];
+  const filteredPresets = IMAGE_STYLE_PRESETS.filter((preset) => presetCategory === "all" || preset.category === presetCategory);
 
   // Load history from database on mount
   useEffect(() => {
@@ -83,12 +83,18 @@ export default function GeneratePage() {
     deductCredits(selectedModelConfig.cost);
 
     try {
-      const fullPrompt = `${style === "photographic" ? "Professional high-end advertising photography, " : style === "cinematic" ? "Cinematic scene, award-winning cinematography, " : style === "illustration" ? "Beautiful artistic illustration, " : style === "3d-render" ? "Stunning 3D render, photorealistic, " : style === "minimal" ? "Minimalist clean design, " : "Abstract artistic, "}${prompt}. High quality, 8k resolution, sharp focus.`;
-
       const res = await fetch("/api/image/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt, size, model }),
+        body: JSON.stringify({
+          prompt,
+          size,
+          model,
+          stylePreset,
+          intensity,
+          customDirection,
+          enhancePrompt,
+        }),
       });
 
       const data = await res.json();
@@ -273,7 +279,7 @@ export default function GeneratePage() {
               <div className="flex items-center gap-3">
                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style</span>
                 <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium capitalize">
-                  {style.replace("-", " ")}
+                  {selectedPreset?.name || "Preset"}
                 </span>
               </div>
               {styleOpen ? (
@@ -286,19 +292,73 @@ export default function GeneratePage() {
               className={`grid transition-all duration-300 ease-in-out ${styleOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
             >
               <div className="overflow-hidden">
-                <div className="px-4 pb-4 grid grid-cols-2 gap-2">
-                  {STYLES.map(s => (
+                <div className="px-4 pb-4 space-y-3">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
-                      key={s.value}
-                      onClick={() => setStyle(s.value)}
-                      className={`px-3 py-2.5 text-xs rounded-sm border text-center transition-all font-medium uppercase tracking-wider ${style === s.value
-                        ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
+                      onClick={() => setPresetCategory("all")}
+                      className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === "all" ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
+                    >
+                      All
+                    </button>
+                    {STYLE_PRESET_CATEGORIES.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => setPresetCategory(category)}
+                        className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === category ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 max-h-64 overflow-auto pr-1">
+                    {filteredPresets.map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => setStylePreset(preset.id)}
+                      className={`px-3 py-2.5 text-left rounded-sm border transition-all ${stylePreset === preset.id
+                        ? "bg-cyan-500/15 border-cyan-500/50"
                         : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                         }`}
                     >
-                      {s.label}
+                      <p className="text-xs font-semibold uppercase tracking-wider text-white">{preset.name}</p>
+                      <p className="text-[10px] text-white/45 mt-1 normal-case">{preset.description}</p>
                     </button>
                   ))}
+                  </div>
+                  <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">AI Enhance</p>
+                      <button
+                        onClick={() => setEnhancePrompt(!enhancePrompt)}
+                        className={`w-9 h-5 rounded-sm transition-colors relative ${enhancePrompt ? "bg-cyan-500" : "bg-white/10"}`}
+                      >
+                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-sm shadow transition-transform ${enhancePrompt ? "left-[18px]" : "left-0.5"}`} />
+                      </button>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Intensity</p>
+                        <span className="text-[10px] font-bold text-cyan-400">{intensity}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={intensity}
+                        onChange={(e) => setIntensity(Number(e.target.value))}
+                        className="w-full h-1 bg-white/[0.06] rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Custom Direction</p>
+                      <textarea
+                        value={customDirection}
+                        onChange={(e) => setCustomDirection(e.target.value.slice(0, 220))}
+                        placeholder="Optional: add specific art direction"
+                        className="w-full h-20 px-3 py-2 bg-black/40 border border-white/[0.06] rounded-sm text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 resize-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

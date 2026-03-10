@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
 import { hasDirectorAccess } from "@/lib/plans";
+import { buildEnhancedPrompt } from "@/lib/prompt-engine";
+import { getDefaultStylePresetId } from "@/lib/style-presets";
 
 export const maxDuration = 300; // 5 minutes
 
@@ -88,6 +90,9 @@ export async function POST(req: Request) {
             genre = "cinematic",
             quality = "720p",
             enhancePrompt = true,
+            stylePreset,
+            intensity,
+            customDirection,
             seed,
             soulMode = false,
         } = body;
@@ -178,29 +183,23 @@ export async function POST(req: Request) {
             }
         }
 
-        // ── Translate prompt to English ──
-        let englishPrompt = prompt || "Cinematic shot with smooth camera motion";
-        try {
-            const { default: OpenAI } = await import("openai");
-            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-            const translation = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                messages: [
-                    {
-                        role: "system",
-                        content: "You are a cinematic video prompt translator. Translate the following to English. Enhance it for cinematic quality — add camera direction, lighting cues, and atmosphere. Only return the enhanced prompt, nothing else.",
-                    },
-                    { role: "user", content: prompt || "Cinematic shot" },
-                ],
-            });
-            englishPrompt = translation.choices[0].message.content || englishPrompt;
-        } catch {
-            console.error("Translation skipped, using original prompt.");
-        }
+        const enhanced = await buildEnhancedPrompt({
+            mode: "director",
+            userPrompt: prompt || "Cinematic shot with smooth camera motion",
+            stylePresetId: stylePreset || getDefaultStylePresetId("director"),
+            modelId: finalModel,
+            intensity: typeof intensity === "number" ? intensity : Number(intensity),
+            customDirection,
+            enhancePrompt,
+            cameraMovement,
+            genre,
+            motionIntensity,
+        });
+        const providerPrompt = enhanced.enhancedPrompt;
 
         // ── Build Higgsfield Payload ──
         const payload: Record<string, any> = {
-            prompt: englishPrompt,
+            prompt: providerPrompt,
             model: finalModel,
             quality,
             enhance_prompt: enhancePrompt,

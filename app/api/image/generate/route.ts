@@ -4,6 +4,8 @@ import OpenAI from "openai";
 import * as fal from "@fal-ai/serverless-client";
 import { createSupabaseServer } from "@/lib/supabase";
 import { hasProModelAccess, STANDARD_DAILY_GENERATION_LIMIT } from "@/lib/plans";
+import { buildEnhancedPrompt } from "@/lib/prompt-engine";
+import { getDefaultStylePresetId } from "@/lib/style-presets";
 
 export const maxDuration = 60;
 
@@ -24,7 +26,15 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, size = "1024x1024", model: modelId = "flux-2-dev" } = body;
+        const {
+            prompt,
+            size = "1024x1024",
+            model: modelId = "flux-2-dev",
+            stylePreset,
+            intensity,
+            customDirection,
+            enhancePrompt = true,
+        } = body;
 
         if (!prompt) {
             return NextResponse.json(
@@ -118,6 +128,17 @@ export async function POST(req: Request) {
         creditDeducted = !isDev;
         deductedCost = cost;
 
+        const enhanced = await buildEnhancedPrompt({
+            mode: "image",
+            userPrompt: prompt,
+            stylePresetId: stylePreset || getDefaultStylePresetId("image"),
+            modelId: finalModel,
+            intensity: typeof intensity === "number" ? intensity : Number(intensity),
+            customDirection,
+            enhancePrompt,
+        });
+        const providerPrompt = enhanced.enhancedPrompt;
+
         let imageUrl = "";
 
         if (finalModel.startsWith("dall-e")) {
@@ -130,7 +151,7 @@ export async function POST(req: Request) {
 
             const response = await client.images.generate({
                 model: finalModel, // "dall-e-2" | "dall-e-3"
-                prompt,
+                prompt: providerPrompt,
                 n: 1,
                 size: openaiSize as "1024x1024" | "1792x1024" | "1024x1792",
                 ...(finalModel === "dall-e-3" ? { quality: "hd" } : {}),
@@ -146,7 +167,7 @@ export async function POST(req: Request) {
 
             const result: any = await fal.subscribe(falModel, {
                 input: {
-                    prompt,
+                    prompt: providerPrompt,
                     image_size: finalModel === "recraft-v3" ? { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) } : undefined,
                     aspect_ratio: finalModel === "flux-2-dev" ? aspect_ratio : undefined,
                 },
@@ -174,7 +195,7 @@ export async function POST(req: Request) {
 
             const output = await replicate.run(modelString as any, {
                 input: {
-                    prompt,
+                    prompt: providerPrompt,
                     aspect_ratio,
                     output_format: "webp",
                     output_quality: 90

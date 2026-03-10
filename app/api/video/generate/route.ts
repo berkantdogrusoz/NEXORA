@@ -4,6 +4,8 @@ import * as fal from "@fal-ai/serverless-client";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
 import { hasProModelAccess, STANDARD_DAILY_GENERATION_LIMIT } from "@/lib/plans";
+import { buildEnhancedPrompt } from "@/lib/prompt-engine";
+import { getDefaultStylePresetId } from "@/lib/style-presets";
 
 export const maxDuration = 300; // 5 minutes for video generation
 
@@ -22,7 +24,18 @@ export async function POST(req: Request) {
         if (rateError) return rateError;
 
         const body = await req.json();
-        const { prompt, model: modelId = "kling-3", aspectRatio = "16:9", duration = "5", quality = "hd", imageUrl } = body;
+        const {
+            prompt,
+            model: modelId = "kling-3",
+            aspectRatio = "16:9",
+            duration = "5",
+            quality = "hd",
+            imageUrl,
+            stylePreset,
+            intensity,
+            customDirection,
+            enhancePrompt = true,
+        } = body;
 
         if (!prompt && !imageUrl) {
             return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });
@@ -159,22 +172,16 @@ export async function POST(req: Request) {
             }
         }
 
-        // Translate prompt to English for better model adherence
-        let englishPrompt = prompt || "Animate this image with smooth cinematic motion";
-        try {
-            const { default: OpenAI } = await import("openai");
-            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-            const translation = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                messages: [
-                    { role: "system", content: "You are a prompt translator. Translate the following video generation prompt to English. Only return the english translation, nothing else. Enhance it slightly for cinematic quality if it's very brief." },
-                    { role: "user", content: prompt || "Animate this image" }
-                ]
-            });
-            englishPrompt = translation.choices[0].message.content || englishPrompt;
-        } catch (e) {
-            console.error("Translation skipped, using original prompt:", e);
-        }
+        const enhanced = await buildEnhancedPrompt({
+            mode: "video",
+            userPrompt: prompt || "Animate this image with smooth cinematic motion",
+            stylePresetId: stylePreset || getDefaultStylePresetId("video"),
+            modelId,
+            intensity: typeof intensity === "number" ? intensity : Number(intensity),
+            customDirection,
+            enhancePrompt,
+        });
+        const providerPrompt = enhanced.enhancedPrompt;
 
         let finalUrl: any = "";
 
@@ -189,7 +196,7 @@ export async function POST(req: Request) {
                 : "fal-ai/kling-video/v2/master/text-to-video";
 
             const falInput: any = {
-                prompt: englishPrompt,
+                prompt: providerPrompt,
                 aspect_ratio: aspectRatio,
                 duration: duration === "10" ? "10" : "5",
             };
@@ -218,7 +225,7 @@ export async function POST(req: Request) {
                 : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
 
             const falInput: any = {
-                prompt: englishPrompt,
+                prompt: providerPrompt,
                 duration: duration === "10s" || duration === "10" ? 10 : 5,
                 aspect_ratio: aspectRatio,
             };
@@ -246,7 +253,7 @@ export async function POST(req: Request) {
 
         } else if (modelId === "luma") {
             const input: any = {
-                prompt: englishPrompt,
+                prompt: providerPrompt,
                 aspect_ratio: aspectRatio,
                 duration: duration === "10" ? "10s" : "5s",
             };
@@ -264,7 +271,7 @@ export async function POST(req: Request) {
                 "1:1": "1080:1080",
             };
             const input: any = {
-                prompt_text: englishPrompt,
+                prompt_text: providerPrompt,
                 ratio: ratioMap[aspectRatio] || "1280:720",
                 duration: duration === "10" ? 10 : 5,
             };
@@ -277,7 +284,7 @@ export async function POST(req: Request) {
         } else if (modelId === "runway-gwm") {
             console.log(`Generating video using Replicate (GWM-1 equivalent, image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
             const input: any = {
-                prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${englishPrompt}`,
+                prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${providerPrompt}`,
                 prompt_optimizer: true,
             };
             if (resolvedImageUrl) input.first_frame_image = resolvedImageUrl;
@@ -305,13 +312,13 @@ export async function POST(req: Request) {
             const soraSeconds = duration === "10" ? "8" : "4";
 
             // Enforce cinematic quality in prompt implicitly to ensure good results
-            const enhancedPrompt = englishPrompt.toLowerCase().includes("cinematic")
-                ? englishPrompt
-                : englishPrompt + " - ultra cinematic, 8k resolution, highly detailed, photorealistic, premium quality";
+            const soraPrompt = providerPrompt.toLowerCase().includes("cinematic")
+                ? providerPrompt
+                : providerPrompt + " - ultra cinematic, 8k resolution, highly detailed, photorealistic, premium quality";
 
             const soraBody: any = {
                 model: "sora-2-pro",
-                prompt: enhancedPrompt,
+                prompt: soraPrompt,
                 seconds: soraSeconds,
                 size: videoSize,
             };
