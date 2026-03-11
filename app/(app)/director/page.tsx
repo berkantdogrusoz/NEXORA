@@ -256,7 +256,7 @@ export default function DirectorStudioPage() {
     const genreLabel = GENRES.find(g => g.id === genre)?.label || "Cinematic";
 
     return (
-        <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+        <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-4xl font-black text-white flex items-center gap-3 tracking-tight">
@@ -272,7 +272,7 @@ export default function DirectorStudioPage() {
                 {/* ═══ Main Content ═══ */}
                 <div className="space-y-5 order-2 xl:order-1">
                     {/* Prompt Box */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm p-4">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl p-4 md:p-5">
                         {/* Reference Image Preview */}
                         {referencePreview && (
                             <div className="mb-4 relative inline-block">
@@ -300,7 +300,7 @@ export default function DirectorStudioPage() {
                                 ? "Describe how to animate this image with cinematic camera motion..."
                                 : "Describe your cinematic scene... e.g., 'A dramatic tracking shot through a neon-lit city at night, rain reflecting off cobblestones'"
                             }
-                            className="w-full h-24 bg-transparent text-white placeholder-white/30 resize-none outline-none border-none text-sm leading-relaxed"
+                            className="w-full h-24 md:h-28 bg-transparent text-white placeholder-white/35 resize-none outline-none border-none text-sm leading-relaxed"
                             onKeyDown={(e) => {
                                 if (e.key === "Enter" && !e.shiftKey) {
                                     e.preventDefault();
@@ -309,8 +309,8 @@ export default function DirectorStudioPage() {
                             }}
                         />
 
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
-                            <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap mt-4 pt-4 border-t border-white/[0.08]">
+                            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                                 <div className="text-xs text-white/40 uppercase tracking-wider font-medium">
                                     <span className="font-bold text-cyan-400">{cost}</span> credits / video
                                 </div>
@@ -320,7 +320,7 @@ export default function DirectorStudioPage() {
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={uploading}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm text-[10px] text-white/50 hover:border-cyan-500/30 hover:text-cyan-400 transition-all uppercase tracking-wider font-medium disabled:opacity-40"
+                                    className="flex items-center gap-1.5 h-8 px-3 bg-white/[0.04] border border-white/[0.08] rounded-full text-[10px] text-white/55 hover:border-cyan-500/30 hover:text-cyan-400 transition-colors uppercase tracking-wider font-medium disabled:opacity-40"
                                 >
                                     <Upload className="w-3 h-3" />
                                     {uploading ? "Uploading..." : "Image"}
@@ -330,7 +330,7 @@ export default function DirectorStudioPage() {
                                 {referenceImage && (
                                     <button
                                         onClick={() => setSoulMode(!soulMode)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-[10px] border uppercase tracking-wider font-bold transition-all ${soulMode
+                                        className={`flex items-center gap-1.5 h-8 px-3 rounded-full text-[10px] border uppercase tracking-wider font-bold transition-colors ${soulMode
                                             ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
                                             : "bg-white/[0.04] border-white/[0.08] text-white/40 hover:border-white/[0.12]"
                                             }`}
@@ -344,7 +344,7 @@ export default function DirectorStudioPage() {
                             <button
                                 onClick={handleGenerate}
                                 disabled={generating || uploading || (!prompt && !referenceImage)}
-                                className="bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white px-8 py-3 rounded-sm font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-wider text-sm"
+                                className="h-10 px-4 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-colors"
                             >
                                 {generating ? (
                                     <>
@@ -362,7 +362,7 @@ export default function DirectorStudioPage() {
                     </div>
 
                     {/* Output Area */}
-                    <div className="aspect-video bg-black/80 border border-white/[0.06] rounded-sm overflow-hidden relative flex items-center justify-center group">
+                    <div className="aspect-video bg-black/80 border border-white/[0.08] rounded-2xl overflow-hidden relative flex items-center justify-center group">
                         {generating ? (
                             <div className="text-center space-y-4">
                                 <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mx-auto" />
@@ -450,14 +450,14 @@ export default function DirectorStudioPage() {
                     </div>
 
                     {/* DOP Model */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
                         <button
                             onClick={() => setModelOpen(!modelOpen)}
-                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">DOP Model</span>
-                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
                                     {selectedModel.name}
                                 </span>
                             </div>
@@ -470,7 +470,7 @@ export default function DirectorStudioPage() {
                                         <button
                                             key={m.id}
                                             onClick={() => setModel(m.id)}
-                                            className={`w-full px-2.5 py-2 text-[11px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
+                                            className={`w-full px-2.5 py-1.5 text-[10px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
                                                 ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                                                 : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                                                 }`}
@@ -488,14 +488,14 @@ export default function DirectorStudioPage() {
                     </div>
 
                     {/* Camera Movement */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
                         <button
                             onClick={() => setStyleOpen(!styleOpen)}
-                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style Preset</span>
-                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
                                     {selectedPreset?.name || "Preset"}
                                 </span>
                             </div>
@@ -526,7 +526,7 @@ export default function DirectorStudioPage() {
                                             <button
                                                 key={preset.id}
                                                 onClick={() => setStylePreset(preset.id)}
-                                                className={`px-2.5 py-2 text-left rounded-sm border transition-all ${stylePreset === preset.id ? "bg-cyan-500/15 border-cyan-500/50" : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"}`}
+                                                className={`px-2.5 py-1.5 text-left rounded-sm border transition-all ${stylePreset === preset.id ? "bg-cyan-500/15 border-cyan-500/50" : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"}`}
                                             >
                                                 <p className="text-xs font-semibold uppercase tracking-wider text-white">{preset.name}</p>
                                                 <p className="text-[10px] text-white/45 mt-1 normal-case">{preset.description}</p>
@@ -538,14 +538,14 @@ export default function DirectorStudioPage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
                         <button
                             onClick={() => setCameraOpen(!cameraOpen)}
-                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Camera</span>
-                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
                                     {cameraLabel}
                                 </span>
                             </div>
@@ -559,7 +559,7 @@ export default function DirectorStudioPage() {
                                             <button
                                                 key={cam.id}
                                                 onClick={() => setCameraMovement(cam.id)}
-                                                className={`px-2 py-2 text-[9px] rounded-sm border text-center transition-all font-bold uppercase tracking-wider ${cameraMovement === cam.id
+                                                className={`px-2 py-1.5 text-[9px] rounded-sm border text-center transition-all font-bold uppercase tracking-wider ${cameraMovement === cam.id
                                                     ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
                                                     : "bg-black/40 border-white/[0.06] text-white/40 hover:border-white/[0.12] hover:text-white/70"
                                                     }`}
@@ -574,14 +574,14 @@ export default function DirectorStudioPage() {
                     </div>
 
                     {/* Motion & Genre */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
                         <button
                             onClick={() => setMotionOpen(!motionOpen)}
-                            className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Motion & Genre</span>
-                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
                                     {motionIntensity}% · {genreLabel}
                                 </span>
                             </div>
@@ -634,14 +634,14 @@ export default function DirectorStudioPage() {
                     </div>
 
                     {/* Advanced */}
-                    <div className="bg-[#0a0a0a] border border-white/[0.08] border-t-2 border-t-cyan-500/60 rounded-sm">
+                    <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
                         <button
                             onClick={() => setAdvancedOpen(!advancedOpen)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
                                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Advanced</span>
-                                <span className="text-[10px] px-2 py-0.5 bg-white/[0.03] text-white/30 border border-white/[0.06] rounded-sm font-medium">
+                                <span className="text-[10px] px-2 py-0.5 bg-white/[0.03] text-white/30 border border-white/[0.06] rounded-sm font-medium max-w-[130px] truncate">
                                     {quality} · {enhancePrompt ? "AI Enhanced" : "Raw"}
                                 </span>
                             </div>
@@ -658,7 +658,7 @@ export default function DirectorStudioPage() {
                                                 <button
                                                     key={q}
                                                     onClick={() => setQuality(q)}
-                                                    className={`px-2.5 py-2 text-[11px] rounded-sm border text-center transition-all font-medium ${quality === q
+                                                    className={`px-2.5 py-1.5 text-[10px] rounded-sm border text-center transition-all font-medium ${quality === q
                                                         ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                                                         : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                                                         }`}
