@@ -115,7 +115,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+    <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-black text-white flex items-center gap-3 tracking-tight">
@@ -129,7 +129,7 @@ export default function GeneratePage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr,340px] gap-4">
         {/* Main Content Area */}
-        <div className="space-y-5 order-1">
+        <div className="space-y-5 order-2 xl:order-1">
           {/* Prompt Box */}
           <div className="neon-frame rounded-2xl p-4 md:p-5">
             <textarea
@@ -145,7 +145,7 @@ export default function GeneratePage() {
               }}
             />
 
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap mt-4 pt-4 border-t border-white/[0.08]">
               <div className="text-xs text-white/45 uppercase tracking-wider font-medium">
                 <span className="font-bold text-cyan-400">{selectedModelConfig.cost}</span> credits / image
               </div>
@@ -215,7 +215,7 @@ export default function GeneratePage() {
         </div>
 
         {/* Sidebar Controls */}
-        <div className="space-y-3 order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
+        <div className="space-y-3 order-1 xl:order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
           {/* Settings Header */}
           <div className="flex items-center gap-2 px-1">
             <Settings2 className="w-4 h-4 text-cyan-400" />
@@ -228,9 +228,9 @@ export default function GeneratePage() {
               onClick={() => setModelOpen(!modelOpen)}
               className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">AI Model</span>
-                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium">
+                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
                   {selectedModelConfig.name}
                 </span>
               </div>
@@ -276,9 +276,9 @@ export default function GeneratePage() {
               onClick={() => setStyleOpen(!styleOpen)}
               className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style</span>
-                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium capitalize">
+                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium capitalize max-w-[130px] truncate">
                   {selectedPreset?.name || "Preset"}
                 </span>
               </div>
