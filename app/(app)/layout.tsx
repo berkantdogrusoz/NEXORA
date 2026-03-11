@@ -72,7 +72,7 @@ function AppLayout({
                                 <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
-                        <span className="font-bold text-lg tracking-wide md:hidden">LEONARDO.AI</span>
+                        <span className="font-bold text-lg tracking-wide md:hidden">NEXORA</span>
                     </Link>
                     <button 
                         className="md:hidden text-white/50 hover:text-white"
@@ -166,7 +166,7 @@ function AppLayout({
                         >
                             <Menu className="w-6 h-6 text-white" />
                         </button>
-                        <span className="font-bold text-sm tracking-widest text-white uppercase">LEONARDO.AI</span>
+                        <span className="font-bold text-sm tracking-widest text-white uppercase">NEXORA</span>
                     </div>
                 </header>
 
