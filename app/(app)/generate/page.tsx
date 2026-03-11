@@ -44,6 +44,7 @@ export default function GeneratePage() {
 
   // Settings dropdown
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
   const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];
@@ -224,17 +225,39 @@ export default function GeneratePage() {
                  {/* Right Col: Style & Details */}
                  <div className="space-y-5">
                     {/* Style */}
-                    <div>
+                    <div className="flex flex-col">
                         <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Style Preset</label>
-                        <select 
-                            value={stylePreset}
-                            onChange={(e) => setStylePreset(e.target.value)}
-                            className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none appearance-none"
-                        >
-                            {IMAGE_STYLE_PRESETS.map(preset => (
-                                <option key={preset.id} value={preset.id}>{preset.name} - {preset.description}</option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setIsStyleDropdownOpen(!isStyleDropdownOpen)}
+                                className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none flex items-center justify-between transition-colors z-10 relative"
+                            >
+                                <span className="truncate pr-2">
+                                    {selectedPreset ? `${selectedPreset.name} - ${selectedPreset.description}` : "Select Style"}
+                                </span>
+                                <ChevronDown className={`w-4 h-4 text-white/40 flex-shrink-0 transition-transform ${isStyleDropdownOpen ? "rotate-180" : ""}`} />
+                            </button>
+                            
+                            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isStyleDropdownOpen ? "max-h-[300px] mt-2 opacity-100" : "max-h-0 opacity-0"}`}>
+                                <div className="bg-[#121419] border border-white/10 rounded-xl overflow-hidden shadow-inner max-h-[250px] overflow-y-auto w-full flex flex-col hide-scrollbar">
+                                    {IMAGE_STYLE_PRESETS.map(preset => (
+                                        <button
+                                            key={preset.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setStylePreset(preset.id);
+                                                setIsStyleDropdownOpen(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2.5 text-xs hover:bg-white/5 transition-colors flex flex-col gap-0.5 ${stylePreset === preset.id ? 'bg-cyan-500/10 text-cyan-400' : 'text-white/80'}`}
+                                        >
+                                            <span className="font-bold truncate">{preset.name}</span>
+                                            <span className={`text-[10px] truncate w-full ${stylePreset === preset.id ? 'text-cyan-400/70' : 'text-white/40'}`}>{preset.description}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Enhance */}
