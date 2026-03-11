@@ -37,6 +37,8 @@ export async function POST(req: Request) {
             enhancePrompt = true,
         } = body;
 
+        const finalQuality: "hd" | "sd" = quality === "sd" ? "sd" : "hd";
+
         if (!prompt && !imageUrl) {
             return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });
         }
@@ -302,11 +304,17 @@ export async function POST(req: Request) {
 
             // Map aspect ratio to size format (strictly allowed values by OpenAI)
             // Allowed: '720x1280', '1280x720', '1024x1792', '1792x1024'
-            const sizeMap: Record<string, string> = {
+            const sizeMapHd: Record<string, string> = {
                 "16:9": "1792x1024", // Max landscape
                 "9:16": "1024x1792", // Max portrait
                 "1:1": "1280x720",   // No native 1:1, fallback to landscape
             };
+            const sizeMapSd: Record<string, string> = {
+                "16:9": "1280x720",
+                "9:16": "720x1280",
+                "1:1": "1280x720",
+            };
+            const sizeMap = finalQuality === "sd" ? sizeMapSd : sizeMapHd;
             const videoSize = sizeMap[aspectRatio] || "1792x1024";
 
             // Map duration to seconds. The OpenAI Sora API strictly supports "4", "8", or "12".
@@ -325,8 +333,12 @@ export async function POST(req: Request) {
                 size: videoSize,
             };
 
+            if (resolvedImageUrl) {
+                soraBody.image_url = resolvedImageUrl;
+            }
+
             // Step 1: Create video generation job
-            const createRes = await fetch("https://api.openai.com/v1/videos", {
+            let createRes = await fetch("https://api.openai.com/v1/videos", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -334,6 +346,21 @@ export async function POST(req: Request) {
                 },
                 body: JSON.stringify(soraBody),
             });
+
+            if (!createRes.ok && resolvedImageUrl) {
+                const fallbackBody = { ...soraBody };
+                delete fallbackBody.image_url;
+
+                console.warn("Sora create with image_url failed, retrying without image_url");
+                createRes = await fetch("https://api.openai.com/v1/videos", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(fallbackBody),
+                });
+            }
 
             if (!createRes.ok) {
                 const errBody = await createRes.text();

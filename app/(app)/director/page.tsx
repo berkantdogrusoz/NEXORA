@@ -471,6 +471,20 @@ export default function DirectorPage() {
                                         className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
                                     />
                                 </div>
+
+                                {/* Prompt Intensity */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Prompt Intensity</label>
+                                        <span className="text-[10px] text-cyan-400 font-bold">{promptIntensity}%</span>
+                                    </div>
+                                    <input
+                                        type="range" min="0" max="100"
+                                        value={promptIntensity}
+                                        onChange={(e) => setPromptIntensity(Number(e.target.value))}
+                                        className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
+                                    />
+                                </div>
                                 
                                 {/* Custom Direction */}
                                 <div>
@@ -480,6 +494,19 @@ export default function DirectorPage() {
                                         value={customDirection}
                                         onChange={(e) => setCustomDirection(e.target.value)}
                                         placeholder="Mood, lighting, specific focus..."
+                                        className="w-full px-3 py-2 bg-black/40 border border-white/[0.06] rounded-xl text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 transition-colors"
+                                    />
+                                </div>
+
+                                {/* Seed */}
+                                <div>
+                                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-2">Seed (Optional)</label>
+                                    <input
+                                        type="number"
+                                        inputMode="numeric"
+                                        value={seed}
+                                        onChange={(e) => setSeed(e.target.value.replace(/[^0-9]/g, ""))}
+                                        placeholder="e.g. 42"
                                         className="w-full px-3 py-2 bg-black/40 border border-white/[0.06] rounded-xl text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 transition-colors"
                                     />
                                 </div>

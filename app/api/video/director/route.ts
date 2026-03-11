@@ -85,6 +85,7 @@ export async function POST(req: Request) {
             prompt,
             imageUrl,
             model = "dop-preview",
+            aspectRatio = "16:9",
             cameraMovement = "auto",
             motionIntensity = 0.5,
             genre = "cinematic",
@@ -204,6 +205,10 @@ export async function POST(req: Request) {
             quality,
             enhance_prompt: enhancePrompt,
         };
+
+        if (["16:9", "9:16", "1:1"].includes(aspectRatio)) {
+            payload.aspect_ratio = aspectRatio;
+        }
 
         // Camera movement
         if (cameraMovement && cameraMovement !== "auto") {

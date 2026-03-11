@@ -486,6 +486,17 @@ export default function StudioPage() {
                                         className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
                                     />
                                 </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-2">Custom Direction</label>
+                                    <input
+                                        type="text"
+                                        value={customDirection}
+                                        onChange={(e) => setCustomDirection(e.target.value)}
+                                        placeholder="Mood, lighting, framing details..."
+                                        className="w-full px-3 py-2 bg-black/40 border border-white/[0.06] rounded-xl text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 transition-colors"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
