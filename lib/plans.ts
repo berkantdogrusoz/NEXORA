@@ -16,5 +16,6 @@ export function hasProModelAccess(planName: string): boolean {
 }
 
 export function hasDirectorAccess(planName: string): boolean {
-    return planName === "Growth" || planName === "Pro";
+    // All users can access Director Studio (Blueprints)
+    return true;
 }

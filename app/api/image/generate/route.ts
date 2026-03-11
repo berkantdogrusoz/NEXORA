@@ -168,8 +168,9 @@ export async function POST(req: Request) {
             const result: any = await fal.subscribe(falModel, {
                 input: {
                     prompt: providerPrompt,
-                    image_size: finalModel === "recraft-v3" ? { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) } : undefined,
-                    aspect_ratio: finalModel === "flux-2-dev" ? aspect_ratio : undefined,
+                    image_size: finalModel === "flux-2-dev"
+                        ? (aspect_ratio === "1:1" ? "square_hd" : aspect_ratio === "16:9" ? "landscape_16_9" : "portrait_16_9")
+                        : { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) },
                 },
                 logs: true,
             });

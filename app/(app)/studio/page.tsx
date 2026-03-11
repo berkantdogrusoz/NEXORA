@@ -23,12 +23,12 @@ const DURATIONS = [
 ];
 
 const VIDEO_MODELS = [
-    { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true },
-    { id: "luma", name: "Luma Ray 2", tier: "Pro", cost: 60, supportsImage: true },
-    { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 75, supportsImage: true },
-    { id: "runway-gwm", name: "GWM-1", tier: "Pro", cost: 85, supportsImage: true },
-    { id: "seedance-2", name: "Seedance 2.0", tier: "Pro", cost: 100, supportsImage: true },
-    { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true },
+    { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true, note: "" },
+    { id: "luma", name: "Luma Ray 2", tier: "Pro", cost: 60, supportsImage: true, note: "" },
+    { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 75, supportsImage: true, note: "" },
+    { id: "runway-gwm", name: "GWM-1", tier: "Pro", cost: 85, supportsImage: true, note: "" },
+    { id: "seedance-2", name: "Seedance 2.0", tier: "Pro", cost: 100, supportsImage: true, note: "" },
+    { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true, note: "No 1:1 · 4s/8s" },
 ];
 
 const VIDEO_STYLE_PRESETS = getStylePresetsForMode("video");
@@ -288,7 +288,7 @@ export default function StudioPage() {
                                                      >
                                                          <div className="flex flex-col">
                                                              <span className="text-xs font-bold">{m.name}</span>
-                                                             <span className={`text-[10px] ${model === m.id ? 'text-cyan-400/60' : 'text-white/30'}`}>{m.cost} credits</span>
+                                                             <span className={`text-[10px] ${model === m.id ? 'text-cyan-400/60' : 'text-white/30'}`}>{m.cost} credits{m.note ? ` · ${m.note}` : ''}</span>
                                                          </div>
                                                          <div className="flex items-center gap-2">
                                                              {m.tier === 'Pro' && <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full uppercase font-black">Pro</span>}

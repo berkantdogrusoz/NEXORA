@@ -286,6 +286,8 @@ export async function POST(req: Request) {
             const input: any = {
                 prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${providerPrompt}`,
                 prompt_optimizer: true,
+                aspect_ratio: aspectRatio,
+                duration: duration === "10" ? 10 : 5,
             };
             if (resolvedImageUrl) input.first_frame_image = resolvedImageUrl;
 
