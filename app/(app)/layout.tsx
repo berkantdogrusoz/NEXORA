@@ -83,7 +83,7 @@ function AppLayout({
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-3 py-4 space-y-2">
+                <nav className="flex-1 px-3 py-4 space-y-2 overflow-y-auto no-scrollbar">
                     {menuItems.map((item) => {
                         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                         const Icon = item.icon;
