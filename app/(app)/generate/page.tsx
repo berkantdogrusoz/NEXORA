@@ -131,12 +131,12 @@ export default function GeneratePage() {
         {/* Main Content Area */}
         <div className="space-y-5 order-2 xl:order-1">
           {/* Prompt Box */}
-          <div className="neon-frame rounded-2xl p-4 md:p-5">
+          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl p-4 md:p-5">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe your image... e.g., 'A neon-lit Tokyo street at night, cinematic rain reflections, 8k resolution'"
-              className="w-full h-28 md:h-32 bg-transparent text-white placeholder-white/35 resize-none outline-none border-none text-sm md:text-base leading-relaxed"
+              className="w-full h-24 md:h-28 bg-transparent text-white placeholder-white/35 resize-none outline-none border-none text-sm leading-relaxed"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -153,7 +153,7 @@ export default function GeneratePage() {
               <button
                 onClick={generateImage}
                 disabled={generating || !prompt}
-                className="bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white px-6 md:px-8 py-3 rounded-xl font-bold shadow-lg shadow-cyan-500/25 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-all hover:scale-[1.02] active:scale-95 uppercase tracking-wider text-sm"
+                className="h-10 px-4 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-colors"
               >
                 {generating ? (
                   <>
@@ -226,7 +226,7 @@ export default function GeneratePage() {
           <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
             <button
               onClick={() => setModelOpen(!modelOpen)}
-              className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">AI Model</span>
@@ -249,7 +249,7 @@ export default function GeneratePage() {
                     <button
                       key={m.id}
                       onClick={() => setModel(m.id)}
-                      className={`w-full px-2.5 py-2 text-[11px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
+                      className={`w-full px-2.5 py-1.5 text-[10px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
                         ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                         : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                         }`}
@@ -274,7 +274,7 @@ export default function GeneratePage() {
           <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
             <button
               onClick={() => setStyleOpen(!styleOpen)}
-              className="w-full flex items-center justify-between p-3 hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style</span>
@@ -315,7 +315,7 @@ export default function GeneratePage() {
                     <button
                       key={preset.id}
                       onClick={() => setStylePreset(preset.id)}
-                      className={`px-2.5 py-2 text-left rounded-sm border transition-all ${stylePreset === preset.id
+                      className={`px-2.5 py-1.5 text-left rounded-sm border transition-all ${stylePreset === preset.id
                         ? "bg-cyan-500/15 border-cyan-500/50"
                         : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                         }`}
@@ -372,7 +372,7 @@ export default function GeneratePage() {
                 <button
                   key={sz.value}
                   onClick={() => setSize(sz.value)}
-                  className={`px-2.5 py-2 text-[11px] rounded-sm border text-center transition-all font-medium ${size === sz.value
+                  className={`px-2.5 py-1.5 text-[10px] rounded-sm border text-center transition-all font-medium ${size === sz.value
                     ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
                     : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
                     }`}
