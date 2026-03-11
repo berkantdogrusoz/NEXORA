@@ -145,31 +145,30 @@ export async function POST(req: Request) {
             // OpenAI Generation
             let openaiSize = finalSize;
             if (finalModel === "dall-e-2") {
-                // DALL-E 2 only supports 1024x1024, 512x512, 256x256
                 openaiSize = "1024x1024";
             }
 
             const response = await client.images.generate({
-                model: finalModel, // "dall-e-2" | "dall-e-3"
+                model: finalModel,
                 prompt: providerPrompt,
                 n: 1,
                 size: openaiSize as "1024x1024" | "1792x1024" | "1024x1792",
                 ...(finalModel === "dall-e-3" ? { quality: "hd" } : {}),
             });
             imageUrl = response.data[0]?.url || "";
-        } else if (finalModel === "flux-2-dev" || finalModel === "recraft-v3" || finalModel === "nano-banana-2") {
-            // Fal.ai models
+
+        } else if (finalModel === "flux-2-dev") {
+            // fal.ai FLUX 2 Dev — uses image_size string
             let aspect_ratio = "1:1";
             if (finalSize === "1024x1792") aspect_ratio = "9:16";
             if (finalSize === "1792x1024") aspect_ratio = "16:9";
 
-            const falModel = finalModel === "flux-2-dev" ? "fal-ai/flux/dev" : finalModel === "nano-banana-2" ? "fal-ai/nano-banana-2" : "fal-ai/recraft-v3";
+            const falImageSize = aspect_ratio === "1:1" ? "square_hd" : aspect_ratio === "16:9" ? "landscape_16_9" : "portrait_16_9";
 
-            const result: any = await fal.subscribe(falModel, {
+            const result: any = await fal.subscribe("fal-ai/flux/dev", {
                 input: {
                     prompt: providerPrompt,
-                    image_size: finalModel === "recraft-v3" ? { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) } : undefined,
-                    aspect_ratio: (finalModel === "flux-2-dev" || finalModel === "nano-banana-2") ? aspect_ratio : undefined,
+                    image_size: falImageSize,
                 },
                 logs: true,
             });
@@ -179,10 +178,58 @@ export async function POST(req: Request) {
             } else if (result?.image?.url) {
                 imageUrl = result.image.url;
             } else {
-                throw new Error("No image in fal.ai response");
+                throw new Error("No image in fal.ai FLUX response");
             }
+
+        } else if (finalModel === "recraft-v3") {
+            // fal.ai Recraft V3 — uses image_size { width, height }
+            const result: any = await fal.subscribe("fal-ai/recraft-v3", {
+                input: {
+                    prompt: providerPrompt,
+                    image_size: {
+                        width: parseInt(finalSize.split("x")[0]),
+                        height: parseInt(finalSize.split("x")[1]),
+                    },
+                },
+                logs: true,
+            });
+
+            if (result?.images?.[0]?.url) {
+                imageUrl = result.images[0].url;
+            } else if (result?.image?.url) {
+                imageUrl = result.image.url;
+            } else {
+                throw new Error("No image in fal.ai Recraft response");
+            }
+
+        } else if (finalModel === "nano-banana-2") {
+            // fal.ai Nano Banana 2 — uses aspect_ratio string
+            let aspect_ratio = "1:1";
+            if (finalSize === "1024x1792") aspect_ratio = "9:16";
+            if (finalSize === "1792x1024") aspect_ratio = "16:9";
+
+            console.log(`[Nano Banana 2] Generating with aspect_ratio=${aspect_ratio}, prompt length=${providerPrompt.length}`);
+
+            const result: any = await fal.subscribe("fal-ai/nano-banana-2", {
+                input: {
+                    prompt: providerPrompt,
+                    aspect_ratio: aspect_ratio,
+                },
+                logs: true,
+            });
+
+            console.log(`[Nano Banana 2] Result keys:`, Object.keys(result || {}));
+
+            if (result?.images?.[0]?.url) {
+                imageUrl = result.images[0].url;
+            } else if (result?.image?.url) {
+                imageUrl = result.image.url;
+            } else {
+                throw new Error("No image in fal.ai Nano Banana response");
+            }
+
         } else {
-            // Replicate FLUX Generation
+            // Replicate FLUX Generation (flux-schnell, flux-pro)
             const { replicate } = await import("@/lib/replicate");
 
             let aspect_ratio = "1:1";
