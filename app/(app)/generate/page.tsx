@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Download, Loader2, ImageIcon, Settings2, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Download, Loader2, Image as ImageIcon, Settings2, ChevronDown, ChevronUp, Sparkles, Video, Film, ImagePlus } from "lucide-react";
 import { getDefaultStylePresetId, getStylePresetsForMode, STYLE_PRESET_CATEGORIES } from "@/lib/style-presets";
+import Link from "next/link";
 
 const IMAGE_STYLE_PRESETS = getStylePresetsForMode("image");
 
@@ -34,21 +35,20 @@ export default function GeneratePage() {
   const [customDirection, setCustomDirection] = useState("");
   const [size, setSize] = useState("1024x1024");
   const [generating, setGenerating] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Gallery state overrides single image
   const [gallery, setGallery] = useState<
     { url: string; prompt: string }[]
   >([]);
 
-  // Collapsible panels
-  const [styleOpen, setStyleOpen] = useState(false);
-  const [modelOpen, setModelOpen] = useState(false);
+  // Settings dropdown
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
   const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];
   const filteredPresets = IMAGE_STYLE_PRESETS.filter((preset) => presetCategory === "all" || preset.category === presetCategory);
 
-  // Load history from database on mount
   useEffect(() => {
     fetch("/api/generations?type=image")
       .then(r => r.json())
@@ -78,8 +78,8 @@ export default function GeneratePage() {
 
     setGenerating(true);
     setError(null);
+    setSettingsOpen(false); // close settings when generating
 
-    // Instantly deduct from UI
     deductCredits(selectedModelConfig.cost);
 
     try {
@@ -100,8 +100,8 @@ export default function GeneratePage() {
       const data = await res.json();
 
       if (res.ok && data.imageUrl) {
-        setImageUrl(data.imageUrl);
-        setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev.slice(0, 9)]);
+        setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev]);
+        setPrompt(""); // Clear prompt after success
       } else {
         setError(data.error || "Failed to generate image.");
         refundCredits(selectedModelConfig.cost);
@@ -115,308 +115,253 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-black text-white flex items-center gap-3 tracking-tight">
-          <ImageIcon className="w-8 h-8 text-cyan-500" />
-          Image Studio
+    <div className="flex-1 w-full h-full relative overflow-y-auto hide-scrollbar flex flex-col items-center pb-20">
+      
+      {/* Hero Header */}
+      <div className="w-full pt-14 pb-8 md:pt-24 md:pb-12 px-4 flex flex-col items-center z-10 transition-all">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white text-center uppercase tracking-[0.1em] drop-shadow-2xl">
+          Yours to Create
         </h1>
-        <p className="text-white/50 mt-2 text-sm font-medium tracking-wide uppercase">
-          AI-Powered Image Generation — DALL-E 3, FLUX 2, Recraft V3 & More
+        <p className="text-cyan-400 text-xs md:text-sm font-bold tracking-[0.2em] uppercase mt-4 text-center">
+          Image Studio
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr,340px] gap-4">
-        {/* Main Content Area */}
-        <div className="space-y-5 order-2 xl:order-1">
-          {/* Prompt Box */}
-          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl p-4 md:p-5">
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe your image... e.g., 'A neon-lit Tokyo street at night, cinematic rain reflections, 8k resolution'"
-              className="w-full h-24 md:h-28 bg-transparent text-white placeholder-white/35 resize-none outline-none border-none text-sm leading-relaxed"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  generateImage();
-                }
-              }}
-            />
-
-            <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap mt-4 pt-4 border-t border-white/[0.08]">
-              <div className="text-xs text-white/45 uppercase tracking-wider font-medium">
-                <span className="font-bold text-cyan-400">{selectedModelConfig.cost}</span> credits / image
-              </div>
-
-              <button
-                onClick={generateImage}
-                disabled={generating || !prompt}
-                className="h-10 px-4 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md shadow-cyan-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center transition-colors"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Image
-                  </>
-                )}
-              </button>
+      {/* Main Prompt Bar Container */}
+      <div className="w-full max-w-[800px] px-4 z-20 relative transition-all">
+        
+        {/* Error Alert */}
+        {error && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider text-center animate-in fade-in slide-in-from-bottom-2">
+                {error}
             </div>
+        )}
+
+        <div className="bg-[#121419]/90 backdrop-blur-3xl border border-white/10 hover:border-white/20 rounded-[32px] md:rounded-[40px] p-2 md:p-3 shadow-2xl transition-all relative">
+          
+          {/* Top Half: Input Area */}
+          <div className={`bg-black/40 rounded-[24px] md:rounded-[32px] p-4 flex flex-col border border-transparent focus-within:border-white/[0.08] transition-all relative z-20 ${generating ? 'opacity-50 pointer-events-none' : ''}`}>
+             <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe your vision... e.g., 'A cyberpunk neon city, cinematic lighting'"
+                className="w-full h-20 md:h-28 bg-transparent text-white placeholder-white/25 resize-none outline-none border-none text-sm leading-relaxed"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    generateImage();
+                  }
+                }}
+             />
+             
+             {/* Quick Actions inside Textarea Bottom */}
+             <div className="flex items-center gap-2 mt-2">
+                 <button 
+                     onClick={() => setSettingsOpen(!settingsOpen)}
+                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${settingsOpen ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 hover:bg-white/10 text-white/60 hover:text-white'}`}
+                 >
+                     <Settings2 className="w-3.5 h-3.5" />
+                     Generation Options
+                 </button>
+                 
+                 {size && (
+                     <div className="px-3 py-1.5 rounded-full bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider hidden sm:block">
+                         {SIZES.find(s => s.value === size)?.label || size}
+                     </div>
+                 )}
+             </div>
           </div>
 
-          {/* Output Area */}
-          <div className="aspect-square bg-black/80 border border-white/[0.08] rounded-2xl overflow-hidden relative flex items-center justify-center group">
-            {generating ? (
-              <div className="text-center space-y-4">
-                <Loader2 className="w-12 h-12 text-cyan-500 animate-spin mx-auto" />
-                <div className="text-cyan-400 font-medium animate-pulse text-sm uppercase tracking-wider">
-                  Synthesizing your image...
-                </div>
-                <div className="text-white/30 text-xs uppercase tracking-wider">This may take 10-20 seconds</div>
-                <div className="w-48 h-0.5 bg-white/[0.06] rounded-sm overflow-hidden mx-auto">
-                  <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-sm animate-pulse w-2/3" />
-                </div>
+          {/* Settings Drawer (Expanded) */}
+          <div 
+             className={`overflow-hidden transition-all duration-300 ease-in-out ${settingsOpen ? 'max-h-[800px] opacity-100 border-t border-white/5 mt-2' : 'max-h-0 opacity-0'}`}
+          >
+             <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                 {/* Left Col: Model & Size */}
+                 <div className="space-y-5">
+                    {/* Model */}
+                    <div>
+                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Model</label>
+                        <div className="grid grid-cols-2 gap-2">
+                           {IMAGE_MODELS.map(m => (
+                              <button
+                                 key={m.id}
+                                 onClick={() => setModel(m.id)}
+                                 className={`px-3 py-2 text-[10px] rounded-xl border text-left transition-all font-medium flex flex-col gap-1 ${model === m.id
+                                    ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                                    : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
+                                 }`}
+                              >
+                                 <span className="font-bold flex items-center justify-between w-full">
+                                    {m.name}
+                                    {m.tier === 'Pro' && <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1 py-0.5 rounded uppercase font-black">Pro</span>}
+                                 </span>
+                                 <span className="text-[9px] text-white/30">{m.cost} cr</span>
+                              </button>
+                           ))}
+                        </div>
+                    </div>
+                    {/* Size */}
+                    <div>
+                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Aspect Ratio</label>
+                        <div className="flex gap-2">
+                           {SIZES.map(sz => (
+                              <button
+                                 key={sz.value}
+                                 onClick={() => setSize(sz.value)}
+                                 className={`flex-1 py-2 text-[10px] rounded-xl border text-center transition-all font-bold ${size === sz.value
+                                    ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
+                                    : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
+                                 }`}
+                              >
+                                 {sz.label.split(' ')[0]}
+                              </button>
+                           ))}
+                        </div>
+                    </div>
+                 </div>
+
+                 {/* Right Col: Style & Details */}
+                 <div className="space-y-5">
+                    {/* Style */}
+                    <div>
+                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Style Preset</label>
+                        <select 
+                            value={stylePreset}
+                            onChange={(e) => setStylePreset(e.target.value)}
+                            className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none appearance-none"
+                        >
+                            {IMAGE_STYLE_PRESETS.map(preset => (
+                                <option key={preset.id} value={preset.id}>{preset.name} - {preset.description}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Enhance */}
+                    <div className="flex items-center justify-between bg-black/40 border border-white/5 rounded-xl px-4 py-3">
+                        <div>
+                            <p className="text-[10px] font-bold text-white uppercase tracking-wider">AI Enhance</p>
+                            <p className="text-[9px] text-white/40 mt-0.5">Auto-optimizes prompt for quality</p>
+                        </div>
+                        <button
+                            onClick={() => setEnhancePrompt(!enhancePrompt)}
+                            className={`w-9 h-5 rounded-full transition-colors relative ${enhancePrompt ? "bg-cyan-500" : "bg-white/10"}`}
+                        >
+                            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${enhancePrompt ? "left-[18px]" : "left-0.5"}`} />
+                        </button>
+                    </div>
+
+                    {/* Intensity */}
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Intensity</label>
+                            <span className="text-[10px] text-cyan-400 font-bold">{intensity}%</span>
+                        </div>
+                        <input
+                            type="range" min="0" max="100"
+                            value={intensity}
+                            onChange={(e) => setIntensity(Number(e.target.value))}
+                            className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
+                        />
+                    </div>
+                 </div>
+             </div>
+          </div>
+
+          {/* Bottom Nav / Submit Row */}
+          <div className="flex items-center justify-between px-2 md:px-4 py-2 mt-1 relative z-20">
+              {/* Tabs */}
+              <div className="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar">
+                  <Link href="/generate" className="px-4 py-2 rounded-full bg-white/10 text-white font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0">
+                      <ImagePlus className="w-4 h-4 text-cyan-400" />
+                      <span className="hidden sm:inline">Image</span>
+                  </Link>
+                  <Link href="/studio" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors">
+                      <Video className="w-4 h-4" />
+                      <span className="hidden sm:inline">Video</span>
+                  </Link>
+                  <Link href="/director" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors hidden sm:flex">
+                      <Film className="w-4 h-4" />
+                      <span className="hidden sm:inline">Blueprints</span>
+                  </Link>
               </div>
-            ) : imageUrl ? (
-              <>
-                <img
-                  src={imageUrl}
-                  alt="Generated"
-                  className="w-full h-full object-contain"
-                />
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                  <a
-                    href={`/api/download?url=${encodeURIComponent(imageUrl)}`}
-                    download
-                    className="p-3 bg-black/70 hover:bg-cyan-600 text-white rounded-sm backdrop-blur-md transition-colors border border-white/10"
+              
+              {/* Generate Button */}
+              <div className="flex items-center gap-3 flex-shrink-0 pl-3 md:pl-4 border-l border-white/5">
+                  <div className="hidden md:block text-right">
+                      <div className="text-[10px] text-white/40 uppercase font-bold tracking-[0.2em]">{selectedModelConfig.cost} cr</div>
+                  </div>
+                  <button 
+                      onClick={generateImage}
+                      disabled={generating || !prompt}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-full h-10 md:h-11 px-5 md:px-8 flex items-center justify-center gap-2 font-black text-[10px] md:text-xs text-white uppercase tracking-wider shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:scale-[1.02] active:scale-95"
                   >
-                    <Download className="w-5 h-5" />
-                  </a>
-                </div>
-              </>
-            ) : error ? (
-              <div className="text-red-400 text-center px-4">
-                <p className="font-bold mb-2 uppercase tracking-wider text-sm">Generation Failed</p>
-                <p className="text-xs opacity-80">{error}</p>
+                      {generating ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                          <Sparkles className="w-4 h-4" />
+                      )}
+                      <span>{generating ? 'Generating' : 'Generate'}</span>
+                  </button>
               </div>
-            ) : (
-              <div className="text-white/15 text-center">
-                <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                <p className="text-sm font-medium uppercase tracking-wider">Your generated image will appear here</p>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Sidebar Controls */}
-        <div className="space-y-3 order-1 xl:order-2 xl:sticky xl:top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-1">
-          {/* Settings Header */}
-          <div className="flex items-center gap-2 px-1">
-            <Settings2 className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-xs font-bold text-white/60 uppercase tracking-[0.2em]">Generation Settings</h3>
-          </div>
-
-          {/* Model Selection — Collapsible */}
-          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
-            <button
-              onClick={() => setModelOpen(!modelOpen)}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">AI Model</span>
-                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium max-w-[130px] truncate">
-                  {selectedModelConfig.name}
-                </span>
-              </div>
-              {modelOpen ? (
-                <ChevronUp className="w-4 h-4 text-white/40" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-white/40" />
-              )}
-            </button>
-            <div
-              className={`grid transition-all duration-300 ease-in-out ${modelOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-            >
-              <div className="overflow-hidden">
-                <div className="px-3 pb-3 space-y-1.5">
-                  {IMAGE_MODELS.map(m => (
-                    <button
-                      key={m.id}
-                      onClick={() => setModel(m.id)}
-                      className={`w-full px-2.5 py-1.5 text-[10px] rounded-sm border text-left transition-all font-medium flex items-center justify-between ${model === m.id
-                        ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
-                        : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
-                        }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span>{m.name}</span>
-                        {m.tier === "Pro" && (
-                          <span className="text-[8px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-sm font-bold normal-case">
-                            PRO
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[10px] text-white/30 font-normal normal-case">{m.cost} cr</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Style Selection — Collapsible */}
-          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl">
-            <button
-              onClick={() => setStyleOpen(!styleOpen)}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 hover:bg-white/[0.02] transition-colors"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs font-bold text-white/80 uppercase tracking-[0.15em]">Style</span>
-                <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-sm font-medium capitalize max-w-[130px] truncate">
-                  {selectedPreset?.name || "Preset"}
-                </span>
-              </div>
-              {styleOpen ? (
-                <ChevronUp className="w-4 h-4 text-white/40" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-white/40" />
-              )}
-            </button>
-            <div
-              className={`grid transition-all duration-300 ease-in-out ${styleOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-            >
-              <div className="overflow-hidden">
-                <div className="px-3 pb-3 space-y-2.5">
-                  <div className="flex flex-wrap gap-1.5">
-                    <button
-                      onClick={() => setPresetCategory("all")}
-                      className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === "all" ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
-                    >
-                      All
-                    </button>
-                    {STYLE_PRESET_CATEGORIES.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => setPresetCategory(category)}
-                        className={`px-2.5 py-1.5 text-[10px] rounded-sm border uppercase tracking-wider font-bold transition ${presetCategory === category ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400" : "bg-black/40 border-white/[0.06] text-white/40 hover:text-white/70"}`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-auto pr-1">
-                    {filteredPresets.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => setStylePreset(preset.id)}
-                      className={`px-2.5 py-1.5 text-left rounded-sm border transition-all ${stylePreset === preset.id
-                        ? "bg-cyan-500/15 border-cyan-500/50"
-                        : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
-                        }`}
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white">{preset.name}</p>
-                      <p className="text-[10px] text-white/45 mt-1 normal-case">{preset.description}</p>
-                    </button>
-                  ))}
-                  </div>
-                  <div className="space-y-2 pt-1 border-t border-white/[0.06]">
-                    <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">AI Enhance</p>
-                      <button
-                        onClick={() => setEnhancePrompt(!enhancePrompt)}
-                        className={`w-9 h-5 rounded-sm transition-colors relative ${enhancePrompt ? "bg-cyan-500" : "bg-white/10"}`}
-                      >
-                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-sm shadow transition-transform ${enhancePrompt ? "left-[18px]" : "left-0.5"}`} />
-                      </button>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Intensity</p>
-                        <span className="text-[10px] font-bold text-cyan-400">{intensity}%</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={intensity}
-                        onChange={(e) => setIntensity(Number(e.target.value))}
-                        className="w-full h-1 bg-white/[0.06] rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Custom Direction</p>
-                      <textarea
-                        value={customDirection}
-                        onChange={(e) => setCustomDirection(e.target.value.slice(0, 220))}
-                        placeholder="Optional: add specific art direction"
-                        className="w-full h-20 px-3 py-2 bg-black/40 border border-white/[0.06] rounded-sm text-xs text-white placeholder-white/20 outline-none focus:border-cyan-500/40 resize-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Aspect Ratio */}
-          <div className="bg-[#0c0f13] border border-white/[0.1] rounded-2xl p-4">
-            <p className="text-xs font-bold text-white/80 uppercase tracking-[0.15em] mb-3">Aspect Ratio</p>
-            <div className="grid grid-cols-3 gap-2">
-              {SIZES.map(sz => (
-                <button
-                  key={sz.value}
-                  onClick={() => setSize(sz.value)}
-                  className={`px-2.5 py-1.5 text-[10px] rounded-sm border text-center transition-all font-medium ${size === sz.value
-                    ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
-                    : "bg-black/40 border-white/[0.06] text-white/50 hover:border-white/[0.12] hover:text-white/70"
-                    }`}
-                >
-                  {sz.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Gallery Section */}
-      {gallery.length > 0 && (
-        <div className="mt-16">
-          <h3 className="text-xs font-bold text-white/60 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-            <ImageIcon className="w-4 h-4 text-cyan-400" />
-            Your Gallery
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {gallery.map((item, i) => (
-              <div key={i} className="group relative aspect-square bg-[#0a0a0a] rounded-sm overflow-hidden border border-white/[0.06]">
-                <img
-                  src={item.url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
-                  <p className="text-white text-[11px] line-clamp-2 font-medium mb-3">{item.prompt}</p>
-                  <div className="flex gap-2">
-                    <a
-                      href={`/api/download?url=${encodeURIComponent(item.url)}`}
-                      download
-                      className="px-3 py-1.5 bg-cyan-600 text-white text-[10px] font-bold rounded-sm hover:bg-cyan-500 transition-colors flex items-center gap-1 w-full justify-center uppercase tracking-wider"
-                    >
-                      <Download className="w-3 h-3" /> Download
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
+      {/* Full Screen Loading Overlay while generating */}
+      {generating && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in">
+             <div className="bg-[#121419] border border-white/10 rounded-3xl p-8 flex flex-col items-center max-w-sm w-full shadow-2xl">
+                 <div className="relative w-16 h-16 mb-6">
+                    <Loader2 className="w-16 h-16 text-cyan-500 animate-spin absolute inset-0" />
+                    <Sparkles className="w-8 h-8 text-white absolute inset-0 m-auto animate-pulse" />
+                 </div>
+                 <h3 className="text-white font-black uppercase tracking-wider text-sm mb-2">Synthesizing Image</h3>
+                 <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest text-center mb-6">This takes about 10-20 seconds</p>
+                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                     <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 w-2/3 animate-pulse rounded-full" />
+                 </div>
+             </div>
           </div>
-        </div>
       )}
+
+      {/* Gallery */}
+      {gallery.length > 0 && (
+         <div className="w-full max-w-7xl px-4 mt-16 md:mt-24 z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+             <div className="flex items-center gap-4 mb-8">
+                 <h2 className="text-white/80 font-black tracking-[0.15em] uppercase text-xs md:text-sm">Recent Creations</h2>
+                 <div className="h-px bg-white/10 flex-1" />
+             </div>
+             
+             {/* Masonry-like Grid */}
+             <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">
+                 {gallery.map((item, i) => (
+                    <div key={i} className="group relative bg-[#0a0a0a] rounded-2xl overflow-hidden border border-white/5 inline-block w-full transition-transform hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                        <img
+                          src={item.url}
+                          alt={item.prompt}
+                          className="w-full h-auto object-cover"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4 md:p-5">
+                          <p className="text-white text-[10px] md:text-xs line-clamp-3 font-medium mb-4 leading-relaxed opacity-90">{item.prompt}</p>
+                          <div className="flex gap-2 w-full">
+                            <a
+                              href={`/api/download?url=${encodeURIComponent(item.url)}`}
+                              download
+                              className="py-2 px-3 bg-white/10 backdrop-blur-md text-white border border-white/10 text-[10px] font-bold rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 w-full uppercase tracking-wider"
+                            >
+                              <Download className="w-3.5 h-3.5" /> Download
+                            </a>
+                          </div>
+                        </div>
+                    </div>
+                 ))}
+             </div>
+         </div>
+      )}
+
     </div>
   );
 }
