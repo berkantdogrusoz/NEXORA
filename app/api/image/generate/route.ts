@@ -168,9 +168,16 @@ export async function POST(req: Request) {
             const result: any = await fal.subscribe(falModel, {
                 input: {
                     prompt: providerPrompt,
-                    image_size: finalModel === "flux-2-dev"
-                        ? (aspect_ratio === "1:1" ? "square_hd" : aspect_ratio === "16:9" ? "landscape_16_9" : "portrait_16_9")
-                        : { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) },
+                    // FLUX 2 Dev: uses image_size string presets
+                    // Recraft V3: uses image_size { width, height } object
+                    // Nano Banana 2: uses aspect_ratio string ("1:1", "16:9", "9:16")
+                    ...(finalModel === "flux-2-dev" ? {
+                        image_size: aspect_ratio === "1:1" ? "square_hd" : aspect_ratio === "16:9" ? "landscape_16_9" : "portrait_16_9",
+                    } : finalModel === "recraft-v3" ? {
+                        image_size: { width: parseInt(finalSize.split("x")[0]), height: parseInt(finalSize.split("x")[1]) },
+                    } : {
+                        aspect_ratio: aspect_ratio,
+                    }),
                 },
                 logs: true,
             });
