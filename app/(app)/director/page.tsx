@@ -2,9 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Upload, X, Loader2, Play, Download, Settings2, Video, ChevronDown, Sparkles, ImagePlus, Clapperboard, Film } from "lucide-react";
-import Link from "next/link";
-import { getDefaultStylePresetId, getStylePresetsForMode, STYLE_PRESET_CATEGORIES } from "@/lib/style-presets";
+import { Upload, X, Loader2, Settings2, ChevronDown, Sparkles, Clapperboard, Film } from "lucide-react";
+import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import { resizeAndCompress } from "@/app/components/generation/image-upload-utils";
+import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
+import VideoPreviewOverlay from "@/app/components/generation/video-preview-overlay";
+import VideoGallery, { type VideoHistoryItem } from "@/app/components/generation/video-gallery";
+import PromptBarTabs from "@/app/components/generation/prompt-bar-tabs";
 
 const DOP_MODELS = [
     { id: "dop-lite", name: "DOP Lite", desc: "Fast preview", cost: 100, speed: "~30s", tier: "Standard" },
@@ -61,7 +65,6 @@ export default function DirectorPage() {
     const [quality, setQuality] = useState<"720p" | "1080p">("720p");
     const [enhancePrompt, setEnhancePrompt] = useState(true);
     const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("director"));
-    const [presetCategory, setPresetCategory] = useState<"all" | (typeof STYLE_PRESET_CATEGORIES)[number]>("all");
     const [promptIntensity, setPromptIntensity] = useState(75);
     const [customDirection, setCustomDirection] = useState("");
     const [soulMode, setSoulMode] = useState(false);
@@ -75,10 +78,8 @@ export default function DirectorPage() {
     const [uploading, setUploading] = useState(false);
 
     // Gallery State
-    const [history, setHistory] = useState<
-        { url: string; prompt: string; createdAt: number }[]
-    >([]);
-    const [previewVideo, setPreviewVideo] = useState<string | null>(null); // For playing selected video
+    const [history, setHistory] = useState<VideoHistoryItem[]>([]);
+    const [previewVideo, setPreviewVideo] = useState<string | null>(null);
 
     // Settings dropdown
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -102,27 +103,7 @@ export default function DirectorPage() {
             .catch(() => { });
     }, []);
 
-    const resizeAndCompress = (file: File): Promise<{ base64: string; contentType: string }> => {
-        return new Promise((resolve) => {
-            const img = new window.Image();
-            img.onload = () => {
-                const MAX = 1536;
-                let w = img.width, h = img.height;
-                if (w > MAX || h > MAX) {
-                    const ratio = Math.min(MAX / w, MAX / h);
-                    w = Math.round(w * ratio);
-                    h = Math.round(h * ratio);
-                }
-                const canvas = document.createElement("canvas");
-                canvas.width = w;
-                canvas.height = h;
-                canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
-                const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-                resolve({ base64: dataUrl.split(",")[1], contentType: "image/jpeg" });
-            };
-            img.src = URL.createObjectURL(file);
-        });
-    };
+
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -508,21 +489,7 @@ export default function DirectorPage() {
 
                     {/* Bottom Nav / Submit Row */}
                     <div className="flex items-center justify-between px-2 md:px-4 py-2 mt-1 relative z-20">
-                        {/* Tabs */}
-                        <div className="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar">
-                            <Link href="/generate" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors">
-                                <ImagePlus className="w-4 h-4" />
-                                <span className="hidden sm:inline">Image</span>
-                            </Link>
-                            <Link href="/studio" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors">
-                                <Video className="w-4 h-4" />
-                                <span className="hidden sm:inline">Video</span>
-                            </Link>
-                            <Link href="/director" className="px-4 py-2 rounded-full bg-white/10 text-white font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 hidden sm:flex">
-                                <Film className="w-4 h-4 text-cyan-400" />
-                                <span className="hidden sm:inline">Blueprints</span>
-                            </Link>
-                        </div>
+                        <PromptBarTabs active="blueprints" />
                         
                         {/* Generate Button */}
                         <div className="flex items-center gap-3 flex-shrink-0 pl-3 md:pl-4 border-l border-white/5">
@@ -539,7 +506,7 @@ export default function DirectorPage() {
                                 ) : (
                                     <Clapperboard className="w-4 h-4" />
                                 )}
-                                <span>{generating ? 'Generate' : 'Generate'}</span>
+                                <span>{generating ? 'Generating' : 'Generate'}</span>
                             </button>
                         </div>
                     </div>
@@ -549,105 +516,27 @@ export default function DirectorPage() {
 
             {/* Video Player Overlay (When a video is recently generated) */}
             {previewVideo && !generating && (
-                <div className="w-full max-w-4xl px-4 z-20 relative mt-8 animate-in slide-in-from-top-4 fade-in duration-500">
-                    <div className="bg-[#121419]/90 backdrop-blur-3xl border border-cyan-500/20 rounded-3xl p-2 shadow-[0_20px_50px_rgba(6,182,212,0.1)] relative">
-                        <button 
-                            onClick={() => setPreviewVideo(null)}
-                            className="absolute -top-3 -right-3 w-8 h-8 bg-black border border-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white z-30"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                        <div className="aspect-video bg-black rounded-[20px] overflow-hidden relative">
-                            <video
-                                src={previewVideo}
-                                controls
-                                autoPlay
-                                loop
-                                playsInline
-                                className="w-full h-full object-contain"
-                            />
-                            <div className="absolute top-4 right-4 flex gap-2">
-                                <a
-                                    href={`/api/download?url=${encodeURIComponent(previewVideo)}`}
-                                    download
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-3 bg-black/60 hover:bg-cyan-600 text-white rounded-xl backdrop-blur-md transition-colors border border-white/10"
-                                >
-                                    <Download className="w-5 h-5" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <VideoPreviewOverlay
+                    videoUrl={previewVideo}
+                    onClose={() => setPreviewVideo(null)}
+                />
             )}
 
             {/* Full Screen Loading Overlay while generating */}
             {generating && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#121419] border border-white/10 rounded-3xl p-8 flex flex-col items-center max-w-sm w-full shadow-2xl">
-                        <div className="relative w-16 h-16 mb-6">
-                            <Loader2 className="w-16 h-16 text-cyan-500 animate-spin absolute inset-0" />
-                            <Film className="w-8 h-8 text-white absolute inset-0 m-auto animate-pulse" />
-                        </div>
-                        <h3 className="text-white font-black uppercase tracking-wider text-sm mb-2">Architecting Blueprint</h3>
-                        <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest text-center mb-6">This takes about 30-60 seconds</p>
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 w-2/3 animate-pulse rounded-full" />
-                        </div>
-                    </div>
-                </div>
+                <GenerationLoadingOverlay
+                    title="Architecting Blueprint"
+                    subtitle="This takes about 30-60 seconds"
+                    icon={Film}
+                />
             )}
 
             {/* Gallery */}
-            {history.length > 0 && (
-                <div className="w-full max-w-7xl px-4 mt-16 md:mt-24 z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="flex items-center gap-4 mb-8">
-                        <h2 className="text-white/80 font-black tracking-[0.15em] uppercase text-xs md:text-sm">Recent Blueprints</h2>
-                        <div className="h-px bg-white/10 flex-1" />
-                    </div>
-                    
-                    {/* Grid Layout */}
-                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {history.map((item, i) => (
-                            <div key={i} className="group relative bg-[#0a0a0a] rounded-2xl overflow-hidden border border-white/5 aspect-video transition-transform hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                                <video
-                                    src={item.url}
-                                    muted
-                                    loop
-                                    playsInline
-                                    onMouseEnter={(e) => e.currentTarget.play()}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.pause();
-                                        e.currentTarget.currentTime = 0;
-                                    }}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4 md:p-5">
-                                    <p className="text-white text-[10px] md:text-xs line-clamp-2 font-medium mb-4 leading-relaxed opacity-90">{item.prompt}</p>
-                                    <div className="flex gap-2 w-full">
-                                        <button
-                                            onClick={() => setPreviewVideo(item.url)}
-                                            className="py-2 flex-1 bg-cyan-600 backdrop-blur-md text-white border border-cyan-500/20 text-[10px] font-bold rounded-xl hover:bg-cyan-500 transition-all flex items-center justify-center gap-1.5 uppercase tracking-wider"
-                                        >
-                                            <Play className="w-3.5 h-3.5 fill-current" /> Play
-                                        </button>
-                                        <a
-                                            href={`/api/download?url=${encodeURIComponent(item.url)}`}
-                                            download
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-4 py-2 bg-white/10 backdrop-blur-md text-white border border-white/10 text-[10px] font-bold rounded-xl hover:bg-white/20 transition-all flex items-center justify-center"
-                                        >
-                                            <Download className="w-3.5 h-3.5" />
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            <VideoGallery
+                history={history}
+                title="Recent Blueprints"
+                onSelectVideo={setPreviewVideo}
+            />
 
         </div>
     );

@@ -271,8 +271,8 @@ export default function Home() {
                 className="group relative aspect-square md:aspect-video bg-[#0a0a0a] rounded-3xl overflow-hidden border border-white/5"
               >
                 <Image
-                  src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80"
-                  alt="AI Robot Preview"
+                  src="/arts/nexora-1772283081135.png"
+                  alt="AI Character Motion"
                   fill
                   className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
                 />
@@ -451,9 +451,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { img: "https://images.unsplash.com/photo-1634926878768-2a5b3c42f139?w=800&q=80", title: "Cyberpunk Art", tag: "DALL-E 3" },
-              { img: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80", title: "Neon Noir", tag: "Photography" },
-              { img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80", title: "Abstract Light", tag: "Digital Art" },
+              { img: "/arts/nexora-1772282772787.png", title: "Cyberpunk Art", tag: "DALL-E 3" },
+              { img: "/arts/nexora-1772283133285.png", title: "Neon Noir", tag: "Photography" },
+              { img: "/arts/nexora-1772315236432.png", title: "Abstract Light", tag: "Digital Art" },
             ].map((item, i) => (
               <motion.div
                 key={i}

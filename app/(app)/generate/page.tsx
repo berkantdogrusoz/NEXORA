@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Download, Loader2, Image as ImageIcon, Settings2, ChevronDown, ChevronUp, Sparkles, Video, Film, ImagePlus, X } from "lucide-react";
-import { getDefaultStylePresetId, getStylePresetsForMode, STYLE_PRESET_CATEGORIES } from "@/lib/style-presets";
-import Link from "next/link";
+import { Download, Loader2, Image as ImageIcon, Settings2, ChevronDown, Sparkles, X, Cpu } from "lucide-react";
+import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
+import PromptBarTabs from "@/app/components/generation/prompt-bar-tabs";
 
 const IMAGE_STYLE_PRESETS = getStylePresetsForMode("image");
 
@@ -29,7 +30,6 @@ export default function GeneratePage() {
   const [prompt, setPrompt] = useState("");
   const [model, setModel] = useState("flux-2-dev");
   const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("image"));
-  const [presetCategory, setPresetCategory] = useState<"all" | (typeof STYLE_PRESET_CATEGORIES)[number]>("all");
   const [enhancePrompt, setEnhancePrompt] = useState(true);
   const [intensity, setIntensity] = useState(70);
   const [customDirection, setCustomDirection] = useState("");
@@ -45,10 +45,10 @@ export default function GeneratePage() {
   // Settings dropdown
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
   const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];
-  const filteredPresets = IMAGE_STYLE_PRESETS.filter((preset) => presetCategory === "all" || preset.category === presetCategory);
 
   useEffect(() => {
     fetch("/api/generations?type=image")
@@ -158,12 +158,50 @@ export default function GeneratePage() {
              
              {/* Quick Actions inside Textarea Bottom */}
              <div className="flex items-center gap-2 mt-2">
+                 {/* Model Selector Dropdown */}
+                 <div className="relative">
+                     <button 
+                         onClick={() => { setIsModelDropdownOpen(!isModelDropdownOpen); setSettingsOpen(false); }}
+                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${isModelDropdownOpen ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 hover:bg-white/10 text-white/60 hover:text-white'}`}
+                     >
+                         <Cpu className="w-3.5 h-3.5" />
+                         <span className="hidden sm:inline">{selectedModelConfig.name}</span>
+                         <ChevronDown className={`w-3 h-3 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
+                     </button>
+                     
+                     {isModelDropdownOpen && (
+                         <div className="absolute bottom-full left-0 mb-2 w-64 bg-[#121419] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                             <div className="p-1.5 max-h-[300px] overflow-y-auto hide-scrollbar">
+                                 {IMAGE_MODELS.map(m => (
+                                     <button
+                                         key={m.id}
+                                         onClick={() => { setModel(m.id); setIsModelDropdownOpen(false); }}
+                                         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${model === m.id
+                                            ? 'bg-cyan-500/10 text-cyan-400'
+                                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                                         }`}
+                                     >
+                                         <div className="flex flex-col">
+                                             <span className="text-xs font-bold">{m.name}</span>
+                                             <span className={`text-[10px] ${model === m.id ? 'text-cyan-400/60' : 'text-white/30'}`}>{m.cost} credits</span>
+                                         </div>
+                                         <div className="flex items-center gap-2">
+                                             {m.tier === 'Pro' && <span className="text-[8px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full uppercase font-black">Pro</span>}
+                                             {model === m.id && <div className="w-2 h-2 bg-cyan-400 rounded-full" />}
+                                         </div>
+                                     </button>
+                                 ))}
+                             </div>
+                         </div>
+                     )}
+                 </div>
+
                  <button 
-                     onClick={() => setSettingsOpen(!settingsOpen)}
+                     onClick={() => { setSettingsOpen(!settingsOpen); setIsModelDropdownOpen(false); }}
                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${settingsOpen ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 hover:bg-white/10 text-white/60 hover:text-white'}`}
                  >
                      <Settings2 className="w-3.5 h-3.5" />
-                     Generation Options
+                     <span className="hidden sm:inline">Options</span>
                  </button>
                  
                  {size && (
@@ -294,21 +332,7 @@ export default function GeneratePage() {
 
           {/* Bottom Nav / Submit Row */}
           <div className="flex items-center justify-between px-2 md:px-4 py-2 mt-1 relative z-20">
-              {/* Tabs */}
-              <div className="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar">
-                  <Link href="/generate" className="px-4 py-2 rounded-full bg-white/10 text-white font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0">
-                      <ImagePlus className="w-4 h-4 text-cyan-400" />
-                      <span className="hidden sm:inline">Image</span>
-                  </Link>
-                  <Link href="/studio" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors">
-                      <Video className="w-4 h-4" />
-                      <span className="hidden sm:inline">Video</span>
-                  </Link>
-                  <Link href="/director" className="px-4 py-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 font-bold text-[10px] md:text-xs flex items-center gap-2 uppercase tracking-wider flex-shrink-0 transition-colors hidden sm:flex">
-                      <Film className="w-4 h-4" />
-                      <span className="hidden sm:inline">Blueprints</span>
-                  </Link>
-              </div>
+              <PromptBarTabs active="image" />
               
               {/* Generate Button */}
               <div className="flex items-center gap-3 flex-shrink-0 pl-3 md:pl-4 border-l border-white/5">
@@ -367,19 +391,11 @@ export default function GeneratePage() {
 
       {/* Full Screen Loading Overlay while generating */}
       {generating && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in">
-             <div className="bg-[#121419] border border-white/10 rounded-3xl p-8 flex flex-col items-center max-w-sm w-full shadow-2xl">
-                 <div className="relative w-16 h-16 mb-6">
-                    <Loader2 className="w-16 h-16 text-cyan-500 animate-spin absolute inset-0" />
-                    <Sparkles className="w-8 h-8 text-white absolute inset-0 m-auto animate-pulse" />
-                 </div>
-                 <h3 className="text-white font-black uppercase tracking-wider text-sm mb-2">Synthesizing Image</h3>
-                 <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest text-center mb-6">This takes about 10-20 seconds</p>
-                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                     <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 w-2/3 animate-pulse rounded-full" />
-                 </div>
-             </div>
-          </div>
+          <GenerationLoadingOverlay
+              title="Synthesizing Image"
+              subtitle="This takes about 10-20 seconds"
+              icon={Sparkles}
+          />
       )}
 
       {/* Gallery */}
