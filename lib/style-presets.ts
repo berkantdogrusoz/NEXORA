@@ -29,7 +29,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["cinematic", "realistic", "camera"],
         directives: "Use strict photorealism, dramatic but natural lighting, dynamic camera movement, realistic textures, real-world physics, subtle motion blur, and premium film color grading.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772283133285.png",
+        image: "/arts/styles/cinema-studio.jpg",
     },
     {
         id: "epic-movie-scenes",
@@ -40,7 +40,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         directives: "Compose as a high-budget movie scene with cinematic blocking, deep atmosphere, dynamic camera choreography, realistic impact physics, and high emotional tension.",
         preferredModes: ["video", "director", "image"],
         premium: true,
-        image: "/arts/nexora-1772282772787.png",
+        image: "/arts/styles/epic-movie-scenes.jpg",
     },
     {
         id: "product-ads",
@@ -50,7 +50,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["ad", "product", "brand"],
         directives: "Style as premium commercial advertising: crisp product focus, clean framing, polished lighting, premium materials, conversion-oriented composition, and brand-safe visuals.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772283081135.png",
+        image: "/arts/styles/product-ads.jpg",
     },
     {
         id: "luxury-style",
@@ -61,7 +61,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         directives: "Use elegant luxury visual language: rich textures, premium wardrobe/materials, soft directional light, refined camera movement, and cinematic high-end color tones.",
         preferredModes: ["video", "director", "image"],
         premium: true,
-        image: "/arts/nexora-1772283133285.png",
+        image: "/arts/styles/product-ads.jpg",
     },
     {
         id: "viral-social",
@@ -71,7 +71,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["viral", "hook", "tiktok"],
         directives: "Prioritize thumb-stopping visual hook in first seconds, punchy scene transitions, expressive action, high clarity, and social-first composition optimized for mobile attention.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772282772787.png",
+        image: "/arts/styles/explainer-clean.jpg",
     },
     {
         id: "ugc-creator",
@@ -81,7 +81,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["ugc", "creator", "authentic"],
         directives: "Style like authentic UGC content: natural expressions, handheld framing, believable environments, practical lighting, and relatable social-media pacing.",
         preferredModes: ["video", "director"],
-        image: "/arts/nexora-1772283081135.png",
+        image: "/arts/styles/documentary.jpg",
     },
     {
         id: "street-interview",
@@ -91,7 +91,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["street", "interview", "documentary"],
         directives: "Use documentary realism with street-level handheld camera style, natural ambient lighting, authentic subject behavior, and grounded real-world details.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772283133285.png",
+        image: "/arts/styles/documentary.jpg",
     },
     {
         id: "documentary",
@@ -101,7 +101,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["doc", "real", "story"],
         directives: "Create a documentary visual tone: observational camera language, realistic pacing, natural lighting, factual atmosphere, and believable environmental context.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772282772787.png",
+        image: "/arts/styles/documentary.jpg",
     },
     {
         id: "explainer-clean",
@@ -111,7 +111,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["explainer", "clear", "educational"],
         directives: "Emphasize clarity over complexity: clean composition, readable focal points, straightforward storytelling flow, and minimal visual noise.",
         preferredModes: ["video", "image"],
-        image: "/arts/nexora-1772283081135.png",
+        image: "/arts/styles/explainer-clean.jpg",
     },
     {
         id: "anime-opening",
@@ -121,7 +121,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["anime", "stylized", "opening"],
         directives: "Use anime-inspired stylization: expressive framing, stylized lighting, high-energy action beats, dramatic mood, and strong art-direction consistency.",
         preferredModes: ["video", "image"],
-        image: "/arts/nexora-1772283133285.png",
+        image: "/arts/styles/anime-opening.jpg",
     },
     {
         id: "faceless-broll",
@@ -131,7 +131,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["faceless", "b-roll", "business"],
         directives: "Design faceless storytelling shots focused on hands, objects, environments, screens, and context details with smooth edit-friendly transitions.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/nexora-1772282772787.png",
+        image: "/arts/styles/product-ads.jpg",
     },
     {
         id: "dramatic-tv-teaser",
@@ -142,7 +142,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         directives: "Craft a dramatic teaser style: high-contrast mood, suspenseful pacing, emotionally charged framing, and cinematic dramatic atmosphere.",
         preferredModes: ["video", "director", "image"],
         premium: true,
-        image: "/arts/nexora-1772283081135.png",
+        image: "/arts/styles/dramatic-tv-teaser.jpg",
     },
 ];
 
