@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Download, Loader2, Image as ImageIcon, Settings2, ChevronDown, Sparkles, X, Cpu } from "lucide-react";
+import Image from "next/image";
 import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
 import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
 import PromptBarTabs from "@/app/components/generation/prompt-bar-tabs";
@@ -44,7 +45,6 @@ export default function GeneratePage() {
 
   // Settings dropdown
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
@@ -265,37 +265,33 @@ export default function GeneratePage() {
                  <div className="space-y-5">
                     {/* Style */}
                     <div className="flex flex-col">
-                        <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Style Preset</label>
-                        <div className="relative">
-                            <button
-                                type="button"
-                                onClick={() => setIsStyleDropdownOpen(!isStyleDropdownOpen)}
-                                className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none flex items-center justify-between transition-colors z-10 relative"
-                            >
-                                <span className="truncate pr-2">
-                                    {selectedPreset ? `${selectedPreset.name} - ${selectedPreset.description}` : "Select Style"}
-                                </span>
-                                <ChevronDown className={`w-4 h-4 text-white/40 flex-shrink-0 transition-transform ${isStyleDropdownOpen ? "rotate-180" : ""}`} />
-                            </button>
-                            
-                            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isStyleDropdownOpen ? "max-h-[300px] mt-2 opacity-100" : "max-h-0 opacity-0"}`}>
-                                <div className="bg-[#121419] border border-white/10 rounded-xl overflow-hidden shadow-inner max-h-[250px] overflow-y-auto w-full flex flex-col hide-scrollbar">
-                                    {IMAGE_STYLE_PRESETS.map(preset => (
-                                        <button
-                                            key={preset.id}
-                                            type="button"
-                                            onClick={() => {
-                                                setStylePreset(preset.id);
-                                                setIsStyleDropdownOpen(false);
-                                            }}
-                                            className={`w-full text-left px-3 py-2.5 text-xs hover:bg-white/5 transition-colors flex flex-col gap-0.5 ${stylePreset === preset.id ? 'bg-cyan-500/10 text-cyan-400' : 'text-white/80'}`}
-                                        >
-                                            <span className="font-bold truncate">{preset.name}</span>
-                                            <span className={`text-[10px] truncate w-full ${stylePreset === preset.id ? 'text-cyan-400/70' : 'text-white/40'}`}>{preset.description}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Visual Style Template</label>
+                            <span className="text-[10px] text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">{selectedPreset?.name || "None"}</span>
+                        </div>
+                        <div className="flex gap-3 overflow-x-auto snap-x pb-4 hide-scrollbar">
+                            {IMAGE_STYLE_PRESETS.map((preset) => (
+                                <button
+                                    key={preset.id}
+                                    type="button"
+                                    onClick={() => setStylePreset(preset.id)}
+                                    className={`relative flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden snap-center outline-none transition-all duration-300 ${stylePreset === preset.id ? 'ring-2 ring-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 opacity-60 hover:opacity-100'}`}
+                                >
+                                    <Image src={preset.image} alt={preset.name} fill className="object-cover transition-transform duration-700 hover:scale-110" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                                    
+                                    <div className="absolute bottom-2 left-2 right-2 flex flex-col items-start gap-1">
+                                        <span className="text-[10px] font-bold text-white leading-tight text-left drop-shadow-md">{preset.name}</span>
+                                        {preset.premium && <span className="text-[7px] bg-amber-500 text-black px-1.5 py-0.5 rounded font-black uppercase">Pro</span>}
+                                    </div>
+                                    
+                                    {stylePreset === preset.id && (
+                                        <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-cyan-500 flex items-center justify-center shadow-lg">
+                                            <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                        </div>
+                                    )}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
