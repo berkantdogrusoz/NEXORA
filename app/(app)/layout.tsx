@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import AnimatedShaderBackground from "@/app/components/ui/animated-shader-background";
+import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
 import {
     LayoutDashboard,
     Clapperboard,
@@ -145,11 +146,7 @@ function AppLayout({
                     <div className="mt-2 flex items-center justify-center">
                         <UserButton
                             afterSignOutUrl="/"
-                            appearance={{
-                                elements: {
-                                    avatarBox: "w-10 h-10 md:w-9 md:h-9 hover:scale-105 transition-all rounded-full border border-white/10",
-                                },
-                            }}
+                            appearance={clerkUserButtonAppearance}
                         />
                     </div>
                 </div>

@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
         const { userId } = auth;
 
         const body = await req.json();
-        const { variantId } = body;
+        const { variantId, redirectPath } = body;
 
         if (!variantId) {
             return NextResponse.json({ error: "Missing variantId" }, { status: 400 });
@@ -24,14 +24,23 @@ export async function POST(req: NextRequest) {
         const storeId = parseInt(process.env.LEMONSQUEEZY_STORE_ID, 10);
         const variantIdNum = parseInt(variantId, 10);
 
+        if (Number.isNaN(storeId) || Number.isNaN(variantIdNum)) {
+            return NextResponse.json({ error: "Invalid checkout configuration" }, { status: 400 });
+        }
+
+        const safeRedirectPath = typeof redirectPath === "string" && redirectPath.startsWith("/")
+            ? redirectPath
+            : "/dashboard";
+        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}${safeRedirectPath}`;
+
         console.log("Creating checkout for:", { storeId, variantIdNum });
 
         // Create Checkout
         const checkout = await createCheckout(storeId, variantIdNum, {
             checkoutOptions: {
-                embed: true, // Use overlay checkout
+                embed: false,
                 media: false,
-                buttonColor: "#7047EB"
+                buttonColor: "#06b6d4"
             },
             checkoutData: {
                 custom: {
@@ -39,8 +48,8 @@ export async function POST(req: NextRequest) {
                 }
             },
             productOptions: {
-                redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-                receiptButtonText: "Go to Dashboard",
+                redirectUrl,
+                receiptButtonText: "Return to Nexora",
                 receiptThankYouNote: "Welcome to Nexora Pro!"
             }
         });

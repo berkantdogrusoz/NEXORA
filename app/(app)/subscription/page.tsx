@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface SubscriptionData {
     plan_name: string;
@@ -16,6 +17,7 @@ interface SubscriptionData {
 
 export default function SubscriptionPage() {
     const { credits, maxCredits, planName, refreshCredits } = useCredits();
+    const router = useRouter();
     const [sub, setSub] = useState<SubscriptionData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -236,14 +238,15 @@ export default function SubscriptionPage() {
                                         onClick={async () => {
                                             setBuyingCredits(pack.id);
                                             try {
-                                                const res = await fetch("/api/lemon/checkout", {
-                                                    method: "POST",
-                                                    headers: { "Content-Type": "application/json" },
-                                                    body: JSON.stringify({ variantId: pack.variantId }),
+                                                const query = new URLSearchParams({
+                                                    variantId: pack.variantId,
+                                                    name: `${pack.name} (${pack.credits} credits)`,
+                                                    price: `${pack.price} one-time`,
+                                                    kind: "one-time",
+                                                    description: "Credits are delivered automatically after successful payment.",
+                                                    returnTo: "/subscription",
                                                 });
-                                                const data = await res.json();
-                                                if (data.url) window.open(data.url, "_blank");
-                                                else alert(data.error || "Failed to start checkout.");
+                                                router.push(`/checkout?${query.toString()}`);
                                             } catch {
                                                 alert("Something went wrong.");
                                             } finally {

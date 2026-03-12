@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton, SignInButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import {
     ChevronDown,
@@ -15,6 +15,7 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
 
 export default function SiteLayout({
     children,
@@ -169,20 +170,14 @@ export default function SiteLayout({
                                     </Link>
                                     <UserButton
                                         afterSignOutUrl="/"
-                                        appearance={{
-                                            elements: {
-                                                avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors",
-                                            },
-                                        }}
+                                        appearance={clerkUserButtonAppearance}
                                     />
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-4">
-                                    <SignInButton mode="modal">
-                                        <button className="text-sm font-bold text-white/90 hover:text-white transition-colors">
-                                            Log in
-                                        </button>
-                                    </SignInButton>
+                                    <Link href="/sign-in" className="text-sm font-bold text-white/90 hover:text-white transition-colors">
+                                        Log in
+                                    </Link>
                                     <Link
                                         href="/sign-up"
                                         className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2"
@@ -283,11 +278,7 @@ export default function SiteLayout({
                                 <div className="flex items-center gap-4 px-4 py-3">
                                     <UserButton
                                         afterSignOutUrl="/"
-                                        appearance={{
-                                            elements: {
-                                                avatarBox: "w-10 h-10 border-2 border-white/20",
-                                            },
-                                        }}
+                                        appearance={clerkUserButtonAppearance}
                                     />
                                     <div>
                                         <div className="text-sm font-bold text-white">My Account</div>
@@ -303,11 +294,12 @@ export default function SiteLayout({
                                         <Sparkles className="w-4 h-4" />
                                         Start Free — No Credit Card
                                     </Link>
-                                    <SignInButton mode="modal">
-                                        <button className="w-full py-3.5 rounded-sm border border-white/10 text-sm font-bold text-white/80 hover:bg-white/[0.04] transition-all">
-                                            Already have an account? Log in
-                                        </button>
-                                    </SignInButton>
+                                    <Link
+                                        href="/sign-in"
+                                        className="block w-full py-3.5 rounded-sm border border-white/10 text-sm font-bold text-white/80 hover:bg-white/[0.04] transition-all text-center"
+                                    >
+                                        Already have an account? Log in
+                                    </Link>
                                 </>
                             )}
                         </div>

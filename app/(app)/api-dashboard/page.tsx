@@ -151,22 +151,16 @@ export default function ApiDashboardPage() {
         }
     };
 
-    const buyPack = async (variantId: string) => {
-        try {
-            const res = await fetch("/api/lemon/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ variantId }),
-            });
-            const data = await res.json();
-            if (data.url) {
-                window.location.href = data.url;
-                return;
-            }
-            window.alert(data.error || "Checkout could not be started");
-        } catch {
-            window.alert("Checkout could not be started");
-        }
+    const buyPack = (pack: { variantId: string; name: string; credits: number }) => {
+        const query = new URLSearchParams({
+            variantId: pack.variantId,
+            name: pack.name,
+            price: `$${(pack.credits / 100).toFixed(2)} one-time`,
+            kind: "one-time",
+            description: "API wallet balance is added automatically after payment confirmation.",
+            returnTo: "/api-dashboard",
+        });
+        window.location.href = `/checkout?${query.toString()}`;
     };
 
     return (
@@ -274,7 +268,7 @@ export default function ApiDashboardPage() {
                             {packs.map((pack) => (
                                 <button
                                     key={pack.id}
-                                    onClick={() => buyPack(pack.variantId)}
+                                    onClick={() => buyPack(pack)}
                                     className="w-full p-3 rounded-xl border border-white/[0.08] bg-black/30 hover:bg-white/[0.06] text-left"
                                 >
                                     <p className="text-white text-sm font-semibold">{pack.name}</p>

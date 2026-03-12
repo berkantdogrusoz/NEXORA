@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton, SignInButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
 
 const links = [
   { href: "/", label: "Home" },
@@ -85,11 +86,7 @@ export default function Navbar() {
               </Link>
               <UserButton
                 afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox: "w-9 h-9 border-2 border-white/20 hover:border-cyan-500 transition-colors"
-                  }
-                }}
+                appearance={clerkUserButtonAppearance}
               />
             </div>
           ) : (
@@ -100,11 +97,9 @@ export default function Navbar() {
               <Link href="/studio" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Studio
               </Link>
-              <SignInButton mode="modal">
-                <button className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                  Log in
-                </button>
-              </SignInButton>
+              <Link href="/sign-in" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                Log in
+              </Link>
               <Link
                 href="/dashboard"
                 className="group relative px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:bg-slate-100 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] overflow-hidden"

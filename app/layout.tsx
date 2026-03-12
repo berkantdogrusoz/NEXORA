@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import Script from "next/script";
 import JsonLd from "@/app/components/JsonLd";
 import CookieConsent from "@/app/components/CookieConsent";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 const GA_ID = "G-6Y87W7H5CY";
 
@@ -93,6 +94,7 @@ export default function RootLayout({
       }
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/dashboard"
+      appearance={clerkAppearance}
     >
       <html lang="en" className={inter.variable} suppressHydrationWarning>
         <head>
