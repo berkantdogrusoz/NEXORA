@@ -6,55 +6,11 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Sparkles, Video, Image as ImageIcon, Zap, Layers, Wand2, PlayCircle } from "lucide-react";
 
-/**
- * IntersectionObserver-based video player component.
- * Plays video only when visible in viewport, pauses when not.
- * Uses poster for instant visual feedback before video loads.
- */
-function LazyVideo({ src, poster, className }: { src: string; poster?: string; className?: string }) {
-    const ref = useRef<HTMLVideoElement>(null);
-
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    el.play().catch(() => {});
-                } else {
-                    el.pause();
-                }
-            },
-            { threshold: 0.25 }
-        );
-
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, []);
-
-    return (
-        <video
-            ref={ref}
-            loop
-            muted
-            playsInline
-            controls={false}
-            preload="auto"
-            poster={poster}
-            disablePictureInPicture
-            className={className}
-        >
-            <source src={src} type="video/mp4" />
-        </video>
-    );
-}
-
 // Hero background media carousel items
 const HERO_MEDIA = [
-  { type: "video" as const, src: "/arts/nexora-1772315602835.mp4", poster: "/arts/nexora-1772282772787.png" },
-  { type: "video" as const, src: "/arts/uzay.mp4", poster: "/arts/nexora-1772283081135.png" },
-  { type: "image" as const, src: "/arts/nexora-1772283133285.png", poster: "/arts/nexora-1772283133285.png" },
+  { type: "video" as const, src: "/arts/nexora-1772315602835.mp4" },
+  { type: "video" as const, src: "/arts/uzay.mp4" },
+  { type: "image" as const, src: "/arts/nexora-1772283133285.png" },
 ];
 const IMAGE_DISPLAY_DURATION = 6000; // 6 seconds for static images
 
@@ -134,7 +90,6 @@ export default function Home() {
               playsInline
               controls={false}
               preload="auto"
-              poster={HERO_MEDIA[activeIndex].poster}
               disablePictureInPicture
               onEnded={handleVideoEnded}
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
@@ -164,7 +119,6 @@ export default function Home() {
                 playsInline
                 controls={false}
                 preload="auto"
-                poster={HERO_MEDIA[nextIndex].poster}
                 disablePictureInPicture
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
               >
@@ -297,7 +251,6 @@ export default function Home() {
                   src="/arts/nexora-1772282772787.png"
                   alt="Fashion Video Preview"
                   fill
-                  priority
                   className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -321,7 +274,6 @@ export default function Home() {
                   src="/arts/nexora-1772283081135.png"
                   alt="AI Character Motion"
                   fill
-                  priority
                   className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -386,12 +338,12 @@ export default function Home() {
           {/* Large Visual Model Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion for powerful intros and hooks.", img: "/arts/nexora-1772284253224.mp4", poster: "/arts/nexora-1772282772787.png", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
-              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp edits with clean motion.", img: "/arts/nexora-1772284437767.mp4", poster: "/arts/nexora-1772283081135.png", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
-              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade visuals for ads, trailers and campaigns.", img: "/arts/nexora-1772284673051.mp4", poster: "/arts/nexora-1772283133285.png", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
-              { name: "Nano Banana 2", type: "Image", desc: "Hero visuals for posts, thumbnails and key visuals.", img: "/arts/nexora-1772282772787.png", poster: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
-              { name: "DALL-E 3", type: "Image", desc: "High-fidelity visuals for ads, UGC-style content and more.", img: "/arts/nexora-1772283081135.png", poster: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
-              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals for standout content.", img: "/arts/nexora-1772283133285.png", poster: "/arts/nexora-1772315236432.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
+              { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion for powerful intros and hooks.", img: "/arts/nexora-1772284253224.mp4", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
+              { name: "Kling 3.0", type: "Video", desc: "Fast, sharp edits with clean motion.", img: "/arts/nexora-1772284437767.mp4", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
+              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade visuals for ads, trailers and campaigns.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
+              { name: "Nano Banana 2", type: "Image", desc: "Hero visuals for posts, thumbnails and key visuals.", img: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
+              { name: "DALL-E 3", type: "Image", desc: "High-fidelity visuals for ads, UGC-style content and more.", img: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
+              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals for standout content.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
             ].map((model, i) => (
               <motion.div
                 key={i}
@@ -404,11 +356,18 @@ export default function Home() {
                   {/* Media Card */}
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-white/5">
                     {model.img.endsWith('.mp4') ? (
-                      <LazyVideo
-                        src={model.img}
-                        poster={model.poster}
+                      <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        controls={false}
+                        preload="auto"
+                        disablePictureInPicture
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
+                      >
+                        <source src={model.img} type="video/mp4" />
+                      </video>
                     ) : (
                       <Image
                         src={model.img}
