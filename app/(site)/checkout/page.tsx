@@ -14,6 +14,7 @@ export default function CheckoutPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [opening, setOpening] = useState(false);
+    const [openedInNewTab, setOpenedInNewTab] = useState(false);
 
     const details = useMemo(() => {
         const variantId = searchParams.get("variantId") || "";
@@ -40,6 +41,8 @@ export default function CheckoutPage() {
         }
 
         setOpening(true);
+        const pendingTab = window.open("", "_blank", "noopener,noreferrer");
+
         try {
             const response = await fetch("/api/lemon/checkout", {
                 method: "POST",
@@ -47,15 +50,25 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     variantId: details.variantId,
                     redirectPath: details.returnTo,
+                    name: details.name,
+                    description: details.description,
+                    kind: details.kind,
                 }),
             });
 
             const data = await response.json();
 
             if (data.url) {
-                window.location.href = data.url;
+                if (pendingTab) {
+                    pendingTab.location.href = data.url;
+                    setOpenedInNewTab(true);
+                } else {
+                    window.location.href = data.url;
+                }
                 return;
             }
+
+            if (pendingTab) pendingTab.close();
 
             if (response.status === 401) {
                 const redirectBack = `/checkout?${searchParams.toString()}`;
@@ -65,6 +78,7 @@ export default function CheckoutPage() {
 
             window.alert(data.error || "Checkout could not be started.");
         } catch {
+            if (pendingTab) pendingTab.close();
             window.alert("Checkout could not be started.");
         } finally {
             setOpening(false);
@@ -112,6 +126,10 @@ export default function CheckoutPage() {
                         Card and billing fields open in Lemon Squeezy secure checkout to keep payments compliant and safe.
                     </p>
 
+                    <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+                        Payment opens in a new tab so you can always return and cancel from Nexora.
+                    </div>
+
                     <div className="mt-6 rounded-2xl border border-white/10 bg-[#070b13] p-4">
                         <p className="text-[11px] uppercase tracking-[0.12em] text-slate-500">Type</p>
                         <p className="mt-1 text-sm font-semibold text-slate-100 capitalize">{details.kind.replace(/-/g, " ")}</p>
@@ -126,6 +144,19 @@ export default function CheckoutPage() {
                         {opening ? "Opening secure checkout..." : "Continue to secure payment"}
                         {!opening ? <ArrowRight className="h-4 w-4" /> : null}
                     </button>
+
+                    {openedInNewTab ? (
+                        <div className="mt-3 rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-100">
+                            Secure checkout opened in a new tab. If you cancel there, continue here from your Nexora panel.
+                        </div>
+                    ) : null}
+
+                    <Link
+                        href={details.returnTo}
+                        className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl border border-white/15 bg-white/[0.03] text-sm font-medium text-slate-200 transition hover:bg-white/[0.08]"
+                    >
+                        Cancel and return
+                    </Link>
 
                     <div className="mt-4 text-center text-xs text-slate-500">
                         Need to change plan? <Link href="/pricing" className="text-cyan-300 hover:text-cyan-200">Back to pricing</Link>

@@ -16,14 +16,14 @@ export default function SignInPage() {
                     <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300/90">Nexora</p>
                         <h1 className="mt-4 text-4xl font-black leading-tight text-white">
-                            Studioya geri don,
+                            Return to your studio,
                             <br />
                             <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-blue-400 bg-clip-text text-transparent">
-                                uretime devam et.
+                                keep creating without pause.
                             </span>
                         </h1>
                         <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-300">
-                            Tum projelerin, API anahtarlarin ve paketlerin tek panelde. Hesabina girip kaldigin yerden devam et.
+                            Your projects, API keys, and plans are all in one place. Sign in and continue right where you left off.
                         </p>
                     </div>
 

@@ -16,14 +16,14 @@ export default function SignUpPage() {
                     <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300/90">Nexora</p>
                         <h1 className="mt-4 text-4xl font-black leading-tight text-white">
-                            Hesabini ac,
+                            Create your account,
                             <br />
                             <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-blue-400 bg-clip-text text-transparent">
-                                ilk uretimini hemen baslat.
+                                launch your first creation today.
                             </span>
                         </h1>
                         <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-300">
-                            Video, image, director ve API akisini tek panelden yonet. Ilk adimi at ve Nexora ile calismaya basla.
+                            Manage video, image, director workflows, and API access from one unified panel. Start building with Nexora now.
                         </p>
                     </div>
 
