@@ -84,6 +84,7 @@ export default function DirectorPage() {
 
     // Settings panel state
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
 
     const selectedModelConfig = DOP_MODELS.find(m => m.id === model) || DOP_MODELS[0];
     const selectedPreset = DIRECTOR_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || DIRECTOR_STYLE_PRESETS[0];
@@ -389,15 +390,36 @@ export default function DirectorPage() {
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Genre</label>
-                                        <select 
-                                            value={genre}
-                                            onChange={(e) => setGenre(e.target.value)}
-                                            className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-[10px] text-xs font-bold uppercase tracking-wider text-white outline-none appearance-none"
-                                        >
-                                            {GENRES.map(g => (
-                                                <option key={g.id} value={g.id}>{g.label}</option>
-                                            ))}
-                                        </select>
+                                        <div className="relative z-20">
+                                            <button 
+                                                type="button"
+                                                onClick={() => setIsGenreDropdownOpen(!isGenreDropdownOpen)}
+                                                className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-xl px-3 py-[10px] text-xs font-bold uppercase tracking-wider text-white outline-none flex items-center justify-between"
+                                            >
+                                                <span>{GENRES.find(g => g.id === genre)?.label || "Select Genre"}</span>
+                                                <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${isGenreDropdownOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            
+                                            {isGenreDropdownOpen && (
+                                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#121419] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                    <div className="max-h-[200px] overflow-y-auto hide-scrollbar flex flex-col">
+                                                        {GENRES.map(g => (
+                                                            <button
+                                                                key={g.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setGenre(g.id);
+                                                                    setIsGenreDropdownOpen(false);
+                                                                }}
+                                                                className={`w-full text-left px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors hover:bg-white/5 ${genre === g.id ? 'bg-cyan-500/10 text-cyan-400' : 'text-white/70'}`}
+                                                            >
+                                                                {g.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
