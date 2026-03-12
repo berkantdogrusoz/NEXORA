@@ -100,10 +100,20 @@ export async function POST(req: NextRequest) {
 
             // Determine credit amount from variant ID
             let creditAmount = 0;
-            if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_300) {
+            if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_10) {
+                creditAmount = 300;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_20) {
+                creditAmount = 750;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_300) {
                 creditAmount = 300;
             } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_750) {
                 creditAmount = 750;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_30) {
+                creditAmount = 1200;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_50) {
+                creditAmount = 2200;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_100) {
+                creditAmount = 5000;
             }
 
             if (creditAmount > 0) {

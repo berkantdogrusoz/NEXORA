@@ -44,16 +44,40 @@ export default function ApiDashboardPage() {
     const packs = useMemo(
         () => [
             {
-                id: "api-300",
-                name: "API Starter Pack",
+                id: "api-10",
+                name: "API Pack - $10",
                 credits: 300,
-                variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332",
+                variantId:
+                    process.env.NEXT_PUBLIC_LEMON_CREDIT_10 ||
+                    process.env.NEXT_PUBLIC_LEMON_CREDIT_300 ||
+                    "1396788",
             },
             {
-                id: "api-750",
-                name: "API Growth Pack",
+                id: "api-20",
+                name: "API Pack - $20",
                 credits: 750,
-                variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335",
+                variantId:
+                    process.env.NEXT_PUBLIC_LEMON_CREDIT_20 ||
+                    process.env.NEXT_PUBLIC_LEMON_CREDIT_750 ||
+                    "1396794",
+            },
+            {
+                id: "api-30",
+                name: "API Pack - $30",
+                credits: 1200,
+                variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_30 || "1396795",
+            },
+            {
+                id: "api-50",
+                name: "API Pack - $50",
+                credits: 2200,
+                variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_50 || "1396796",
+            },
+            {
+                id: "api-100",
+                name: "API Pack - $100",
+                credits: 5000,
+                variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_100 || "1396797",
             },
         ],
         []
