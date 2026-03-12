@@ -115,39 +115,134 @@ export async function logApiRequest(params: {
     });
 }
 
+export async function getApiBalanceCents(userId: string) {
+    const supabase = createSupabaseServer();
+
+    const { data } = await supabase
+        .from("api_balances")
+        .select("balance_cents")
+        .eq("user_id", userId)
+        .single();
+
+    if (!data) {
+        await supabase
+            .from("api_balances")
+            .upsert({ user_id: userId, balance_cents: 0, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+        return 0;
+    }
+
+    return Number(data.balance_cents || 0);
+}
+
+export async function addApiBalanceCents(params: {
+    userId: string;
+    amountCents: number;
+    reason: string;
+    apiKeyId?: string | null;
+    metadata?: Record<string, unknown>;
+}) {
+    const supabase = createSupabaseServer();
+
+    const currentBalance = await getApiBalanceCents(params.userId);
+    const newBalance = currentBalance + Math.max(0, Math.floor(params.amountCents));
+
+    await supabase
+        .from("api_balances")
+        .upsert({ user_id: params.userId, balance_cents: newBalance, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+
+    await supabase.from("api_balance_transactions").insert({
+        user_id: params.userId,
+        api_key_id: params.apiKeyId || null,
+        amount_cents: Math.max(0, Math.floor(params.amountCents)),
+        direction: "credit",
+        reason: params.reason,
+        metadata: params.metadata || null,
+    });
+
+    return { balanceCents: newBalance };
+}
+
+export async function deductApiBalanceCents(params: {
+    userId: string;
+    amountCents: number;
+    reason: string;
+    apiKeyId?: string | null;
+    metadata?: Record<string, unknown>;
+}) {
+    const supabase = createSupabaseServer();
+    const amount = Math.max(0, Math.floor(params.amountCents));
+    if (amount <= 0) {
+        const current = await getApiBalanceCents(params.userId);
+        return { ok: true, balanceCents: current };
+    }
+
+    for (let i = 0; i < 3; i++) {
+        const currentBalance = await getApiBalanceCents(params.userId);
+
+        if (currentBalance < amount) {
+            return { ok: false, balanceCents: currentBalance };
+        }
+
+        const targetBalance = currentBalance - amount;
+        const { data, error } = await supabase
+            .from("api_balances")
+            .update({ balance_cents: targetBalance, updated_at: new Date().toISOString() })
+            .eq("user_id", params.userId)
+            .eq("balance_cents", currentBalance)
+            .select("balance_cents")
+            .single();
+
+        if (!error && data) {
+            await supabase.from("api_balance_transactions").insert({
+                user_id: params.userId,
+                api_key_id: params.apiKeyId || null,
+                amount_cents: amount,
+                direction: "debit",
+                reason: params.reason,
+                metadata: params.metadata || null,
+            });
+
+            return { ok: true, balanceCents: Number(data.balance_cents || 0) };
+        }
+    }
+
+    const finalBalance = await getApiBalanceCents(params.userId);
+    return { ok: finalBalance >= amount, balanceCents: finalBalance };
+}
+
 export function hasScope(scopes: string[] | null | undefined, scope: ApiScope) {
     if (!scopes || !Array.isArray(scopes)) return false;
     return scopes.includes(scope);
 }
 
 export function estimateImageCost(model: string) {
-    const costs: Record<string, number> = {
-        "dall-e-2": 5,
-        "flux-schnell": 8,
-        "dall-e-3": 15,
-        "nano-banana-2": 15,
+    const costsInCents: Record<string, number> = {
+        "dall-e-2": 100,
+        "flux-schnell": 100,
+        "dall-e-3": 100,
+        "nano-banana-2": 100,
     };
-    return costs[model] ?? 10;
+    return costsInCents[model] ?? 100;
 }
 
 export function estimateVideoCost(model: string) {
-    const costs: Record<string, number> = {
-        "wan-2.1-turbo": 8,
-        "kling-3": 15,
-        "luma-ray-2": 25,
-        "runway-gen-4.5": 45,
-        "gwm-1": 35,
-        "seedance-2": 50,
-        "sora-2": 55,
+    const costsInCents: Record<string, number> = {
+        "wan-2.1-turbo": 100,
+        "kling-3": 100,
+        "luma-ray-2": 100,
+        "runway-gen-4.5": 100,
+        "gwm-1": 100,
+        "seedance-2": 100,
+        "sora-2": 100,
     };
-    return costs[model] ?? 20;
+    return costsInCents[model] ?? 100;
 }
 
 export function estimateDirectorCost(model: string) {
-    const costs: Record<string, number> = {
+    const costsInCents: Record<string, number> = {
         "dop-lite": 100,
-        "dop-preview": 150,
-        "dop-turbo": 200,
+        "dop-preview": 100,
+        "dop-turbo": 100,
     };
-    return costs[model] ?? 150;
+    return costsInCents[model] ?? 100;
 }

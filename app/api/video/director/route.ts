@@ -76,9 +76,18 @@ export async function POST(req: Request) {
         if ("error" in authResult) return authResult.error;
         userId = authResult.userId;
 
+        const internalSecret = req.headers.get("x-internal-api-secret");
+        const skipWebBilling =
+            internalSecret &&
+            process.env.INTERNAL_API_SECRET &&
+            internalSecret === process.env.INTERNAL_API_SECRET &&
+            req.headers.get("x-api-billing-mode") === "usd";
+
         // Rate Limiting
-        const rateError = checkRateLimit(userId, "director-generate");
-        if (rateError) return rateError;
+        if (!skipWebBilling) {
+            const rateError = checkRateLimit(userId, "director-generate");
+            if (rateError) return rateError;
+        }
 
         const body = await req.json();
         const {
@@ -127,36 +136,35 @@ export async function POST(req: Request) {
         const isDev = process.env.NODE_ENV === "development";
 
         // Director Studio is Premium ONLY
-        if (!hasDirectorAccess(planName)) {
+        if (!skipWebBilling && !hasDirectorAccess(planName)) {
             return NextResponse.json({ error: "Director Studio is exclusively for Premium members." }, { status: 403 });
         }
 
-        // Check balance
-        const { data: creditData } = await supabase
-            .from("user_credits")
-            .select("credits")
-            .eq("user_id", userId)
-            .single();
+        const shouldUseCreditBilling = !skipWebBilling && !isDev;
+        if (shouldUseCreditBilling) {
+            const { data: creditData } = await supabase
+                .from("user_credits")
+                .select("credits")
+                .eq("user_id", userId)
+                .single();
 
-        const currentCredits = Number(creditData?.credits || 0);
+            const currentCredits = Number(creditData?.credits || 0);
 
-        if (!isDev && (!creditData || currentCredits < cost)) {
-            return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
-        }
+            if (!creditData || currentCredits < cost) {
+                return NextResponse.json({ error: "Insufficient credits. Please upgrade your plan." }, { status: 402 });
+            }
 
-        // Deduct credits
-        if (!isDev) {
-            const { error } = await supabase
+            const { error: deductError } = await supabase
                 .from("user_credits")
                 .update({ credits: currentCredits - cost })
                 .eq("user_id", userId);
-            if (error) {
+            if (deductError) {
                 return NextResponse.json({ error: "Failed to process credits" }, { status: 500 });
             }
-        }
 
-        creditDeducted = !isDev;
-        deductedCost = cost;
+            creditDeducted = true;
+            deductedCost = cost;
+        }
 
         // ── Higgsfield API Key ──
         const apiKey = process.env.HIGGSFIELD_API_KEY;

@@ -98,26 +98,44 @@ export async function POST(req: NextRequest) {
                 || ""
             );
 
-            // Determine credit amount from variant ID
-            let creditAmount = 0;
+            // Determine API balance top-up from variant ID (cents)
+            let apiBalanceTopUpCents = 0;
             if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_10) {
-                creditAmount = 300;
+                apiBalanceTopUpCents = 1000;
             } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_20) {
-                creditAmount = 750;
-            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_300) {
+                apiBalanceTopUpCents = 2000;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_30) {
+                apiBalanceTopUpCents = 3000;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_50) {
+                apiBalanceTopUpCents = 5000;
+            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_100) {
+                apiBalanceTopUpCents = 10000;
+            }
+
+            if (apiBalanceTopUpCents > 0) {
+                console.log(`API pack purchased: +$${(apiBalanceTopUpCents / 100).toFixed(2)} for user ${userId}`);
+                const { addApiBalanceCents } = await import("@/lib/developer-api");
+                await addApiBalanceCents({
+                    userId,
+                    amountCents: apiBalanceTopUpCents,
+                    reason: "lemon_order_created",
+                    metadata: {
+                        variantId,
+                        orderId: data.id,
+                    },
+                });
+            }
+
+            // Backward compatibility for older credit pack variants
+            let creditAmount = 0;
+            if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_300) {
                 creditAmount = 300;
             } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_750) {
                 creditAmount = 750;
-            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_30) {
-                creditAmount = 1200;
-            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_50) {
-                creditAmount = 2200;
-            } else if (variantId === process.env.NEXT_PUBLIC_LEMON_CREDIT_100) {
-                creditAmount = 5000;
             }
 
             if (creditAmount > 0) {
-                console.log(`Credit pack purchased: ${creditAmount} credits for user ${userId}`);
+                console.log(`Legacy credit pack purchased: ${creditAmount} credits for user ${userId}`);
                 const { createSupabaseServer } = await import("@/lib/supabase");
                 const supabase = createSupabaseServer();
 

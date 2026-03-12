@@ -19,16 +19,17 @@ type UsageResponse = {
         totalRequests: number;
         successRequests: number;
         failedRequests: number;
-        totalCredits: number;
+        spentCents: number;
+        balanceCents: number;
         avgLatency: number;
         monthStart: string;
     };
-    byEndpoint: Record<string, { requests: number; credits: number }>;
+    byEndpoint: Record<string, { requests: number; spentCents: number }>;
     recent: Array<{
         endpoint: string;
         status_code: number;
         latency_ms: number;
-        cost_credits: number;
+        cost_credits: number; // stored as cents for API billing
         created_at: string;
     }>;
 };
@@ -46,7 +47,7 @@ export default function ApiDashboardPage() {
             {
                 id: "api-10",
                 name: "API Pack - $10",
-                credits: 300,
+                credits: 1000,
                 variantId:
                     process.env.NEXT_PUBLIC_LEMON_CREDIT_10 ||
                     process.env.NEXT_PUBLIC_LEMON_CREDIT_300 ||
@@ -55,7 +56,7 @@ export default function ApiDashboardPage() {
             {
                 id: "api-20",
                 name: "API Pack - $20",
-                credits: 750,
+                credits: 2000,
                 variantId:
                     process.env.NEXT_PUBLIC_LEMON_CREDIT_20 ||
                     process.env.NEXT_PUBLIC_LEMON_CREDIT_750 ||
@@ -64,19 +65,19 @@ export default function ApiDashboardPage() {
             {
                 id: "api-30",
                 name: "API Pack - $30",
-                credits: 1200,
+                credits: 3000,
                 variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_30 || "1396795",
             },
             {
                 id: "api-50",
                 name: "API Pack - $50",
-                credits: 2200,
+                credits: 5000,
                 variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_50 || "1396796",
             },
             {
                 id: "api-100",
                 name: "API Pack - $100",
-                credits: 5000,
+                credits: 10000,
                 variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_100 || "1396797",
             },
         ],
@@ -255,10 +256,11 @@ export default function ApiDashboardPage() {
                         <h2 className="text-white font-bold text-lg flex items-center gap-2 mb-4"><BarChart3 className="w-4 h-4 text-cyan-400" /> Usage (This Month)</h2>
                         {usage ? (
                             <div className="grid grid-cols-2 gap-3">
+                                <Metric label="Balance" value={`$${(usage.summary.balanceCents / 100).toFixed(2)}`} />
                                 <Metric label="Requests" value={String(usage.summary.totalRequests)} />
                                 <Metric label="Success" value={String(usage.summary.successRequests)} />
                                 <Metric label="Failures" value={String(usage.summary.failedRequests)} />
-                                <Metric label="Credits" value={String(usage.summary.totalCredits)} />
+                                <Metric label="Spent" value={`$${(usage.summary.spentCents / 100).toFixed(2)}`} />
                                 <Metric label="Avg Latency" value={`${usage.summary.avgLatency}ms`} />
                             </div>
                         ) : (
@@ -267,7 +269,7 @@ export default function ApiDashboardPage() {
                     </div>
 
                     <div className="bg-[#0f1116] border border-white/[0.08] rounded-2xl p-4 md:p-5">
-                        <h2 className="text-white font-bold text-lg flex items-center gap-2 mb-3"><Coins className="w-4 h-4 text-amber-400" /> Buy API Credits</h2>
+                        <h2 className="text-white font-bold text-lg flex items-center gap-2 mb-3"><Coins className="w-4 h-4 text-amber-400" /> Buy API Balance</h2>
                         <div className="space-y-2">
                             {packs.map((pack) => (
                                 <button
@@ -276,7 +278,7 @@ export default function ApiDashboardPage() {
                                     className="w-full p-3 rounded-xl border border-white/[0.08] bg-black/30 hover:bg-white/[0.06] text-left"
                                 >
                                     <p className="text-white text-sm font-semibold">{pack.name}</p>
-                                    <p className="text-white/45 text-xs mt-0.5">{pack.credits} credits</p>
+                                    <p className="text-white/45 text-xs mt-0.5">Adds ${(pack.credits / 100).toFixed(2)} API balance</p>
                                 </button>
                             ))}
                         </div>

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import {
+    addApiBalanceCents,
+    deductApiBalanceCents,
     estimateImageCost,
     hasScope,
     isMonthlyQuotaExceeded,
@@ -13,7 +15,8 @@ export async function POST(req: Request) {
     const startedAt = Date.now();
     let apiKeyId = "";
     let userId = "";
-    let estimatedCost = 0;
+    let estimatedCostCents = 0;
+    let balanceDebited = false;
 
     try {
         const rawApiKey = parseApiKeyFromRequest(req);
@@ -43,7 +46,27 @@ export async function POST(req: Request) {
         await touchApiKeyUsage(apiKeyId);
 
         const body = await req.json();
-        estimatedCost = estimateImageCost(String(body?.model || ""));
+        estimatedCostCents = estimateImageCost(String(body?.model || ""));
+
+        const debit = await deductApiBalanceCents({
+            userId,
+            amountCents: estimatedCostCents,
+            reason: "api_v1_image_generate",
+            apiKeyId,
+            metadata: { model: body?.model || null },
+        });
+
+        if (!debit.ok) {
+            return NextResponse.json(
+                {
+                    error: "Insufficient API balance. Please top up your API wallet.",
+                    balanceUsd: Number((debit.balanceCents / 100).toFixed(2)),
+                    requiredUsd: Number((estimatedCostCents / 100).toFixed(2)),
+                },
+                { status: 402 }
+            );
+        }
+        balanceDebited = true;
 
         const targetUrl = new URL("/api/image/generate", req.url);
         const upstream = await fetch(targetUrl.toString(), {
@@ -52,6 +75,7 @@ export async function POST(req: Request) {
                 "Content-Type": "application/json",
                 "x-internal-user-id": userId,
                 "x-internal-api-secret": process.env.INTERNAL_API_SECRET,
+                "x-api-billing-mode": "usd",
             },
             body: JSON.stringify(body),
         });
@@ -71,11 +95,31 @@ export async function POST(req: Request) {
             method: "POST",
             statusCode: upstream.status,
             latencyMs: Date.now() - startedAt,
-            costCredits: upstream.ok ? estimatedCost : 0,
+            costCredits: upstream.ok ? estimatedCostCents : 0,
         });
+
+        if (!upstream.ok && balanceDebited) {
+            await addApiBalanceCents({
+                userId,
+                amountCents: estimatedCostCents,
+                reason: "api_v1_image_refund",
+                apiKeyId,
+                metadata: { statusCode: upstream.status },
+            });
+            balanceDebited = false;
+        }
 
         return NextResponse.json(payload, { status: upstream.status });
     } catch (error: any) {
+        if (balanceDebited && userId) {
+            await addApiBalanceCents({
+                userId,
+                amountCents: estimatedCostCents,
+                reason: "api_v1_image_refund_exception",
+                apiKeyId: apiKeyId || null,
+            });
+        }
+
         if (apiKeyId && userId) {
             await logApiRequest({
                 apiKeyId,

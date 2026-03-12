@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthUserId } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
+import { getApiBalanceCents } from "@/lib/developer-api";
 
 export async function GET() {
     try {
@@ -26,17 +27,18 @@ export async function GET() {
 
         const totalRequests = rows?.length || 0;
         const successRequests = (rows || []).filter((r) => Number(r.status_code) < 400).length;
-        const totalCredits = (rows || []).reduce((sum, r) => sum + Number(r.cost_credits || 0), 0);
+        const spentCents = (rows || []).reduce((sum, r) => sum + Number(r.cost_credits || 0), 0);
         const avgLatency = totalRequests
             ? Math.round((rows || []).reduce((sum, r) => sum + Number(r.latency_ms || 0), 0) / totalRequests)
             : 0;
+        const balanceCents = await getApiBalanceCents(auth.userId);
 
-        const byEndpoint: Record<string, { requests: number; credits: number }> = {};
+        const byEndpoint: Record<string, { requests: number; spentCents: number }> = {};
         for (const row of rows || []) {
             const endpoint = row.endpoint || "unknown";
-            if (!byEndpoint[endpoint]) byEndpoint[endpoint] = { requests: 0, credits: 0 };
+            if (!byEndpoint[endpoint]) byEndpoint[endpoint] = { requests: 0, spentCents: 0 };
             byEndpoint[endpoint].requests += 1;
-            byEndpoint[endpoint].credits += Number(row.cost_credits || 0);
+            byEndpoint[endpoint].spentCents += Number(row.cost_credits || 0);
         }
 
         return NextResponse.json({
@@ -44,7 +46,8 @@ export async function GET() {
                 totalRequests,
                 successRequests,
                 failedRequests: totalRequests - successRequests,
-                totalCredits,
+                spentCents,
+                balanceCents,
                 avgLatency,
                 monthStart,
             },
