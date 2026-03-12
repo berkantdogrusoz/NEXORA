@@ -38,6 +38,8 @@ export default function Home() {
 
     // If next is a video, start preloading
     if (HERO_MEDIA[next].type === "video" && nextVideoRef.current) {
+      nextVideoRef.current.defaultMuted = true;
+      nextVideoRef.current.muted = true;
       nextVideoRef.current.currentTime = 0;
       nextVideoRef.current.play().catch(() => { });
     }
@@ -67,6 +69,8 @@ export default function Home() {
   // Force play active video to bypass strict autoplay policies
   useEffect(() => {
     if (HERO_MEDIA[activeIndex].type === "video" && videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
       videoRef.current.play().catch(() => {});
     }
   }, [activeIndex]);
@@ -364,7 +368,13 @@ export default function Home() {
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-white/5">
                     {model.img.endsWith('.mp4') ? (
                       <video
-                        ref={(el) => { if (el) el.play().catch(() => {}); }}
+                        ref={(el) => { 
+                          if (el) {
+                            el.defaultMuted = true;
+                            el.muted = true;
+                            el.play().catch(() => {}); 
+                          }
+                        }}
                         autoPlay
                         loop
                         muted
