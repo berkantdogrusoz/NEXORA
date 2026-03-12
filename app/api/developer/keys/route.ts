@@ -13,6 +13,7 @@ export async function GET() {
             .from("api_keys")
             .select("id, name, key_prefix, scopes, monthly_quota, is_active, last_used_at, created_at")
             .eq("user_id", auth.userId)
+            .eq("is_active", true)
             .order("created_at", { ascending: false });
 
         if (error) {

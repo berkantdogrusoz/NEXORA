@@ -88,13 +88,13 @@ export default function ApiDashboardPage() {
         setLoading(true);
         try {
             const [keysRes, usageRes] = await Promise.all([
-                fetch("/api/developer/keys"),
+                fetch("/api/developer/keys", { cache: "no-store" }),
                 fetch("/api/developer/usage"),
             ]);
 
             if (keysRes.ok) {
                 const k = await keysRes.json();
-                setKeys(k.keys || []);
+                setKeys((k.keys || []).filter((key: ApiKeyItem) => key.is_active));
             }
 
             if (usageRes.ok) {

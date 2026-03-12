@@ -10,7 +10,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
         const supabase = createSupabaseServer();
         const { error } = await supabase
             .from("api_keys")
-            .update({ is_active: false })
+            .delete()
             .eq("id", params.id)
             .eq("user_id", auth.userId);
 
