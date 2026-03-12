@@ -61,7 +61,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         directives: "Use elegant luxury visual language: rich textures, premium wardrobe/materials, soft directional light, refined camera movement, and cinematic high-end color tones.",
         preferredModes: ["video", "director", "image"],
         premium: true,
-        image: "/arts/styles/product-ads.jpg",
+        image: "/arts/styles/luxury-style.png",
     },
     {
         id: "viral-social",
@@ -71,7 +71,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["viral", "hook", "tiktok"],
         directives: "Prioritize thumb-stopping visual hook in first seconds, punchy scene transitions, expressive action, high clarity, and social-first composition optimized for mobile attention.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/styles/explainer-clean.jpg",
+        image: "/arts/styles/viral-social.png",
     },
     {
         id: "ugc-creator",
@@ -81,7 +81,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["ugc", "creator", "authentic"],
         directives: "Style like authentic UGC content: natural expressions, handheld framing, believable environments, practical lighting, and relatable social-media pacing.",
         preferredModes: ["video", "director"],
-        image: "/arts/styles/documentary.jpg",
+        image: "/arts/styles/ugc-creator.png",
     },
     {
         id: "street-interview",
@@ -91,7 +91,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["street", "interview", "documentary"],
         directives: "Use documentary realism with street-level handheld camera style, natural ambient lighting, authentic subject behavior, and grounded real-world details.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/styles/documentary.jpg",
+        image: "/arts/styles/street-interview.png",
     },
     {
         id: "documentary",
@@ -131,7 +131,7 @@ export const STYLE_PRESETS: StylePreset[] = [
         tags: ["faceless", "b-roll", "business"],
         directives: "Design faceless storytelling shots focused on hands, objects, environments, screens, and context details with smooth edit-friendly transitions.",
         preferredModes: ["video", "director", "image"],
-        image: "/arts/styles/product-ads.jpg",
+        image: "/arts/styles/faceless-broll.png",
     },
     {
         id: "dramatic-tv-teaser",
