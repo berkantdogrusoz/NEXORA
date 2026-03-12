@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 // Public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
     "/",
+    "/api/v1(.*)",
     "/pricing(.*)",
     "/sign-in(.*)",
     "/sign-up(.*)",
@@ -28,6 +29,15 @@ function noopMiddleware(_req: NextRequest) {
 
 const clerkHandler = hasClerkKeys
     ? clerkMiddleware(async (auth, req) => {
+        const internalSecret = req.headers.get("x-internal-api-secret");
+        if (
+            internalSecret &&
+            process.env.INTERNAL_API_SECRET &&
+            internalSecret === process.env.INTERNAL_API_SECRET
+        ) {
+            return;
+        }
+
         if (!isPublicRoute(req)) {
             await auth.protect();
         }

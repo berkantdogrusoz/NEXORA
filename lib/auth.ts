@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 
 // Rate limiting store (in-memory, per-instance)
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -11,6 +12,24 @@ const RATE_LIMIT_MAX_REQUESTS = 3;      // 3 requests per 2 minutes (tight to co
  * Get the authenticated userId or return an error response
  */
 export async function getAuthUserId(): Promise<{ userId: string } | { error: NextResponse }> {
+    // Internal server-to-server auth path used by /api/v1 proxy routes.
+    // Requires a shared secret so this cannot be forged by public callers.
+    try {
+        const h = headers();
+        const internalUserId = h.get("x-internal-user-id");
+        const internalSecret = h.get("x-internal-api-secret");
+        if (
+            internalUserId &&
+            internalSecret &&
+            process.env.INTERNAL_API_SECRET &&
+            internalSecret === process.env.INTERNAL_API_SECRET
+        ) {
+            return { userId: internalUserId };
+        }
+    } catch {
+        // No request header context available; continue with normal Clerk auth.
+    }
+
     // Build-time safety: check if secret key exists before calling auth()
     if (!process.env.CLERK_SECRET_KEY) {
         return {
