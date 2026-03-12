@@ -471,7 +471,7 @@ export default function Home() {
             {[
               { img: "/arts/nexora-1772282772787.png", title: "Cyberpunk Art", tag: "DALL-E 3" },
               { img: "/arts/nexora-1772283133285.png", title: "Neon Noir", tag: "Photography" },
-              { img: "/arts/nexora-1772315236432.png", title: "Abstract Light", tag: "Digital Art" },
+              { img: "/arts/nexora-1772283081135.png", title: "Abstract Light", tag: "Digital Art" },
             ].map((item, i) => (
               <motion.div
                 key={i}
