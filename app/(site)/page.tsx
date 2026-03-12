@@ -64,6 +64,13 @@ export default function Home() {
     }
   }, [activeIndex, goToNext]);
 
+  // Force play active video to bypass strict autoplay policies
+  useEffect(() => {
+    if (HERO_MEDIA[activeIndex].type === "video" && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, [activeIndex]);
+
   return (
     <div className="relative min-h-screen bg-[#000000] text-white selection:bg-blue-500/30 overflow-hidden font-sans">
 
@@ -357,6 +364,7 @@ export default function Home() {
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 bg-white/5">
                     {model.img.endsWith('.mp4') ? (
                       <video
+                        ref={(el) => { if (el) el.play().catch(() => {}); }}
                         autoPlay
                         loop
                         muted
