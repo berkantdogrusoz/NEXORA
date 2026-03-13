@@ -13,6 +13,8 @@ const isPublicRoute = createRouteMatcher([
     "/privacy(.*)",
     "/terms(.*)",
     "/api-docs(.*)",
+    "/checkout(.*)",
+    "/api/lemon/checkout(.*)",
     "/sitemap.xml",
     "/robots.txt",
     "/icon.svg",

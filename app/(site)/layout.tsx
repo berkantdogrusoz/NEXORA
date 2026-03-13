@@ -272,6 +272,9 @@ export default function SiteLayout({
                         <Link href="/director" className="block px-4 py-3.5 text-sm font-bold text-white/70 hover:text-white rounded-sm hover:bg-white/[0.04] transition-all">
                             Director Studio
                         </Link>
+                        <Link href="/api-docs" className="block px-4 py-3.5 text-sm font-bold text-emerald-400/80 hover:text-emerald-300 rounded-sm hover:bg-white/[0.04] transition-all">
+                            Developer API
+                        </Link>
 
                         {/* Auth Section */}
                         <div className="pt-6 border-t border-white/[0.06] mt-6 space-y-3">

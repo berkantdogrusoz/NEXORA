@@ -54,6 +54,17 @@ export default function CheckoutPage() {
                 }),
             });
 
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                if (response.status === 401 || response.status === 403) {
+                    const redirectBack = `/checkout?${searchParams.toString()}`;
+                    router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectBack)}`);
+                    return;
+                }
+                window.alert("Checkout could not be started. Please sign in and try again.");
+                return;
+            }
+
             const data = await response.json();
 
             if (data.url) {
