@@ -80,9 +80,9 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
               <Link
                 href="/api-dashboard"
-                className="hidden sm:flex items-center justify-center px-4 py-1.5 rounded-full border border-white/20 text-xs font-bold text-white hover:bg-white/10 transition-all"
+                className="flex items-center justify-center px-3 sm:px-4 py-1.5 rounded-full border border-white/20 text-xs font-bold text-white hover:bg-white/10 transition-all"
               >
-                Developer API
+                API
               </Link>
               <UserButton
                 afterSignOutUrl="/"
@@ -91,8 +91,8 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link href="/api-dashboard" className="hidden sm:block text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                Developer API
+              <Link href="/api-dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                API
               </Link>
               <Link href="/studio" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
                 Studio
