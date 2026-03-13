@@ -74,16 +74,13 @@ export async function POST(req: Request) {
         // Cost mapping
         const costMap: Record<string, number> = {
             "kling-3": 50,
-            "luma": 60,
-            "runway-gen4": 75,
-            "runway-gwm": 85,
             "seedance-2": 100,
             "sora-2": 120,
         };
         const cost = costMap[modelId] || 25;
 
         // Block Pro models for non-premium users
-        const proModels = ["luma", "seedance-2", "runway-gen4", "runway-gwm", "sora-2"];
+        const proModels = ["seedance-2", "sora-2"];
         if (!skipWebBilling && proModels.includes(modelId) && !hasProModelAccess(planName)) {
             return NextResponse.json({ error: "You need a Premium plan to use Pro models." }, { status: 403 });
         }
@@ -234,8 +231,10 @@ export async function POST(req: Request) {
 
             const falInput: any = {
                 prompt: providerPrompt,
-                duration: duration === "10s" || duration === "10" ? 10 : 5,
+                duration: duration === "10s" || duration === "10" ? "10" : "5",
                 aspect_ratio: aspectRatio,
+                resolution: "720p",
+                generate_audio: true,
             };
             if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
@@ -254,53 +253,6 @@ export async function POST(req: Request) {
             } else {
                 throw new Error("Invalid output from fal.ai Seedance");
             }
-
-            // ═══════════════════════════════════════════
-            //   REPLICATE MODELS (Luma, Runway)
-            // ═══════════════════════════════════════════
-
-        } else if (modelId === "luma") {
-            const input: any = {
-                prompt: providerPrompt,
-                aspect_ratio: aspectRatio,
-                duration: duration === "10" ? 10 : 5,
-            };
-            if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
-
-            console.log(`Generating video using Replicate Luma Ray 2 (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
-            const output = await replicate.run("luma/ray-2-720p" as any, { input });
-            finalUrl = Array.isArray(output) ? output[0] : output;
-
-        } else if (modelId === "runway-gen4") {
-            // Runway ratio format: "1280:720", "720:1280", "1080:1080"
-            const ratioMap: Record<string, string> = {
-                "16:9": "1280:720",
-                "9:16": "720:1280",
-                "1:1": "1080:1080",
-            };
-            const input: any = {
-                prompt_text: providerPrompt,
-                ratio: ratioMap[aspectRatio] || "1280:720",
-                duration: duration === "10" ? 10 : 5,
-            };
-            if (resolvedImageUrl) input.prompt_image = resolvedImageUrl;
-
-            console.log(`Generating video using Replicate Runway Gen-4 Turbo (image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
-            const output = await replicate.run("runwayml/gen4-turbo" as any, { input });
-            finalUrl = Array.isArray(output) ? output[0] : output;
-
-        } else if (modelId === "runway-gwm") {
-            console.log(`Generating video using Replicate (GWM-1 equivalent, image-to-video: ${!!resolvedImageUrl}, duration: ${duration}s)`);
-            const input: any = {
-                prompt: `(Extremely high fidelity, real-world physics, complex world simulation) ${providerPrompt}`,
-                prompt_optimizer: true,
-                aspect_ratio: aspectRatio,
-                duration: duration === "10" ? 10 : 5,
-            };
-            if (resolvedImageUrl) input.first_frame_image = resolvedImageUrl;
-
-            const output = await replicate.run("minimax/video-01" as any, { input });
-            finalUrl = Array.isArray(output) ? output[0] : output;
 
         } else if (modelId === "sora-2") {
             // ═══════════════════════════════════════════
