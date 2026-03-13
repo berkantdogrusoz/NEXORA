@@ -201,6 +201,12 @@ export default function Home() {
                 >
                   Director Studio
                 </Link>
+                <Link
+                  href="/api-docs"
+                  className="hidden md:inline-flex px-7 py-3 rounded-full text-sm font-bold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 transition-colors backdrop-blur-sm"
+                >
+                  Developer API
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -351,10 +357,10 @@ export default function Home() {
             {[
               { name: "Seedance 2.0", type: "Video", desc: "Cinematic motion for powerful intros and hooks.", img: "/arts/nexora-1772284253224.mp4", gradient: "from-amber-600/80 to-orange-600/80", link: "/studio" },
               { name: "Kling 3.0", type: "Video", desc: "Fast, sharp edits with clean motion.", img: "/arts/nexora-1772284437767.mp4", gradient: "from-cyan-600/80 to-blue-600/80", link: "/studio" },
-              { name: "Runway Gen-4.5", type: "Video", desc: "Hollywood-grade visuals for ads, trailers and campaigns.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
+              { name: "Sora 2", type: "Video", desc: "OpenAI's latest model for stunning cinematic visuals.", img: "/arts/nexora-1772284673051.mp4", gradient: "from-purple-600/80 to-pink-600/80", link: "/studio" },
               { name: "Nano Banana 2", type: "Image", desc: "Hero visuals for posts, thumbnails and key visuals.", img: "/arts/nexora-1772282772787.png", gradient: "from-yellow-500/80 to-amber-600/80", link: "/generate" },
               { name: "DALL-E 3", type: "Image", desc: "High-fidelity visuals for ads, UGC-style content and more.", img: "/arts/nexora-1772283081135.png", gradient: "from-emerald-600/80 to-teal-600/80", link: "/generate" },
-              { name: "Luma Ray 2", type: "Video", desc: "Surreal visuals for standout content.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/studio" },
+              { name: "Higgsfield", type: "Video", desc: "Director-level control over scenes and cinematic sequences.", img: "/arts/nexora-1772283133285.png", gradient: "from-indigo-600/80 to-violet-600/80", link: "/director" },
             ].map((model, i) => (
               <motion.div
                 key={i}
@@ -509,7 +515,7 @@ export default function Home() {
             {[
               { icon: Zap, title: "Lightning Fast", desc: "Our serverless architecture renders your ideas in seconds, not hours." },
               { icon: Wand2, title: "Prompt Adherence", desc: "Advanced LLM pre-processing ensures the models follow your exact instructions." },
-              { icon: Layers, title: "Multi-Model Native", desc: "Switch instantly between top-tier models like Seedance, Luma, and DALL-E." },
+              { icon: Layers, title: "Multi-Model Native", desc: "Switch instantly between top-tier models like Seedance, Kling, and DALL-E." },
             ].map((feat, i) => (
               <motion.div
                 key={i}

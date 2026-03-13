@@ -139,7 +139,7 @@ export default function SiteLayout({
                                             <PlayCircle className="w-5 h-5" />
                                             <div className="text-sm font-semibold">Video Tutorials</div>
                                         </Link>
-                                        <Link href="#" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-white/70 hover:text-white transition-colors mt-1">
+                                        <Link href="/api-docs" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-white/70 hover:text-white transition-colors mt-1">
                                             <BookOpen className="w-5 h-5" />
                                             <div className="text-sm font-semibold">API Documentation</div>
                                         </Link>
@@ -150,6 +150,9 @@ export default function SiteLayout({
                             {/* Static Links */}
                             <Link href="/pricing" className="text-sm font-semibold text-white/90 hover:text-white transition-colors py-2">
                                 Pricing
+                            </Link>
+                            <Link href="/api-docs" className="text-sm font-semibold text-emerald-400/90 hover:text-emerald-300 transition-colors py-2">
+                                API
                             </Link>
                         </div>
                     </div>
@@ -243,7 +246,7 @@ export default function SiteLayout({
                             </div>
                             <div>
                                 <div className="text-sm font-bold text-white">AI Image Generator</div>
-                                <div className="text-[11px] text-white/40">DALL-E 3, FLUX, Recraft</div>
+                                <div className="text-[11px] text-white/40">DALL-E 3, Nano Banana 2, Recraft</div>
                             </div>
                         </Link>
                         <Link
@@ -255,7 +258,7 @@ export default function SiteLayout({
                             </div>
                             <div>
                                 <div className="text-sm font-bold text-white">AI Video Studio</div>
-                                <div className="text-[11px] text-white/40">Kling 3.0, Seedance, Runway</div>
+                                <div className="text-[11px] text-white/40">Kling 3.0, Seedance, Sora 2</div>
                             </div>
                         </Link>
 
