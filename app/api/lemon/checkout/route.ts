@@ -12,7 +12,7 @@ function safeText(value: unknown, fallback: string, maxLength = 140) {
 export async function POST(req: NextRequest) {
     try {
         const auth = await getAuthUserId();
-        if ("error" in auth) return NextResponse.json(auth.error, { status: 401 });
+        if ("error" in auth) return auth.error;
         const { userId } = auth;
 
         const body = await req.json();
