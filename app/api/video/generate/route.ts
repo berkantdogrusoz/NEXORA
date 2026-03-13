@@ -263,7 +263,7 @@ export async function POST(req: Request) {
             const input: any = {
                 prompt: providerPrompt,
                 aspect_ratio: aspectRatio,
-                duration: duration === "10" ? "10s" : "5s",
+                duration: duration === "10" ? 10 : 5,
             };
             if (resolvedImageUrl) input.start_image_url = resolvedImageUrl;
 
