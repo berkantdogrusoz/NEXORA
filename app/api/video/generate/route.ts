@@ -227,10 +227,10 @@ export async function POST(req: Request) {
             }
 
         } else if (modelId === "seedance-2") {
-            console.log(`Generating video using fal.ai Seedance 2.0 Pro (image-to-video: ${!!resolvedImageUrl})`);
+            console.log(`Generating video using fal.ai Seedance 1.5 Pro (image-to-video: ${!!resolvedImageUrl})`);
             const falModel = resolvedImageUrl
-                ? "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video"
-                : "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video";
+                ? "fal-ai/bytedance/seedance/v1.5/pro/image-to-video"
+                : "fal-ai/bytedance/seedance/v1.5/pro/text-to-video";
 
             const falInput: any = {
                 prompt: providerPrompt,
