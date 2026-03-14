@@ -249,7 +249,6 @@ export async function POST(req: Request) {
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
                     resolution: finalQuality === "sd" ? "720p" : "1080p",
                     personGeneration: "allow_adult",
-                    generateAudio: true,
                     enhancePrompt: true,
                 },
             });
