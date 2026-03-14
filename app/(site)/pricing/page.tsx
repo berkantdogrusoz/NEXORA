@@ -113,21 +113,12 @@ const PLAN_RANK: Record<string, number> = { Free: 0, Standard: 1, Growth: 2, Pro
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [buyingCredits, setBuyingCredits] = useState<string | null>(null);
-  const [buyingApi, setBuyingApi] = useState<string | null>(null);
   const [userPlan, setUserPlan] = useState<string>("Free");
   const router = useRouter();
 
   const CREDIT_PACKS = [
     { id: "300", name: "Starter Pack", credits: 300, price: "$10", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
     { id: "750", name: "Mega Pack", credits: 750, price: "$20", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "25% Bonus" },
-  ];
-
-  const API_PACKS = [
-    { id: "api-10", name: "API Starter", dollars: "$10", credits: 1000, variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_10 || process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1396788", badge: null },
-    { id: "api-20", name: "API Standard", dollars: "$20", credits: 2000, variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_20 || process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1396794", badge: null },
-    { id: "api-30", name: "API Pro", dollars: "$30", credits: 3000, variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_30 || "1396795", badge: "Best Value" },
-    { id: "api-50", name: "API Business", dollars: "$50", credits: 5000, variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_50 || "1396796", badge: null },
-    { id: "api-100", name: "API Enterprise", dollars: "$100", credits: 10000, variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_100 || "1396797", badge: null },
   ];
 
   useEffect(() => {
@@ -372,56 +363,6 @@ export default function PricingPage() {
                   className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-bold text-sm transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-500/20"
                 >
                   {buyingCredits === pack.id ? "Opening Checkout..." : `Buy ${pack.credits} Credits`}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* API Token Packs Section */}
-        <div className="mt-16 max-w-5xl mx-auto">
-          <div className="text-center mb-8">
-            <p className="text-xs font-semibold text-violet-400 uppercase tracking-widest mb-2">API Access</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Buy API Balance</h2>
-            <p className="text-sm text-slate-400">One-time purchase. Use with your API keys. Balance is separate from studio credits.</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {API_PACKS.map((pack) => (
-              <div
-                key={pack.id}
-                className="relative bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 text-left hover:border-violet-500/30 transition-all group"
-              >
-                {pack.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-gradient-to-r from-violet-500 to-purple-500 text-white px-3 py-1 rounded-full uppercase shadow-lg shadow-violet-500/20 whitespace-nowrap">
-                    {pack.badge}
-                  </span>
-                )}
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-2">{pack.name}</p>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-3xl font-black text-white">{pack.dollars}</span>
-                </div>
-                <p className="text-xs text-slate-500 mb-5">{pack.credits.toLocaleString()} API credits</p>
-                <button
-                  onClick={async () => {
-                    setBuyingApi(pack.id);
-                    try {
-                      await goToCheckout({
-                        variantId: pack.variantId,
-                        name: `${pack.name} (${pack.dollars} API Balance)`,
-                        kind: "one-time",
-                        description: "API balance is added automatically after payment confirmation.",
-                        returnTo: "/api-dashboard",
-                      });
-                    } catch {
-                      alert("Something went wrong.");
-                    } finally {
-                      setBuyingApi(null);
-                    }
-                  }}
-                  disabled={buyingApi === pack.id}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold text-sm transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-95 shadow-lg shadow-violet-500/20"
-                >
-                  {buyingApi === pack.id ? "Processing..." : `Buy ${pack.dollars}`}
                 </button>
               </div>
             ))}
