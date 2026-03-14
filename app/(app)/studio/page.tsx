@@ -90,7 +90,7 @@ export default function StudioPage() {
     const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
     const selectedModelConfig = VIDEO_MODELS.find(m => m.id === model) || VIDEO_MODELS[0];
-    const selectedPreset = VIDEO_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || VIDEO_STYLE_PRESETS[0];
+    const selectedPreset = stylePreset === "none" ? null : (VIDEO_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || VIDEO_STYLE_PRESETS[0]);
 
     useEffect(() => {
         fetch("/api/generations?type=video")
@@ -458,6 +458,24 @@ export default function StudioPage() {
                                         <span className="text-[10px] text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">{selectedPreset?.name || "None"}</span>
                                     </div>
                                     <div className="flex gap-3 overflow-x-auto snap-x pb-4 hide-scrollbar">
+                                        {/* None Option */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setStylePreset("none")}
+                                            className={`relative flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden snap-center outline-none transition-all duration-300 ${stylePreset === "none" ? 'ring-2 ring-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 opacity-60 hover:opacity-100'}`}
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-br from-[#0c1421] to-[#070b14] flex items-center justify-center">
+                                                <X className="w-6 h-6 text-white/30" />
+                                            </div>
+                                            <div className="absolute bottom-2 left-2 right-2">
+                                                <span className="text-[10px] font-bold text-white leading-tight drop-shadow-md">None</span>
+                                            </div>
+                                            {stylePreset === "none" && (
+                                                <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-cyan-500 flex items-center justify-center shadow-lg">
+                                                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                                </div>
+                                            )}
+                                        </button>
                                         {VIDEO_STYLE_PRESETS.map((preset) => (
                                             <button
                                                 key={preset.id}
