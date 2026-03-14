@@ -19,7 +19,7 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
             size: "1024x1024",
         },
         response: {
-            url: "https://fal.media/files/…/generated.webp",
+            imageUrl: "https://fal.media/files/…/generated.webp",
             model: "nano-banana-2",
             enhancedPrompt: "…",
         },
@@ -35,7 +35,7 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
             duration: "5",
         },
         response: {
-            url: "https://cdn.nexora.ai/…/generated.mp4",
+            videoUrl: "https://cdn.nexora.ai/…/generated.mp4",
             model: "google-veo-3",
             duration: "5s",
         },
@@ -106,7 +106,7 @@ response = requests.post(
 )
 
 data = response.json()
-print(data${activeTab === "director" ? '["video_url"]' : '["url"]'})`;
+print(data${activeTab === "director" ? '[\"video_url\"]' : activeTab === "image" ? '[\"imageUrl\"]' : '[\"videoUrl\"]'})`;
 
     const jsExample = `const response = await fetch("${BASE}${ep.path}", {
   method: "POST",
@@ -118,7 +118,7 @@ print(data${activeTab === "director" ? '["video_url"]' : '["url"]'})`;
 });
 
 const data = await response.json();
-console.log(data.${activeTab === "director" ? "video_url" : "url"});`;
+console.log(data.${activeTab === "director" ? "video_url" : activeTab === "image" ? "imageUrl" : "videoUrl"});`;
 
     return (
         <div className="relative min-h-screen bg-black text-white">
