@@ -226,7 +226,6 @@ export function estimateImageCost(model: string) {
 
 export function estimateVideoCost(model: string) {
     const costsInCents: Record<string, number> = {
-        "wan-2.1-turbo": 100,
         "kling-3": 100,
         "google-veo-3": 100,
         "seedance-2": 100,

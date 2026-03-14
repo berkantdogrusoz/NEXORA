@@ -9,6 +9,8 @@ import { GoogleGenAI } from "@google/genai";
 
 export const maxDuration = 300; // 5 minutes for video generation
 
+const SUPPORTED_VIDEO_MODELS = ["kling-3", "google-veo-3", "seedance-2", "sora-2"] as const;
+
 export async function POST(req: Request) {
     let creditDeducted = false;
     let deductedCost = 0;
@@ -49,6 +51,13 @@ export async function POST(req: Request) {
         } = body;
 
         const finalQuality: "hd" | "sd" = quality === "sd" ? "sd" : "hd";
+
+        if (!SUPPORTED_VIDEO_MODELS.includes(modelId as any)) {
+            return NextResponse.json({
+                error: `Unsupported video model: ${modelId}`,
+                supportedModels: SUPPORTED_VIDEO_MODELS,
+            }, { status: 400 });
+        }
 
         if (!prompt && !imageUrl) {
             return NextResponse.json({ error: "Prompt or reference image is required" }, { status: 400 });

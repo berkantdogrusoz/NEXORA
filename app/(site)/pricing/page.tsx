@@ -27,8 +27,8 @@ const PLANS = [
     features: [
       { text: "50 AI credits (One-time)", has: true },
       { text: "GPT-4o Mini (Chat)", has: true },
-      { text: "Wan-2.1 + Kling 3.0 (Video)", has: true },
-      { text: "DALL-E 3 (Image Generation)", has: true },
+      { text: "Kling 3.0 + Google Veo 3 (Video)", has: true },
+      { text: "Nano Banana 2 (Image Generation)", has: true },
       { text: "AI Assistant", has: true },
       { text: "GPT-4o / Gemini (Pro Models)", has: false },
       { text: "Cinematic HD Video", has: false },
