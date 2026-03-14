@@ -30,13 +30,13 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
         desc: "Generate a short video from a text prompt.",
         body: {
             prompt: "A slow-motion cinematic shot of ocean waves at sunset",
-            model: "kling-3",
+            model: "google-veo-3",
             aspectRatio: "16:9",
             duration: "5",
         },
         response: {
             url: "https://cdn.nexora.ai/…/generated.mp4",
-            model: "kling-3",
+            model: "google-veo-3",
             duration: "5s",
         },
     },
@@ -61,6 +61,7 @@ const PRICING = [
     { model: "recraft-v3", type: "Image", cost: "$0.40" },
     { model: "dall-e-3", type: "Image", cost: "$0.50" },
     { model: "wan-2.1-turbo", type: "Video", cost: "$1.00" },
+    { model: "google-veo-3", type: "Video", cost: "$1.00" },
     { model: "kling-3", type: "Video", cost: "$1.00" },
     { model: "seedance-2", type: "Video", cost: "$1.00" },
     { model: "sora-2", type: "Video", cost: "$1.00" },
