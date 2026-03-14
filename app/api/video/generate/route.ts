@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { replicate } from "@/lib/replicate";
 import * as fal from "@fal-ai/serverless-client";
 import { getAuthUserId, checkRateLimit } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
 import { hasProModelAccess, STANDARD_DAILY_GENERATION_LIMIT } from "@/lib/plans";
 import { buildEnhancedPrompt } from "@/lib/prompt-engine";
 import { getDefaultStylePresetId } from "@/lib/style-presets";
+import { GoogleGenAI } from "@google/genai";
 
 export const maxDuration = 300; // 5 minutes for video generation
 
@@ -76,6 +76,7 @@ export async function POST(req: Request) {
         // Cost mapping
         const costMap: Record<string, number> = {
             "kling-3": 50,
+            "google-veo-3": 180,
             "seedance-2": 100,
             "sora-2": 120,
         };
@@ -225,6 +226,96 @@ export async function POST(req: Request) {
                 finalUrl = result.video.url;
             } else {
                 throw new Error("Invalid output from fal.ai Kling");
+            }
+
+        } else if (modelId === "google-veo-3") {
+            if (resolvedImageUrl) {
+                throw new Error("Google Veo 3 currently supports text-to-video only in Nexora.");
+            }
+
+            if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+                throw new Error("GOOGLE_GENERATIVE_AI_API_KEY missing.");
+            }
+
+            const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
+            const veoModel = process.env.GOOGLE_VEO_VIDEO_MODEL || "veo-3.0-generate-preview";
+
+            const configCandidates: Array<Record<string, any>> = [
+                {
+                    numberOfVideos: 1,
+                    durationSeconds: duration === "10" ? 10 : 5,
+                    aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                    resolution: finalQuality === "sd" ? "720p" : "1080p",
+                    personGeneration: "allow_adult",
+                    enhancePrompt: true,
+                },
+                {
+                    numberOfVideos: 1,
+                    durationSeconds: duration === "10" ? 10 : 5,
+                    aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                    personGeneration: "allow_adult",
+                    enhancePrompt: true,
+                },
+                {
+                    numberOfVideos: 1,
+                    durationSeconds: duration === "10" ? 10 : 5,
+                    aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                },
+            ];
+
+            let operation: any = null;
+            let lastCreateError: unknown = null;
+
+            for (const config of configCandidates) {
+                try {
+                    operation = await ai.models.generateVideos({
+                        model: veoModel,
+                        source: { prompt: providerPrompt },
+                        config,
+                    });
+                    break;
+                } catch (createError) {
+                    lastCreateError = createError;
+                }
+            }
+
+            if (!operation) {
+                throw lastCreateError instanceof Error
+                    ? lastCreateError
+                    : new Error("Google Veo request failed before operation creation.");
+            }
+
+            let currentOp = operation;
+            for (let i = 0; i < 120 && !currentOp.done; i++) {
+                await new Promise((r) => setTimeout(r, 3000));
+                currentOp = await ai.operations.getVideosOperation({ operation: currentOp });
+            }
+
+            if (!currentOp.done) {
+                throw new Error("Google Veo generation timed out after 6 minutes.");
+            }
+
+            const generatedVideo = currentOp.response?.generatedVideos?.[0]?.video;
+            if (!generatedVideo) {
+                throw new Error("Google Veo returned no video.");
+            }
+
+            const candidateUrl = (generatedVideo as any).uri || (generatedVideo as any).url;
+            if (typeof candidateUrl === "string" && candidateUrl.startsWith("http")) {
+                finalUrl = candidateUrl;
+            } else {
+                const tmpPath = `/tmp/nexora-veo-${Date.now()}.mp4`;
+                await ai.files.download({ file: generatedVideo as any, downloadPath: tmpPath });
+                const videoBuffer = Buffer.from(await (await import("fs/promises")).readFile(tmpPath));
+                const filename = `videos/${Date.now()}-veo-${Math.random().toString(36).slice(2)}.mp4`;
+                const sb = createSupabaseServer();
+                const { error: uploadError } = await sb.storage
+                    .from("instagram-images")
+                    .upload(filename, videoBuffer, { contentType: "video/mp4", upsert: false });
+
+                if (uploadError) throw new Error("Failed to save Google Veo output.");
+                const { data: pub } = sb.storage.from("instagram-images").getPublicUrl(filename);
+                finalUrl = pub.publicUrl;
             }
 
         } else if (modelId === "seedance-2") {
