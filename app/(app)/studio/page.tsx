@@ -24,6 +24,7 @@ const DURATIONS = [
 
 const VIDEO_MODELS = [
     { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true, note: "" },
+    { id: "google-veo-3", name: "Google Veo 3", tier: "Free", cost: 180, supportsImage: false, note: "Premium quality" },
     { id: "seedance-2", name: "Seedance 1.5 Pro", tier: "Pro", cost: 100, supportsImage: true, note: "Audio sync" },
     { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true, note: "No 1:1 · 4s/8s" },
 ];
