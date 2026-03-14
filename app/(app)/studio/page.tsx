@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Upload, X, Loader2, Settings2, ChevronDown, Clapperboard, Video, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import { getStylePresetsForMode } from "@/lib/style-presets";
 import { resizeAndCompress } from "@/app/components/generation/image-upload-utils";
 import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
 import VideoPreviewOverlay from "@/app/components/generation/video-preview-overlay";
@@ -68,7 +68,7 @@ export default function StudioPage() {
     const [aspectRatio, setAspectRatio] = useState("16:9");
     const [duration, setDuration] = useState("5");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
-    const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("video"));
+    const [stylePreset, setStylePreset] = useState("none");
     const [enhanceMode, setEnhanceMode] = useState<"auto" | "on" | "off">("auto");
     const [intensity, setIntensity] = useState(70);
     const [customDirection, setCustomDirection] = useState("");
