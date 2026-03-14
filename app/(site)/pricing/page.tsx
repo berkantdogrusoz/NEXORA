@@ -49,7 +49,7 @@ const PLANS = [
     features: [
       { text: "200 AI credits / month", has: true },
       { text: "Daily generation cap (6/day)", has: true },
-      { text: "Kling 3.0 + Wan 2.1 (Video)", has: true },
+      { text: "Kling 3.0 + Google Veo 3 (Video)", has: true },
       { text: "Nano Banana 2 (Image)", has: true },
       { text: "AI Assistant (GPT-4o Mini)", has: true },
       { text: "Pro Video Models (Seedance, Sora)", has: false },
@@ -92,7 +92,7 @@ const PLANS = [
     badge: null,
     features: [
       { text: "1,000 AI credits / month", has: true },
-      { text: "All AI Models (Seedance, Kling 3.0, Sora 2, Higgsfield Director)", has: true },
+      { text: "All AI Models (Google Veo 3, Seedance, Kling 3.0, Sora 2, Higgsfield Director)", has: true },
       { text: "Cinematic Video (Highest quality)", has: true },
       { text: "Premium Image Generation (DALL-E 3, Nano Banana 2, Recraft)", has: true },
       { text: "Image-to-Video + All Pro Features", has: true },
@@ -373,7 +373,7 @@ export default function PricingPage() {
               },
               {
                 q: "Which AI models are used?",
-                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, Nano Banana 2, Recraft V3 (images), Wan-2.1, Kling 3.0, Seedance 2.0, Sora 2, Higgsfield Director Studio (video)."
+                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, Nano Banana 2, Recraft V3 (images), Google Veo 3, Kling 3.0, Seedance 2.0, Sora 2, Higgsfield Director Studio (video)."
               },
             ].map((faq, i) => (
               <div key={i} className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
