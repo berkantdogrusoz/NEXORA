@@ -50,7 +50,7 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
             blueprint: "handshake",
         },
         response: {
-            video_url: "https://cdn.nexora.ai/…/directed.mp4",
+            url: "https://cdn.nexora.ai/…/directed.mp4",
             model: "dop-preview",
         },
     },
@@ -106,7 +106,7 @@ response = requests.post(
 )
 
 data = response.json()
-print(data${activeTab === "director" ? '[\"video_url\"]' : activeTab === "image" ? '[\"imageUrl\"]' : '[\"videoUrl\"]'})`;
+print(data${activeTab === "director" ? '[\"url\"]' : activeTab === "image" ? '[\"imageUrl\"]' : '[\"videoUrl\"]'})`;
 
     const jsExample = `const response = await fetch("${BASE}${ep.path}", {
   method: "POST",
@@ -118,7 +118,7 @@ print(data${activeTab === "director" ? '[\"video_url\"]' : activeTab === "image"
 });
 
 const data = await response.json();
-console.log(data.${activeTab === "director" ? "video_url" : activeTab === "image" ? "imageUrl" : "videoUrl"});`;
+console.log(data.${activeTab === "director" ? "url" : activeTab === "image" ? "imageUrl" : "videoUrl"});`;
 
     return (
         <div className="relative min-h-screen bg-black text-white">

@@ -242,6 +242,10 @@ export async function POST(req: Request) {
                 throw new Error("Google Veo 3 currently supports text-to-video only in Nexora.");
             }
 
+            if (aspectRatio === "1:1") {
+                return NextResponse.json({ error: "Google Veo 3 supports only 16:9 and 9:16 aspect ratios." }, { status: 400 });
+            }
+
             if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
                 throw new Error("GOOGLE_GENERATIVE_AI_API_KEY missing.");
             }
