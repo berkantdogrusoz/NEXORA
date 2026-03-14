@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Upload, X, Loader2, Settings2, ChevronDown, Clapperboard } from "lucide-react";
+import { Upload, X, Loader2, Settings2, ChevronDown, Clapperboard, Video, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
 import { resizeAndCompress } from "@/app/components/generation/image-upload-utils";
@@ -24,12 +24,36 @@ const DURATIONS = [
 
 const VIDEO_MODELS = [
     { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true, note: "" },
-    { id: "luma", name: "Luma Ray 2", tier: "Pro", cost: 60, supportsImage: true, note: "" },
-    { id: "runway-gen4", name: "Runway Gen-4.5", tier: "Pro", cost: 75, supportsImage: true, note: "" },
-    { id: "runway-gwm", name: "GWM-1", tier: "Pro", cost: 85, supportsImage: true, note: "" },
-    { id: "seedance-2", name: "Seedance 1.5", tier: "Pro", cost: 100, supportsImage: true, note: "Audio sync" },
+    { id: "seedance-2", name: "Seedance 1.5 Pro", tier: "Pro", cost: 100, supportsImage: true, note: "Audio sync" },
     { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true, note: "No 1:1 · 4s/8s" },
 ];
+
+const CAMERA_MOVEMENTS = [
+    { id: "auto", label: "Auto" },
+    { id: "dolly-in", label: "Dolly In" },
+    { id: "dolly-out", label: "Dolly Out" },
+    { id: "crane-up", label: "Crane Up" },
+    { id: "crane-down", label: "Crane Down" },
+    { id: "orbit-left", label: "Orbit L" },
+    { id: "orbit-right", label: "Orbit R" },
+    { id: "pan-left", label: "Pan L" },
+    { id: "pan-right", label: "Pan R" },
+    { id: "tilt-up", label: "Tilt Up" },
+    { id: "tilt-down", label: "Tilt Down" },
+    { id: "tracking", label: "Tracking" },
+    { id: "steadicam", label: "Steadicam" },
+    { id: "handheld", label: "Handheld" },
+    { id: "static", label: "Static" },
+    { id: "zoom-in", label: "Zoom In" },
+    { id: "aerial", label: "Aerial" },
+    { id: "fixed", label: "Fixed" },
+];
+
+const ENHANCE_MODES = [
+    { id: "auto", label: "Auto", description: "AI decides based on prompt complexity" },
+    { id: "on", label: "On", description: "Always enhance with GPT-4o" },
+    { id: "off", label: "Off", description: "Use raw prompt as-is" },
+] as const;
 
 const VIDEO_STYLE_PRESETS = getStylePresetsForMode("video");
 
@@ -44,9 +68,12 @@ export default function StudioPage() {
     const [duration, setDuration] = useState("5");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
     const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("video"));
-    const [enhancePrompt, setEnhancePrompt] = useState(true);
+    const [enhanceMode, setEnhanceMode] = useState<"auto" | "on" | "off">("auto");
     const [intensity, setIntensity] = useState(70);
     const [customDirection, setCustomDirection] = useState("");
+    const [cameraMovement, setCameraMovement] = useState("auto");
+    const [motionIntensity, setMotionIntensity] = useState(50);
+    const [motionControlEnabled, setMotionControlEnabled] = useState(false);
     
     // Image Upload State
     const [referenceImage, setReferenceImage] = useState<string | null>(null);
@@ -163,7 +190,9 @@ export default function StudioPage() {
                     stylePreset,
                     intensity,
                     customDirection,
-                    enhancePrompt,
+                    enhancePrompt: enhanceMode === "off" ? false : true,
+                    cameraMovement: motionControlEnabled ? cameraMovement : "auto",
+                    motionIntensity: motionControlEnabled ? motionIntensity / 100 : undefined,
                 }),
             });
 
@@ -454,18 +483,27 @@ export default function StudioPage() {
                                     </div>
                                 </div>
 
-                                {/* Enhance */}
-                                <div className="flex items-center justify-between bg-black/40 border border-white/5 rounded-xl px-4 py-3">
-                                    <div>
-                                        <p className="text-[10px] font-bold text-white uppercase tracking-wider">AI Enhance</p>
-                                        <p className="text-[9px] text-white/40 mt-0.5">Auto-optimizes prompt for quality</p>
+                                {/* Prompt Enhance Mode */}
+                                <div>
+                                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">
+                                        <Sparkles className="w-3 h-3 inline mr-1.5" />
+                                        Prompt Enhance
+                                    </label>
+                                    <div className="flex gap-2">
+                                        {ENHANCE_MODES.map(em => (
+                                            <button
+                                                key={em.id}
+                                                onClick={() => setEnhanceMode(em.id)}
+                                                className={`flex-1 py-2 text-[10px] rounded-xl border text-center transition-all font-bold ${enhanceMode === em.id
+                                                    ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
+                                                    : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
+                                                }`}
+                                                title={em.description}
+                                            >
+                                                {em.label}
+                                            </button>
+                                        ))}
                                     </div>
-                                    <button
-                                        onClick={() => setEnhancePrompt(!enhancePrompt)}
-                                        className={`w-9 h-5 rounded-full transition-colors relative ${enhancePrompt ? "bg-cyan-500" : "bg-white/10"}`}
-                                    >
-                                        <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${enhancePrompt ? "left-[18px]" : "left-0.5"}`} />
-                                    </button>
                                 </div>
 
                                 {/* Intensity */}
@@ -480,6 +518,66 @@ export default function StudioPage() {
                                         onChange={(e) => setIntensity(Number(e.target.value))}
                                         className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
                                     />
+                                </div>
+
+                                {/* Motion Control Toggle + Options */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between bg-black/40 border border-white/5 rounded-xl px-4 py-3">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-white uppercase tracking-wider">
+                                                <Video className="w-3 h-3 inline mr-1.5" />
+                                                Motion Control
+                                            </p>
+                                            <p className="text-[9px] text-white/40 mt-0.5">Camera movement & motion intensity</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setMotionControlEnabled(!motionControlEnabled)}
+                                            className={`w-9 h-5 rounded-full transition-colors relative ${motionControlEnabled ? "bg-cyan-500" : "bg-white/10"}`}
+                                        >
+                                            <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${motionControlEnabled ? "left-[18px]" : "left-0.5"}`} />
+                                        </button>
+                                    </div>
+
+                                    {motionControlEnabled && (
+                                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            {/* Camera Movement Grid */}
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-2">Camera Movement</label>
+                                                <div className="grid grid-cols-3 gap-1.5 max-h-[160px] overflow-y-auto hide-scrollbar pr-1">
+                                                    {CAMERA_MOVEMENTS.map(cm => (
+                                                        <button
+                                                            key={cm.id}
+                                                            onClick={() => setCameraMovement(cm.id)}
+                                                            className={`px-2 py-1.5 text-[9px] rounded-lg border text-center transition-all font-bold truncate ${cameraMovement === cm.id
+                                                                ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
+                                                                : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {cm.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Motion Intensity Slider */}
+                                            <div>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Motion Intensity</label>
+                                                    <span className="text-[10px] text-cyan-400 font-bold">{motionIntensity}%</span>
+                                                </div>
+                                                <input
+                                                    type="range" min="0" max="100"
+                                                    value={motionIntensity}
+                                                    onChange={(e) => setMotionIntensity(Number(e.target.value))}
+                                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:rounded-full"
+                                                />
+                                                <div className="flex justify-between mt-1">
+                                                    <span className="text-[8px] text-white/30">Subtle</span>
+                                                    <span className="text-[8px] text-white/30">Intense</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>

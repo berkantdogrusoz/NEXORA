@@ -44,6 +44,8 @@ export async function POST(req: Request) {
             intensity,
             customDirection,
             enhancePrompt = true,
+            cameraMovement,
+            motionIntensity,
         } = body;
 
         const finalQuality: "hd" | "sd" = quality === "sd" ? "sd" : "hd";
@@ -185,6 +187,8 @@ export async function POST(req: Request) {
             intensity: typeof intensity === "number" ? intensity : Number(intensity),
             customDirection,
             enhancePrompt,
+            cameraMovement,
+            motionIntensity: typeof motionIntensity === "number" ? motionIntensity : undefined,
         });
         const providerPrompt = enhanced.enhancedPrompt;
 
@@ -231,11 +235,12 @@ export async function POST(req: Request) {
 
             const falInput: any = {
                 prompt: providerPrompt,
-                duration: duration === "10s" || duration === "10" ? "10" : "5",
+                duration: duration === "10s" || duration === "10" ? 10 : 5,
                 aspect_ratio: aspectRatio,
                 resolution: "720p",
                 generate_audio: true,
             };
+            if (cameraMovement === "fixed") falInput.camera_fixed = true;
             if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
             const result: any = await fal.subscribe(falModel, {
