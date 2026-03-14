@@ -240,10 +240,8 @@ export async function POST(req: Request) {
             const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
             const veoModel = process.env.GOOGLE_VEO_VIDEO_MODEL || "veo-3.0-generate-preview";
 
-            const operation = await ai.models.generateVideos({
-                model: veoModel,
-                source: { prompt: providerPrompt },
-                config: {
+            const configCandidates: Array<Record<string, any>> = [
+                {
                     numberOfVideos: 1,
                     durationSeconds: duration === "10" ? 10 : 5,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
@@ -251,7 +249,41 @@ export async function POST(req: Request) {
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
                 },
-            });
+                {
+                    numberOfVideos: 1,
+                    durationSeconds: duration === "10" ? 10 : 5,
+                    aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                    personGeneration: "allow_adult",
+                    enhancePrompt: true,
+                },
+                {
+                    numberOfVideos: 1,
+                    durationSeconds: duration === "10" ? 10 : 5,
+                    aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                },
+            ];
+
+            let operation: any = null;
+            let lastCreateError: unknown = null;
+
+            for (const config of configCandidates) {
+                try {
+                    operation = await ai.models.generateVideos({
+                        model: veoModel,
+                        source: { prompt: providerPrompt },
+                        config,
+                    });
+                    break;
+                } catch (createError) {
+                    lastCreateError = createError;
+                }
+            }
+
+            if (!operation) {
+                throw lastCreateError instanceof Error
+                    ? lastCreateError
+                    : new Error("Google Veo request failed before operation creation.");
+            }
 
             let currentOp = operation;
             for (let i = 0; i < 120 && !currentOp.done; i++) {
