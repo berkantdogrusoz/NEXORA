@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Upload, X, Loader2, Settings2, ChevronDown, Clapperboard, Video, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import { getStylePresetsForMode } from "@/lib/style-presets";
 import { resizeAndCompress } from "@/app/components/generation/image-upload-utils";
 import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
 import VideoPreviewOverlay from "@/app/components/generation/video-preview-overlay";
@@ -24,6 +24,7 @@ const DURATIONS = [
 
 const VIDEO_MODELS = [
     { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true, note: "" },
+    { id: "google-veo-3", name: "Google Veo 3", tier: "Free", cost: 40, supportsImage: false, note: "Premium quality" },
     { id: "seedance-2", name: "Seedance 1.5 Pro", tier: "Pro", cost: 100, supportsImage: true, note: "Audio sync" },
     { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true, note: "No 1:1 · 4s/8s" },
 ];
@@ -67,7 +68,7 @@ export default function StudioPage() {
     const [aspectRatio, setAspectRatio] = useState("16:9");
     const [duration, setDuration] = useState("5");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
-    const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("video"));
+    const [stylePreset, setStylePreset] = useState("none");
     const [enhanceMode, setEnhanceMode] = useState<"auto" | "on" | "off">("auto");
     const [intensity, setIntensity] = useState(70);
     const [customDirection, setCustomDirection] = useState("");
