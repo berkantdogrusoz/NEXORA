@@ -245,7 +245,7 @@ export async function POST(req: Request) {
                     numberOfVideos: 1,
                     durationSeconds: duration === "10" ? 10 : 5,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
-                    resolution: finalQuality === "sd" ? "720p" : "1080p",
+                    resolution: finalQuality === "sd" ? "medium" : "high",
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
                 },
@@ -295,12 +295,36 @@ export async function POST(req: Request) {
                 throw new Error("Google Veo generation timed out after 6 minutes.");
             }
 
-            const generatedVideo = currentOp.response?.generatedVideos?.[0]?.video;
+            const responseAny: any = currentOp.response || {};
+            const generatedContainer =
+                responseAny?.generatedVideos?.[0]
+                || responseAny?.generated_videos?.[0]
+                || responseAny?.videos?.[0]
+                || null;
+            const generatedVideo =
+                generatedContainer?.video
+                || generatedContainer?.output?.video
+                || generatedContainer
+                || null;
+
             if (!generatedVideo) {
-                throw new Error("Google Veo returned no video.");
+                const filteredCount = Number(responseAny?.raiMediaFilteredCount ?? responseAny?.rai_media_filtered_count ?? 0);
+                const filteredReasons = responseAny?.raiMediaFilteredReasons || responseAny?.rai_media_filtered_reasons;
+                if (filteredCount > 0) {
+                    throw new Error(`Google Veo output blocked by safety filters (${filteredCount}). ${Array.isArray(filteredReasons) ? filteredReasons.join(", ") : ""}`.trim());
+                }
+                throw new Error("Google Veo returned no video. Try a safer/shorter prompt or switch model to veo-2.0-generate-001.");
             }
 
-            const candidateUrl = (generatedVideo as any).uri || (generatedVideo as any).url;
+            const candidateUrl =
+                (generatedVideo as any)?.uri
+                || (generatedVideo as any)?.url
+                || (generatedVideo as any)?.downloadUri
+                || (generatedVideo as any)?.download_url
+                || (generatedVideo as any)?.fileUri
+                || (generatedContainer as any)?.uri
+                || (generatedContainer as any)?.url;
+
             if (typeof candidateUrl === "string" && candidateUrl.startsWith("http")) {
                 finalUrl = candidateUrl;
             } else {
