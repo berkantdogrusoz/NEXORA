@@ -128,39 +128,26 @@ export default function PricingPage() {
       .catch(() => { });
   }, []);
 
-  const goToCheckout = async (params: {
+  const goToCheckout = (params: {
     variantId: string;
     name: string;
+    price: string;
     kind: "subscription" | "one-time";
     description: string;
     returnTo: string;
   }) => {
-    try {
-      const res = await fetch("/api/lemon/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          variantId: params.variantId,
-          redirectPath: params.returnTo,
-          name: params.name,
-          description: params.description,
-          kind: params.kind,
-        }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else if (res.status === 401) {
-        router.push("/sign-up");
-      } else {
-        alert(data.error || "Checkout failed.");
-      }
-    } catch {
-      alert("Something went wrong. Please try again.");
-    }
+    const query = new URLSearchParams({
+      variantId: params.variantId,
+      name: params.name,
+      price: params.price,
+      kind: params.kind,
+      description: params.description,
+      returnTo: params.returnTo,
+    });
+    router.push(`/checkout?${query.toString()}`);
   };
 
-  const handleCheckout = async (plan: "Standard" | "Growth" | "Pro") => {
+  const handleCheckout = (plan: "Standard" | "Growth" | "Pro") => {
     setLoading(plan);
     const variantId = plan === "Standard"
       ? process.env.NEXT_PUBLIC_LEMON_VARIANT_STANDARD
@@ -175,15 +162,16 @@ export default function PricingPage() {
     }
 
     const planTitle = plan === "Growth" ? "Nexora" : plan;
+    const price = plan === "Standard" ? "$9 / month" : plan === "Growth" ? "$29 / month" : "$59 / month";
 
-    await goToCheckout({
+    goToCheckout({
       variantId,
       name: `${planTitle} plan`,
+      price,
       kind: "subscription",
       description: "Subscription is managed in your account and can be cancelled anytime.",
       returnTo: "/dashboard",
     });
-    setLoading(null);
   };
 
   return (
@@ -346,9 +334,10 @@ export default function PricingPage() {
                   onClick={async () => {
                     setBuyingCredits(pack.id);
                     try {
-                      await goToCheckout({
+                      goToCheckout({
                         variantId: pack.variantId,
                         name: `${pack.name} (${pack.credits} credits)`,
+                        price: `${pack.price} one-time`,
                         kind: "one-time",
                         description: "Credits are delivered automatically after payment confirmation.",
                         returnTo: "/pricing",

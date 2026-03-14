@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CreditCard, Lock, ShieldCheck, Sparkles } from "lucide-react";
-import { createCheckoutAction } from "@/app/actions/checkout";
 
 function safeReturnPath(value: string | null) {
     if (!value || !value.startsWith("/")) return "/dashboard";
@@ -43,28 +42,45 @@ export default function CheckoutPage() {
         setOpening(true);
 
         try {
-            const result = await createCheckoutAction({
-                variantId: details.variantId,
-                redirectPath: details.returnTo,
-                name: details.name,
-                description: details.description,
-                kind: details.kind,
+            const response = await fetch("/api/lemon/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    variantId: details.variantId,
+                    redirectPath: details.returnTo,
+                    name: details.name,
+                    description: details.description,
+                    kind: details.kind,
+                }),
             });
 
-            if (result.url) {
-                window.location.href = result.url;
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                if (response.status === 401 || response.status === 403) {
+                    const redirectBack = `/checkout?${searchParams.toString()}`;
+                    router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectBack)}`);
+                    return;
+                }
+                window.alert("Checkout could not be started. Please sign in and try again.");
                 return;
             }
 
-            if (result.error?.includes("sign in")) {
+            const data = await response.json();
+
+            if (data.url) {
+                window.location.href = data.url;
+                return;
+            }
+
+            if (response.status === 401) {
                 const redirectBack = `/checkout?${searchParams.toString()}`;
                 router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectBack)}`);
                 return;
             }
 
-            window.alert(result.error || "Checkout could not be started.");
+            window.alert(data.error || "Checkout could not be started.");
         } catch {
-            window.alert("Checkout could not be started. Please try again.");
+            window.alert("Checkout could not be started.");
         } finally {
             setOpening(false);
         }
