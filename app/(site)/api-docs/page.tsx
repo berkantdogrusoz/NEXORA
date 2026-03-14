@@ -19,7 +19,7 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
             size: "1024x1024",
         },
         response: {
-            url: "https://fal.media/files/…/generated.webp",
+            imageUrl: "https://fal.media/files/…/generated.webp",
             model: "nano-banana-2",
             enhancedPrompt: "…",
         },
@@ -30,13 +30,13 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
         desc: "Generate a short video from a text prompt.",
         body: {
             prompt: "A slow-motion cinematic shot of ocean waves at sunset",
-            model: "kling-3",
+            model: "google-veo-3",
             aspectRatio: "16:9",
             duration: "5",
         },
         response: {
-            url: "https://cdn.nexora.ai/…/generated.mp4",
-            model: "kling-3",
+            videoUrl: "https://cdn.nexora.ai/…/generated.mp4",
+            model: "google-veo-3",
             duration: "5s",
         },
     },
@@ -60,7 +60,7 @@ const PRICING = [
     { model: "nano-banana-2", type: "Image", cost: "$0.30" },
     { model: "recraft-v3", type: "Image", cost: "$0.40" },
     { model: "dall-e-3", type: "Image", cost: "$0.50" },
-    { model: "wan-2.1-turbo", type: "Video", cost: "$1.00" },
+    { model: "google-veo-3", type: "Video", cost: "$1.00" },
     { model: "kling-3", type: "Video", cost: "$1.00" },
     { model: "seedance-2", type: "Video", cost: "$1.00" },
     { model: "sora-2", type: "Video", cost: "$1.00" },
@@ -106,7 +106,7 @@ response = requests.post(
 )
 
 data = response.json()
-print(data${activeTab === "director" ? '["video_url"]' : '["url"]'})`;
+print(data${activeTab === "director" ? '[\"video_url\"]' : activeTab === "image" ? '[\"imageUrl\"]' : '[\"videoUrl\"]'})`;
 
     const jsExample = `const response = await fetch("${BASE}${ep.path}", {
   method: "POST",
@@ -118,7 +118,7 @@ print(data${activeTab === "director" ? '["video_url"]' : '["url"]'})`;
 });
 
 const data = await response.json();
-console.log(data.${activeTab === "director" ? "video_url" : "url"});`;
+console.log(data.${activeTab === "director" ? "video_url" : activeTab === "image" ? "imageUrl" : "videoUrl"});`;
 
     return (
         <div className="relative min-h-screen bg-black text-white">
