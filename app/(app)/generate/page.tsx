@@ -17,19 +17,16 @@ const SIZES = [
 ];
 
 const IMAGE_MODELS = [
-  { id: "flux-2-dev", name: "FLUX 2 Dev", tier: "Standard", cost: 15 },
-  { id: "flux-schnell", name: "FLUX Schnell", tier: "Standard", cost: 15 },
-  { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 30 },
   { id: "nano-banana-2", name: "Nano Banana 2 🍌", tier: "Free", cost: 20 },
+  { id: "recraft-v3", name: "Recraft V3 (Design)", tier: "Pro", cost: 30 },
   { id: "dall-e-3", name: "DALL-E 3 (HD)", tier: "Pro", cost: 35 },
-  { id: "flux-pro", name: "FLUX 1.1 Pro", tier: "Pro", cost: 45 },
 ];
 
 export default function GeneratePage() {
   const { credits, deductCredits, refundCredits, planName } = useCredits();
 
   const [prompt, setPrompt] = useState("");
-  const [model, setModel] = useState("flux-2-dev");
+  const [model, setModel] = useState("nano-banana-2");
   const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("image"));
   const [enhancePrompt, setEnhancePrompt] = useState(true);
   const [intensity, setIntensity] = useState(70);

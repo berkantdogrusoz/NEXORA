@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Nexora AI",
   },
   description:
-    "Generate cinematic AI videos and stunning images from simple text prompts. Powered by DALL-E 3, FLUX, Seedance 2.0, Runway Gen-4.5, and 10+ AI models. Metinden video oluşturma, yapay zeka görsel üretici ve AI stüdyo.",
+    "Generate cinematic AI videos and stunning images from simple text prompts. Powered by DALL-E 3, Nano Banana 2, Seedance 2.0, Kling 3.0, Sora 2, and 10+ AI models. Metinden video oluşturma, yapay zeka görsel üretici ve AI stüdyo.",
   keywords: [
     "AI video generator",
     "AI image generator",
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
     "ücretsiz yapay zeka",
     "Seedance",
     "DALL-E 3",
-    "FLUX",
-    "Runway",
+    "Kling",
+    "Sora",
     "Nexora AI",
     "free AI video",
     "AI content creator",
@@ -124,4 +124,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-

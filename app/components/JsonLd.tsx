@@ -26,7 +26,7 @@ export default function JsonLd() {
             description: "Free tier with 100 credits",
         },
         description:
-            "Create cinematic AI videos and stunning images with Nexora AI. Powered by DALL-E 3, FLUX, Seedance 2.0, Runway, and more.",
+            "Create cinematic AI videos and stunning images with Nexora AI. Powered by DALL-E 3, Nano Banana 2, Seedance 2.0, Kling 3.0, Sora 2, and more.",
         featureList: [
             "AI Video Generation",
             "AI Image Generation",

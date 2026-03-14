@@ -58,14 +58,14 @@ export default function DashboardPage() {
             href: "/studio",
             icon: Clapperboard,
             label: "Video Studio",
-            desc: "Kling 3.0, Luma, Runway",
+            desc: "Kling 3.0, Seedance, Sora 2",
             accent: "cyan",
         },
         {
             href: "/generate",
             icon: ImagePlus,
             label: "Image Gen",
-            desc: "DALL-E 3, FLUX, Recraft",
+            desc: "DALL-E 3, Nano Banana 2, Recraft",
             accent: "blue",
         },
         {

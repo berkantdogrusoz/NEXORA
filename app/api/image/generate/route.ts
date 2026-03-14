@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         const {
             prompt,
             size = "1024x1024",
-            model: modelId = "flux-2-dev",
+            model: modelId = "nano-banana-2",
             stylePreset,
             intensity,
             customDirection,
@@ -57,9 +57,9 @@ export async function POST(req: Request) {
         const finalSize = validSizes.includes(size) ? size : "1024x1024";
 
         // Validate Model & Cost
-        const validModels = ["dall-e-3", "flux-schnell", "flux-pro", "flux-2-dev", "recraft-v3", "nano-banana-2"];
-        const finalModel = validModels.includes(modelId) ? modelId : "flux-2-dev";
-        const cost = finalModel === "flux-pro" ? 45 : finalModel === "dall-e-3" ? 35 : finalModel === "recraft-v3" ? 30 : finalModel === "nano-banana-2" ? 20 : finalModel === "flux-schnell" ? 15 : 15;
+        const validModels = ["dall-e-3", "recraft-v3", "nano-banana-2"];
+        const finalModel = validModels.includes(modelId) ? modelId : "nano-banana-2";
+        const cost = finalModel === "dall-e-3" ? 35 : finalModel === "recraft-v3" ? 30 : 20;
 
         // Check user plan and credits
         const supabase = createSupabaseServer();
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         if (process.env.NODE_ENV === "development") planName = "Pro";
         const isDev = process.env.NODE_ENV === "development";
 
-        if (!skipWebBilling && (finalModel === "dall-e-3" || finalModel === "flux-pro" || finalModel === "recraft-v3") && !hasProModelAccess(planName)) {
+        if (!skipWebBilling && (finalModel === "dall-e-3" || finalModel === "recraft-v3") && !hasProModelAccess(planName)) {
             return NextResponse.json({ error: "You need a Premium plan to use Pro image models." }, { status: 403 });
         }
 
@@ -163,30 +163,6 @@ export async function POST(req: Request) {
             });
             imageUrl = response.data[0]?.url || "";
 
-        } else if (finalModel === "flux-2-dev") {
-            // fal.ai FLUX 2 Dev — uses image_size string
-            let aspect_ratio = "1:1";
-            if (finalSize === "1024x1792") aspect_ratio = "9:16";
-            if (finalSize === "1792x1024") aspect_ratio = "16:9";
-
-            const falImageSize = aspect_ratio === "1:1" ? "square_hd" : aspect_ratio === "16:9" ? "landscape_16_9" : "portrait_16_9";
-
-            const result: any = await fal.subscribe("fal-ai/flux/dev", {
-                input: {
-                    prompt: providerPrompt,
-                    image_size: falImageSize,
-                },
-                logs: true,
-            });
-
-            if (result?.images?.[0]?.url) {
-                imageUrl = result.images[0].url;
-            } else if (result?.image?.url) {
-                imageUrl = result.image.url;
-            } else {
-                throw new Error("No image in fal.ai FLUX response");
-            }
-
         } else if (finalModel === "recraft-v3") {
             // fal.ai Recraft V3 — uses image_size { width, height }
             const result: any = await fal.subscribe("fal-ai/recraft-v3", {
@@ -235,32 +211,7 @@ export async function POST(req: Request) {
             }
 
         } else {
-            // Replicate FLUX Generation (flux-schnell, flux-pro)
-            const { replicate } = await import("@/lib/replicate");
-
-            let aspect_ratio = "1:1";
-            if (finalSize === "1024x1792") aspect_ratio = "9:16";
-            if (finalSize === "1792x1024") aspect_ratio = "16:9";
-
-            const modelString = finalModel === "flux-pro"
-                ? "black-forest-labs/flux-1.1-pro"
-                : "black-forest-labs/flux-schnell";
-
-            const output = await replicate.run(modelString as any, {
-                input: {
-                    prompt: providerPrompt,
-                    aspect_ratio,
-                    output_format: "webp",
-                    output_quality: 90
-                }
-            });
-
-            let finalUrl = Array.isArray(output) ? output[0] : output;
-            if (typeof finalUrl === "object" && finalUrl !== null) {
-                if (typeof finalUrl.url === "function") finalUrl = finalUrl.url().toString();
-                else if (typeof finalUrl.url === "string") finalUrl = finalUrl.url;
-            }
-            imageUrl = typeof finalUrl === "string" ? finalUrl : "";
+            throw new Error(`Unsupported image model: ${finalModel}`);
         }
 
         if (!imageUrl) {
