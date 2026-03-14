@@ -61,7 +61,7 @@ const PRICING = [
     { model: "recraft-v3", type: "Image", cost: "$0.40" },
     { model: "dall-e-3", type: "Image", cost: "$0.50" },
     { model: "wan-2.1-turbo", type: "Video", cost: "$1.00" },
-    { model: "google-veo-3", type: "Video", cost: "$2.50" },
+    { model: "google-veo-3", type: "Video", cost: "$1.00" },
     { model: "kling-3", type: "Video", cost: "$1.00" },
     { model: "seedance-2", type: "Video", cost: "$1.00" },
     { model: "sora-2", type: "Video", cost: "$1.00" },

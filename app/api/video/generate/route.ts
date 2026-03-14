@@ -76,7 +76,7 @@ export async function POST(req: Request) {
         // Cost mapping
         const costMap: Record<string, number> = {
             "kling-3": 50,
-            "google-veo-3": 180,
+            "google-veo-3": 40,
             "seedance-2": 100,
             "sora-2": 120,
         };
@@ -325,22 +325,37 @@ export async function POST(req: Request) {
                 || (generatedContainer as any)?.uri
                 || (generatedContainer as any)?.url;
 
+            let videoBuffer: Buffer | null = null;
             if (typeof candidateUrl === "string" && candidateUrl.startsWith("http")) {
-                finalUrl = candidateUrl;
-            } else {
+                try {
+                    const directRes = await fetch(candidateUrl);
+                    if (directRes.ok) {
+                        videoBuffer = Buffer.from(await directRes.arrayBuffer());
+                    }
+                } catch {
+                    // fall through to SDK file download
+                }
+            }
+
+            if (!videoBuffer) {
                 const tmpPath = `/tmp/nexora-veo-${Date.now()}.mp4`;
                 await ai.files.download({ file: generatedVideo as any, downloadPath: tmpPath });
-                const videoBuffer = Buffer.from(await (await import("fs/promises")).readFile(tmpPath));
-                const filename = `videos/${Date.now()}-veo-${Math.random().toString(36).slice(2)}.mp4`;
-                const sb = createSupabaseServer();
-                const { error: uploadError } = await sb.storage
-                    .from("instagram-images")
-                    .upload(filename, videoBuffer, { contentType: "video/mp4", upsert: false });
-
-                if (uploadError) throw new Error("Failed to save Google Veo output.");
-                const { data: pub } = sb.storage.from("instagram-images").getPublicUrl(filename);
-                finalUrl = pub.publicUrl;
+                videoBuffer = Buffer.from(await (await import("fs/promises")).readFile(tmpPath));
             }
+
+            if (!videoBuffer || videoBuffer.length < 1000) {
+                throw new Error("Google Veo output could not be downloaded.");
+            }
+
+            const filename = `videos/${Date.now()}-veo-${Math.random().toString(36).slice(2)}.mp4`;
+            const sb = createSupabaseServer();
+            const { error: uploadError } = await sb.storage
+                .from("instagram-images")
+                .upload(filename, videoBuffer, { contentType: "video/mp4", upsert: false });
+
+            if (uploadError) throw new Error("Failed to save Google Veo output.");
+            const { data: pub } = sb.storage.from("instagram-images").getPublicUrl(filename);
+            finalUrl = pub.publicUrl;
 
         } else if (modelId === "seedance-2") {
             console.log(`Generating video using fal.ai Seedance 1.5 Pro (image-to-video: ${!!resolvedImageUrl})`);
