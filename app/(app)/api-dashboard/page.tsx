@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { KeyRound, BarChart3, Shield, Copy, Trash2, Plus, Coins } from "lucide-react";
+import { createCheckoutAction } from "@/app/actions/checkout";
 
 type ApiKeyItem = {
     id: string;
@@ -151,16 +152,23 @@ export default function ApiDashboardPage() {
         }
     };
 
-    const buyPack = (pack: { variantId: string; name: string; credits: number }) => {
-        const query = new URLSearchParams({
-            variantId: pack.variantId,
-            name: pack.name,
-            price: `$${(pack.credits / 100).toFixed(2)} one-time`,
-            kind: "one-time",
-            description: "API wallet balance is added automatically after payment confirmation.",
-            returnTo: "/api-dashboard",
-        });
-        window.location.href = `/checkout?${query.toString()}`;
+    const buyPack = async (pack: { variantId: string; name: string; credits: number }) => {
+        try {
+            const result = await createCheckoutAction({
+                variantId: pack.variantId,
+                redirectPath: "/api-dashboard",
+                name: pack.name,
+                description: "API wallet balance is added automatically after payment confirmation.",
+                kind: "one-time",
+            });
+            if (result.url) {
+                window.location.href = result.url;
+            } else {
+                window.alert(result.error || "Checkout failed.");
+            }
+        } catch {
+            window.alert("Something went wrong. Please try again.");
+        }
     };
 
     return (

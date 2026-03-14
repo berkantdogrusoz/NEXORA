@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { createCheckoutAction } from "@/app/actions/checkout";
+
 
 interface SubscriptionData {
     plan_name: string;
@@ -17,7 +18,6 @@ interface SubscriptionData {
 
 export default function SubscriptionPage() {
     const { credits, maxCredits, planName, refreshCredits } = useCredits();
-    const router = useRouter();
     const [sub, setSub] = useState<SubscriptionData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -238,15 +238,18 @@ export default function SubscriptionPage() {
                                         onClick={async () => {
                                             setBuyingCredits(pack.id);
                                             try {
-                                                const query = new URLSearchParams({
+                                                const result = await createCheckoutAction({
                                                     variantId: pack.variantId,
+                                                    redirectPath: "/subscription",
                                                     name: `${pack.name} (${pack.credits} credits)`,
-                                                    price: `${pack.price} one-time`,
-                                                    kind: "one-time",
                                                     description: "Credits are delivered automatically after successful payment.",
-                                                    returnTo: "/subscription",
+                                                    kind: "one-time",
                                                 });
-                                                router.push(`/checkout?${query.toString()}`);
+                                                if (result.url) {
+                                                    window.location.href = result.url;
+                                                } else {
+                                                    alert(result.error || "Checkout failed.");
+                                                }
                                             } catch {
                                                 alert("Something went wrong.");
                                             } finally {
@@ -270,7 +273,7 @@ export default function SubscriptionPage() {
                             {sub.plan_name === "Pro" && (
                                 <>
                                     <Feature text="1000 credits per month" />
-                                    <Feature text="All Pro AI models (Runway Gen-4.5, GWM-1, Seedance 2.0)" />
+                                    <Feature text="All Pro AI models (Seedance 2.0, Sora 2, Kling 3.0)" />
                                     <Feature text="HD & 10s video generation" />
                                     <Feature text="Priority processing" />
                                     <Feature text="Commercial usage rights" />

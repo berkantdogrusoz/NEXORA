@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createCheckoutAction } from "@/app/actions/checkout";
 
 const CHECK = (
   <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,9 +51,9 @@ const PLANS = [
       { text: "200 AI credits / month", has: true },
       { text: "Daily generation cap (6/day)", has: true },
       { text: "Kling 3.0 + Wan 2.1 (Video)", has: true },
-      { text: "FLUX 2 Dev + Nano Banana 2 (Image)", has: true },
+      { text: "Nano Banana 2 (Image)", has: true },
       { text: "AI Assistant (GPT-4o Mini)", has: true },
-      { text: "Pro Video Models (Runway, Seedance, Sora)", has: false },
+      { text: "Pro Video Models (Seedance, Sora)", has: false },
       { text: "Director Studio (Higgsfield)", has: false },
       { text: "Priority Queue", has: false },
     ],
@@ -72,7 +73,7 @@ const PLANS = [
       { text: "500 AI credits / month", has: true },
       { text: "GPT-4o + Gemini 1.5 Pro", has: true },
       { text: "All Standard + Pro Video Models", has: true },
-      { text: "DALL-E 3 + FLUX 2 (Images)", has: true },
+      { text: "DALL-E 3 + Nano Banana 2 (Images)", has: true },
       { text: "Image-to-Video Generation", has: true },
       { text: "All Aspect Ratios & Durations", has: true },
       { text: "Priority AI Queue", has: true },
@@ -92,9 +93,9 @@ const PLANS = [
     badge: null,
     features: [
       { text: "1,000 AI credits / month", has: true },
-      { text: "All AI Models (Runway Gen-4.5, Seedance, Kling 3.0, Higgsfield Director)", has: true },
+      { text: "All AI Models (Seedance, Kling 3.0, Sora 2, Higgsfield Director)", has: true },
       { text: "Cinematic Video (Highest quality)", has: true },
-      { text: "Premium Image Generation (DALL-E 3, FLUX 2, Recraft)", has: true },
+      { text: "Premium Image Generation (DALL-E 3, Nano Banana 2, Recraft)", has: true },
       { text: "Image-to-Video + All Pro Features", has: true },
       { text: "Multi-Brand Management", has: true },
       { text: "API Access", has: true },
@@ -128,26 +129,34 @@ export default function PricingPage() {
       .catch(() => { });
   }, []);
 
-  const goToCheckout = (params: {
+  const goToCheckout = async (params: {
     variantId: string;
     name: string;
-    price: string;
     kind: "subscription" | "one-time";
     description: string;
     returnTo: string;
   }) => {
-    const query = new URLSearchParams({
-      variantId: params.variantId,
-      name: params.name,
-      price: params.price,
-      kind: params.kind,
-      description: params.description,
-      returnTo: params.returnTo,
-    });
-    router.push(`/checkout?${query.toString()}`);
+    try {
+      const result = await createCheckoutAction({
+        variantId: params.variantId,
+        redirectPath: params.returnTo,
+        name: params.name,
+        description: params.description,
+        kind: params.kind,
+      });
+      if (result.url) {
+        window.location.href = result.url;
+      } else if (result.error?.includes("sign in")) {
+        router.push("/sign-up");
+      } else {
+        alert(result.error || "Checkout failed.");
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    }
   };
 
-  const handleCheckout = (plan: "Standard" | "Growth" | "Pro") => {
+  const handleCheckout = async (plan: "Standard" | "Growth" | "Pro") => {
     setLoading(plan);
     const variantId = plan === "Standard"
       ? process.env.NEXT_PUBLIC_LEMON_VARIANT_STANDARD
@@ -162,16 +171,15 @@ export default function PricingPage() {
     }
 
     const planTitle = plan === "Growth" ? "Nexora" : plan;
-    const price = plan === "Standard" ? "$9 / month" : plan === "Growth" ? "$29 / month" : "$59 / month";
 
-    goToCheckout({
+    await goToCheckout({
       variantId,
       name: `${planTitle} plan`,
-      price,
       kind: "subscription",
       description: "Subscription is managed in your account and can be cancelled anytime.",
       returnTo: "/dashboard",
     });
+    setLoading(null);
   };
 
   return (
@@ -334,10 +342,9 @@ export default function PricingPage() {
                   onClick={async () => {
                     setBuyingCredits(pack.id);
                     try {
-                      goToCheckout({
+                      await goToCheckout({
                         variantId: pack.variantId,
                         name: `${pack.name} (${pack.credits} credits)`,
-                        price: `${pack.price} one-time`,
                         kind: "one-time",
                         description: "Credits are delivered automatically after payment confirmation.",
                         returnTo: "/pricing",
@@ -373,7 +380,7 @@ export default function PricingPage() {
               },
               {
                 q: "Which AI models are used?",
-                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, FLUX 2, Recraft V3 (images), Wan-2.1, Kling 3.0, Luma Ray 2, Seedance 2.0, Runway Gen-4.5, Higgsfield Director Studio (video)."
+                a: "GPT-4o, GPT-4o Mini, Gemini 1.5 Pro (chat), DALL-E 3, Nano Banana 2, Recraft V3 (images), Wan-2.1, Kling 3.0, Seedance 2.0, Sora 2, Higgsfield Director Studio (video)."
               },
             ].map((faq, i) => (
               <div key={i} className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
