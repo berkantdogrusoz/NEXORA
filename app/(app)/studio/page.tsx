@@ -212,10 +212,62 @@ export default function StudioPage() {
                 const text = await res.text().catch(() => "");
                 setError(`Server error (${res.status}): ${text.slice(0, 200) || "No response"}`);
                 refundCredits(selectedModelConfig.cost);
+                setGenerating(false);
                 return;
             }
 
-            if (res.ok && data.success) {
+            if (!res.ok) {
+                setError(data.error || "Failed to generate video.");
+                refundCredits(selectedModelConfig.cost);
+                setGenerating(false);
+                return;
+            }
+
+            // Async queue flow (fal.ai models)
+            if (data.status === "queued" && data.requestId) {
+                const maxPolls = 120;
+                const pollInterval = 3000;
+                for (let i = 0; i < maxPolls; i++) {
+                    await new Promise((r) => setTimeout(r, pollInterval));
+                    try {
+                        const params = new URLSearchParams({
+                            requestId: data.requestId,
+                            endpointId: data.endpointId,
+                            modelId: data.modelId || model,
+                            cost: String(data.cost || selectedModelConfig.cost),
+                            prompt: (prompt || "").slice(0, 500),
+                        });
+                        const pollRes = await fetch(`/api/video/status?${params}`);
+                        const pollData = await pollRes.json();
+
+                        if (pollData.status === "completed" && pollData.videoUrl) {
+                            setPreviewVideo(pollData.videoUrl);
+                            setHistory((prev) => [
+                                { url: pollData.videoUrl, prompt, createdAt: Date.now() },
+                                ...prev,
+                            ]);
+                            setPrompt("");
+                            setGenerating(false);
+                            return;
+                        }
+                        if (pollData.status === "failed") {
+                            setError(pollData.error || "Video generation failed.");
+                            refundCredits(selectedModelConfig.cost);
+                            setGenerating(false);
+                            return;
+                        }
+                    } catch {
+                        // poll failed, retry
+                    }
+                }
+                setError("Video generation timed out. Please try again.");
+                refundCredits(selectedModelConfig.cost);
+                setGenerating(false);
+                return;
+            }
+
+            // Sync flow (Veo, Sora etc.)
+            if (data.success && data.videoUrl) {
                 setPreviewVideo(data.videoUrl);
                 setHistory((prev) => [
                     { url: data.videoUrl, prompt, createdAt: Date.now() },

@@ -337,10 +337,47 @@ export default function TemplatesPage() {
       } catch {
         throw new Error(text || "Template video generation failed.");
       }
-      if (!res.ok || !data?.videoUrl) {
+      if (!res.ok) {
         throw new Error(data?.error || "Template video generation failed.");
       }
 
+      // Async queue flow (fal.ai models)
+      if (data.status === "queued" && data.requestId) {
+        const maxPolls = 120;
+        const pollInterval = 3000;
+        for (let i = 0; i < maxPolls; i++) {
+          await new Promise((r) => setTimeout(r, pollInterval));
+          try {
+            const params = new URLSearchParams({
+              requestId: data.requestId,
+              endpointId: data.endpointId,
+              modelId: data.modelId || "kling-3",
+              cost: String(data.cost || TEMPLATE_COST),
+              prompt: compiledPrompt.slice(0, 500),
+            });
+            const pollRes = await fetch(`/api/video/status?${params}`);
+            const pollData = await pollRes.json();
+
+            if (pollData.status === "completed" && pollData.videoUrl) {
+              setLatestVideoUrl(pollData.videoUrl);
+              setHistory((prev) => [{ url: pollData.videoUrl, prompt: selectedTemplate.name }, ...prev].slice(0, 8));
+              setGenerating(false);
+              return;
+            }
+            if (pollData.status === "failed") {
+              throw new Error(pollData.error || "Template video generation failed.");
+            }
+          } catch (pollErr: any) {
+            if (pollErr?.message?.includes("failed")) throw pollErr;
+          }
+        }
+        throw new Error("Video generation timed out. Please try again.");
+      }
+
+      // Sync flow fallback
+      if (!data?.videoUrl) {
+        throw new Error(data?.error || "Template video generation failed.");
+      }
       setLatestVideoUrl(data.videoUrl);
       setHistory((prev) => [{ url: data.videoUrl, prompt: selectedTemplate.name }, ...prev].slice(0, 8));
     } catch (e: any) {

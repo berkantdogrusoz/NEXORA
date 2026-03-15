@@ -221,21 +221,16 @@ export async function POST(req: Request) {
             };
             if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
-            const result: any = await fal.subscribe(falModel, {
-                input: falInput,
-                logs: true,
-                onQueueUpdate: (update) => {
-                    if (update.status === "IN_PROGRESS") {
-                        update.logs.map((log: any) => log.message).forEach(console.log);
-                    }
-                },
-            });
+            const queued = await fal.queue.submit(falModel, { input: falInput });
 
-            if (result?.video?.url) {
-                finalUrl = result.video.url;
-            } else {
-                throw new Error("Invalid output from fal.ai Kling");
-            }
+            return NextResponse.json({
+                status: "queued",
+                requestId: queued.request_id,
+                endpointId: falModel,
+                modelId,
+                cost: deductedCost,
+                prompt: prompt || "",
+            });
 
         } else if (modelId === "google-veo-3") {
             if (resolvedImageUrl) {
@@ -386,21 +381,16 @@ export async function POST(req: Request) {
             if (cameraMovement === "fixed") falInput.camera_fixed = true;
             if (resolvedImageUrl) falInput.image_url = resolvedImageUrl;
 
-            const result: any = await fal.subscribe(falModel, {
-                input: falInput,
-                logs: true,
-                onQueueUpdate: (update) => {
-                    if (update.status === "IN_PROGRESS") {
-                        update.logs.map((log: any) => log.message).forEach(console.log);
-                    }
-                },
-            });
+            const queued = await fal.queue.submit(falModel, { input: falInput });
 
-            if (result?.video?.url) {
-                finalUrl = result.video.url;
-            } else {
-                throw new Error("Invalid output from fal.ai Seedance");
-            }
+            return NextResponse.json({
+                status: "queued",
+                requestId: queued.request_id,
+                endpointId: falModel,
+                modelId,
+                cost: deductedCost,
+                prompt: prompt || "",
+            });
 
         } else if (modelId === "sora-2") {
             // ═══════════════════════════════════════════
