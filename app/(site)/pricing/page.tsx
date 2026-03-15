@@ -41,7 +41,7 @@ const PLANS = [
   },
   {
     name: "Standard",
-    price: "$9",
+    price: "$12",
     period: "/mo",
     subtitle: "For regular creators",
     highlight: false,
@@ -63,7 +63,7 @@ const PLANS = [
   },
   {
     name: "Nexora",
-    price: "$29",
+    price: "$32",
     period: "/mo",
     subtitle: "For content creators",
     highlight: true,
@@ -85,7 +85,7 @@ const PLANS = [
   },
   {
     name: "Pro",
-    price: "$59",
+    price: "$62",
     period: "/mo",
     subtitle: "For agencies & brands",
     highlight: false,
@@ -162,7 +162,7 @@ export default function PricingPage() {
     }
 
     const planTitle = plan === "Growth" ? "Nexora" : plan;
-    const price = plan === "Standard" ? "$9 / month" : plan === "Growth" ? "$29 / month" : "$59 / month";
+    const price = plan === "Standard" ? "$12 / month" : plan === "Growth" ? "$32 / month" : "$62 / month";
 
     goToCheckout({
       variantId,
@@ -190,13 +190,6 @@ export default function PricingPage() {
         <p className="text-lg text-slate-400 max-w-xl mx-auto mb-8">
           Start for free. Upgrade when you&apos;re ready to scale. No hidden fees.
         </p>
-
-        {/* Promo Banner */}
-        <div className="flex items-center justify-center mb-12">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20">
-            <span className="text-sm text-cyan-300">Use code <span className="font-bold text-white bg-cyan-500/20 px-2 py-0.5 rounded ml-1">NEXORA20</span> for 20% off</span>
-          </div>
-        </div>
 
         {/* Plan Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
