@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Loader2, Upload, WandSparkles, Sparkles, Download, ListOrdered } from "lucide-react";
+import { Loader2, Upload, WandSparkles, Sparkles, Download, ListOrdered, Music, VolumeX } from "lucide-react";
 
 type TemplateCard = {
   id: string;
@@ -15,6 +15,8 @@ type TemplateCard = {
   motionSequence: string[];
   cameraDirection: string;
   styleDirection: string;
+  audioTrack: string | null;
+  audioVolume: number;
 };
 
 const TEMPLATE_COST = 20;
@@ -27,6 +29,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/viral-social.png",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/drunk-dance.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start in neutral stance with a tiny head nod and shoulder preload on beat.",
       "Lift one leg with playful imbalance, then recover into a centered bounce.",
@@ -44,6 +48,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/ugc-creator.png",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/kitty-sway.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start with a relaxed bounce and soft shoulder roll to the beat.",
       "Step right-left-right while hips sway in opposite direction.",
@@ -61,6 +67,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/viral-social.png",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/paw-pop.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Begin with two-count bounce and slight forward lean.",
       "Pop right hand forward, retract, then pop left hand forward.",
@@ -78,6 +86,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/dramatic-tv-teaser.jpg",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/bubble-bounce.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start with two soft hops in place synced to the beat.",
       "Draw a small hip circle clockwise then counter-clockwise.",
@@ -95,6 +105,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/street-interview.png",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/street-groove.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start with head nod + shoulder isolation on beat.",
       "Add left-right step pattern with loose knee bounce and heel accents.",
@@ -112,6 +124,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/anime-opening.jpg",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/twirl-fun.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start with soft sway and one hand raised for timing cue.",
       "Perform a quarter twirl to the right and re-center.",
@@ -129,6 +143,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/product-ads.jpg",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/bounce-shuffle.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Start with small in-place bounce and toe-heel prep.",
       "Execute quick shuffle right then shuffle left with balance control.",
@@ -146,6 +162,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     preview: "/arts/styles/faceless-broll.png",
     duration: "10",
     aspectRatio: "9:16",
+    audioTrack: "/audio/templates/hip-hop-smile.mp3",
+    audioVolume: 0.8,
     motionSequence: [
       "Open with shoulder drop and confident head nod on beat.",
       "Perform two-count side step with relaxed arm swing.",
@@ -184,11 +202,63 @@ export default function TemplatesPage() {
   const [error, setError] = useState<string | null>(null);
   const [latestVideoUrl, setLatestVideoUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<{ url: string; prompt: string }[]>([]);
+  const [useTemplateMusic, setUseTemplateMusic] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const selectedTemplate = useMemo(
     () => MOTION_TEMPLATES.find((t) => t.id === selectedTemplateId) || MOTION_TEMPLATES[0],
     [selectedTemplateId]
   );
+
+  const syncAudio = useCallback(() => {
+    const video = videoRef.current;
+    const audio = audioRef.current;
+    if (!video || !audio) return;
+
+    if (!useTemplateMusic || !selectedTemplate.audioTrack) {
+      audio.pause();
+      return;
+    }
+
+    if (audio.src !== window.location.origin + selectedTemplate.audioTrack) {
+      audio.src = selectedTemplate.audioTrack;
+      audio.volume = selectedTemplate.audioVolume;
+    }
+
+    if (!video.paused && video.currentTime > 0) {
+      audio.currentTime = video.currentTime;
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+  }, [useTemplateMusic, selectedTemplate]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onPlay = () => syncAudio();
+    const onPause = () => { audioRef.current?.pause(); };
+    const onEnded = () => { audioRef.current?.pause(); if (audioRef.current) audioRef.current.currentTime = 0; };
+    const onSeeked = () => { if (audioRef.current && !video.paused) { audioRef.current.currentTime = video.currentTime; } };
+
+    video.addEventListener("play", onPlay);
+    video.addEventListener("pause", onPause);
+    video.addEventListener("ended", onEnded);
+    video.addEventListener("seeked", onSeeked);
+
+    return () => {
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("pause", onPause);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("seeked", onSeeked);
+    };
+  }, [latestVideoUrl, syncAudio]);
+
+  useEffect(() => {
+    syncAudio();
+  }, [useTemplateMusic, syncAudio]);
 
   useEffect(() => {
     fetch("/api/generations?type=video")
@@ -357,6 +427,29 @@ export default function TemplatesPage() {
               <p className="text-[11px] text-white/70">Your balance: <span className="font-semibold text-cyan-300">{credits ?? 0} credits</span></p>
             </div>
 
+            {/* Template Music Toggle */}
+            {selectedTemplate.audioTrack && (
+              <div className="flex items-center justify-between bg-black/30 border border-white/10 rounded-2xl px-4 py-3">
+                <div className="flex items-center gap-2">
+                  {useTemplateMusic ? (
+                    <Music className="w-4 h-4 text-cyan-400" />
+                  ) : (
+                    <VolumeX className="w-4 h-4 text-white/40" />
+                  )}
+                  <div>
+                    <p className="text-xs font-bold text-white">Template Music</p>
+                    <p className="text-[10px] text-white/40">Play audio with generated video</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setUseTemplateMusic(!useTemplateMusic)}
+                  className={`w-9 h-5 rounded-full transition-colors relative ${useTemplateMusic ? "bg-cyan-500" : "bg-white/10"}`}
+                >
+                  <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${useTemplateMusic ? "left-[18px]" : "left-0.5"}`} />
+                </button>
+              </div>
+            )}
+
             <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-3">
               <div className="flex items-center gap-2 mb-2">
                 <ListOrdered className="w-4 h-4 text-cyan-300" />
@@ -389,7 +482,8 @@ export default function TemplatesPage() {
           <h3 className="text-white font-bold mb-4">Latest Output</h3>
           {latestVideoUrl ? (
             <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-4 items-start">
-              <video src={latestVideoUrl} controls className="w-full rounded-2xl border border-white/10" />
+              <video ref={videoRef} src={latestVideoUrl} controls className="w-full rounded-2xl border border-white/10" />
+              <audio ref={audioRef} preload="auto" className="hidden" />
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                 <p className="text-white text-sm font-semibold">Output format: MP4 Video</p>
                 <p className="text-white/60 text-xs mt-1">Output is generated as a normal MP4 video, ready for social and ad workflows.</p>
