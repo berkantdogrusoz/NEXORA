@@ -330,7 +330,13 @@ export default function TemplatesPage() {
         }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Template video generation failed.");
+      }
       if (!res.ok || !data?.videoUrl) {
         throw new Error(data?.error || "Template video generation failed.");
       }

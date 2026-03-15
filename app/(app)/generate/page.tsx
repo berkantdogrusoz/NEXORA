@@ -95,18 +95,24 @@ export default function GeneratePage() {
         }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text || "Failed to generate image.");
+      }
 
       if (res.ok && data.imageUrl) {
         setPreviewImage(data.imageUrl);
         setGallery((prev) => [{ url: data.imageUrl, prompt }, ...prev]);
-        setPrompt(""); // Clear prompt after success
+        setPrompt("");
       } else {
         setError(data.error || "Failed to generate image.");
         refundCredits(selectedModelConfig.cost);
       }
-    } catch {
-      setError("Something went wrong.");
+    } catch (e: any) {
+      setError(e?.message || "Something went wrong.");
       refundCredits(selectedModelConfig.cost);
     } finally {
       setGenerating(false);
