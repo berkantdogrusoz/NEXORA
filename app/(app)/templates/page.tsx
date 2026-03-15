@@ -428,7 +428,7 @@ export default function TemplatesPage() {
                         : "border-white/10 hover:border-white/30"
                     }`}
                   >
-                    <div className="relative h-28 w-full">
+                    <div className="relative h-24 md:h-28 w-full">
                       <Image src={template.preview} alt={template.name} fill className="object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
                       <div className="absolute bottom-2 left-2 right-2">
@@ -533,7 +533,7 @@ export default function TemplatesPage() {
           <h3 className="text-white font-bold mb-4">Latest Output</h3>
           {latestVideoUrl ? (
             <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-4 items-start">
-              <video ref={videoRef} src={latestVideoUrl} controls className="w-full rounded-2xl border border-white/10" />
+              <video ref={videoRef} src={latestVideoUrl} controls playsInline className="w-full rounded-2xl border border-white/10" />
               <audio ref={audioRef} preload="auto" className="hidden" />
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                 <p className="text-white text-sm font-semibold">Output format: MP4 Video</p>
@@ -553,10 +553,26 @@ export default function TemplatesPage() {
           )}
 
           {!!history.length && (
-            <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
-              {history.map((h, i) => (
-                <video key={`${h.url}-${i}`} src={h.url} controls className="w-full rounded-xl border border-white/10" />
-              ))}
+            <div className="mt-6">
+              <h4 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3">Generation History</h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {history.map((h, i) => (
+                  <div key={`${h.url}-${i}`} className="group relative rounded-xl overflow-hidden border border-white/10 bg-black/30">
+                    <video
+                      src={h.url}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="w-full aspect-[9/16] object-cover"
+                    />
+                    {h.prompt && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 pointer-events-none">
+                        <p className="text-white text-[10px] font-medium truncate">{h.prompt}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </section>
