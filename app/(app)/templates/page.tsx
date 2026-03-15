@@ -221,12 +221,14 @@ export default function TemplatesPage() {
       return;
     }
 
-    if (audio.src !== window.location.origin + selectedTemplate.audioTrack) {
-      audio.src = selectedTemplate.audioTrack;
+    const trackUrl = selectedTemplate.audioTrack;
+    if (!audio.src || !audio.src.includes(trackUrl)) {
+      audio.src = trackUrl;
       audio.volume = selectedTemplate.audioVolume;
+      audio.load();
     }
 
-    if (!video.paused && video.currentTime > 0) {
+    if (!video.paused) {
       audio.currentTime = video.currentTime;
       audio.play().catch(() => {});
     } else {
