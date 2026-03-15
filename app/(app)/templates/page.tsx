@@ -3,16 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useCredits } from "@/app/providers/credit-provider";
-import { Loader2, Upload, WandSparkles, Sparkles, Download } from "lucide-react";
+import { Loader2, Upload, WandSparkles, Sparkles, Download, ListOrdered } from "lucide-react";
 
 type TemplateCard = {
   id: string;
   name: string;
   description: string;
   preview: string;
-  motionPrompt: string;
   duration: "5" | "10";
   aspectRatio: "16:9" | "9:16";
+  motionSequence: string[];
+  cameraDirection: string;
+  styleDirection: string;
 };
 
 const TEMPLATE_COST = 50;
@@ -21,64 +23,123 @@ const MOTION_TEMPLATES: TemplateCard[] = [
   {
     id: "drunk-dance",
     name: "Drunk Dance",
-    description: "Enerjik, komik ve viral dans hareketi.",
+    description: "Viral ritimde komik ama kontrollü dans koreografisi.",
     preview: "/arts/styles/viral-social.png",
-    motionPrompt:
-      "Animate the uploaded character with high-energy dance choreography synced to an upbeat rhythm, full-body motion, expressive arm swings, footwork transitions, clean subject identity preservation, stable background continuity, cinematic realism.",
-    duration: "5",
+    duration: "10",
     aspectRatio: "9:16",
+    motionSequence: [
+      "Start in a neutral standing pose, slight beat anticipation in shoulders and head.",
+      "Lift one leg with playful imbalance, hips swing left-right in sync with rhythm.",
+      "Drop the leg, step diagonally and perform two-arm wave motion at chest level.",
+      "Add quick hip twist + shoulder bounce combo for 2 beats.",
+      "Finish with a confident bounce and small spin while preserving face identity.",
+    ],
+    cameraDirection: "Medium full-body framing, slight handheld social feel, keep subject centered.",
+    styleDirection: "Fun, social-first, realistic body mechanics, no body distortion.",
   },
   {
     id: "hero-fly",
     name: "Hero Fly",
-    description: "Sinematik yükseliş ve havalanma efekti.",
+    description: "Sinematik yükseliş, havalanma ve ileri uçuş hareketi.",
     preview: "/arts/styles/epic-movie-scenes.jpg",
-    motionPrompt:
-      "Animate the uploaded character rising from the ground and flying forward like a cinematic hero, dramatic wind on clothes and hair, dynamic camera parallax, realistic lighting and motion blur.",
     duration: "5",
     aspectRatio: "16:9",
+    motionSequence: [
+      "Start with crouched power stance and subtle wind reaction in clothes/hair.",
+      "Character pushes off the ground with visible body force transfer.",
+      "Vertical rise with controlled acceleration, chest opens and arms stabilize.",
+      "Transition to forward glide with cinematic momentum.",
+      "End in a strong airborne hero pose with stable identity.",
+    ],
+    cameraDirection: "Cinematic medium-wide shot, upward tilt during takeoff, smooth parallax.",
+    styleDirection: "Epic cinematic realism, dramatic light contrast, premium action mood.",
   },
   {
     id: "escape-run",
     name: "Escape Run",
     description: "Kaçış temposunda hızlı koşu aksiyonu.",
     preview: "/arts/styles/cinema-studio.jpg",
-    motionPrompt:
-      "Animate the uploaded character sprinting in panic through a cinematic environment, fast footwork, natural body momentum, slight handheld camera shake, intense pace and realistic motion.",
     duration: "5",
     aspectRatio: "16:9",
+    motionSequence: [
+      "Character glances back in fear while shifting body weight forward.",
+      "Explosive first sprint step, arms pumping naturally.",
+      "Sustain fast run with realistic leg extension and torso rotation.",
+      "Quick side-step dodge while maintaining speed.",
+      "Final acceleration burst away from camera.",
+    ],
+    cameraDirection: "Tracking shot with slight handheld shake, keep full-body readable.",
+    styleDirection: "High tension, cinematic chase feel, physically plausible motion.",
   },
   {
     id: "power-pose",
     name: "Power Pose",
-    description: "Karizmatik dönüş + güçlü final pozu.",
+    description: "Karizmatik yürüyüş + finalde güçlü duruş.",
     preview: "/arts/styles/dramatic-tv-teaser.jpg",
-    motionPrompt:
-      "Animate the uploaded character with a stylish turn, confident walk-in, then strong power pose with subtle dramatic effects, premium cinematic camera language and clean identity preservation.",
     duration: "5",
     aspectRatio: "9:16",
+    motionSequence: [
+      "Begin with calm stand and subtle eye focus forward.",
+      "Take two confident forward steps with shoulder control.",
+      "Perform a sharp quarter turn with clean foot pivot.",
+      "Raise one arm in a dominant gesture, pause for emphasis.",
+      "Lock into final power pose for the last beat.",
+    ],
+    cameraDirection: "Vertical hero framing, smooth dolly-in toward final pose.",
+    styleDirection: "Premium ad aesthetic, confident attitude, clean facial consistency.",
   },
   {
     id: "street-groove",
     name: "Street Groove",
-    description: "Sokak stili beat'e uyumlu groove dans.",
+    description: "Sokak stili beat’e uyumlu groove dans sekansı.",
     preview: "/arts/styles/street-interview.png",
-    motionPrompt:
-      "Animate the uploaded character performing street-style groove choreography with controlled footwork, shoulder isolations, timing accents, social-media framing, realistic body mechanics and consistent character identity.",
     duration: "10",
     aspectRatio: "9:16",
+    motionSequence: [
+      "Start with head nod + shoulder isolation on beat.",
+      "Add left-right step pattern with loose knee bounce.",
+      "Perform arm cross-and-open combo for two bars.",
+      "Hip groove section with controlled torso roll.",
+      "Finish with signature hand move and freeze-frame ending.",
+    ],
+    cameraDirection: "Vertical social framing, full-body visibility, steady center composition.",
+    styleDirection: "Urban dance vibe, rhythm-accurate timing, natural human kinematics.",
   },
   {
     id: "anime-burst",
     name: "Anime Burst",
-    description: "Anime açılış enerjisi + patlayıcı aksiyon.",
+    description: "Anime enerjisiyle hızlı dash ve aksiyon pozu.",
     preview: "/arts/styles/anime-opening.jpg",
-    motionPrompt:
-      "Animate the uploaded character with anime-inspired explosive movement, quick dash and dynamic pose transitions, stylized kinetic energy, but keep subject identity recognizable.",
     duration: "5",
     aspectRatio: "16:9",
+    motionSequence: [
+      "Character charges energy in a ready stance.",
+      "Instant forward dash with speed-line style kinetic feel.",
+      "Mid-motion directional pivot with dynamic arm extension.",
+      "Short airborne action beat with controlled landing.",
+      "End in iconic anime action pose.",
+    ],
+    cameraDirection: "Dynamic wide shot, quick push-in on dash, stable final framing.",
+    styleDirection: "Stylized anime energy but preserve core subject identity.",
   },
 ];
+
+function compileTemplatePrompt(template: TemplateCard) {
+  const sequenceText = template.motionSequence
+    .map((step, index) => `${index + 1}. ${step}`)
+    .join(" ");
+
+  return [
+    `Template Name: ${template.name}.`,
+    `STRICTLY FOLLOW THIS MOTION ORDER: ${sequenceText}`,
+    `Camera Direction: ${template.cameraDirection}`,
+    `Style Direction: ${template.styleDirection}`,
+    "Keep the uploaded subject identity, face, clothes, and body proportions consistent throughout.",
+    "Do not change species/person identity; do not morph into another character.",
+    "Maintain coherent background continuity and stable scene geometry.",
+    "Output should be ad-ready, smooth, detailed, and realistic.",
+  ].join(" ");
+}
 
 export default function TemplatesPage() {
   const { credits, deductCredits, refundCredits } = useCredits();
@@ -144,11 +205,13 @@ export default function TemplatesPage() {
     deductCredits(TEMPLATE_COST);
 
     try {
+      const compiledPrompt = compileTemplatePrompt(selectedTemplate);
+
       const res = await fetch("/api/video/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: selectedTemplate.motionPrompt,
+          prompt: compiledPrompt,
           model: "kling-3",
           duration: selectedTemplate.duration,
           aspectRatio: selectedTemplate.aspectRatio,
@@ -156,10 +219,10 @@ export default function TemplatesPage() {
           imageUrl: referenceImage,
           stylePreset: "none",
           enhancePrompt: true,
-          intensity: 75,
-          customDirection: `Template: ${selectedTemplate.name}`,
+          intensity: 85,
+          customDirection: `TemplateID=${selectedTemplate.id}; Keep motion order exact.`,
           cameraMovement: "auto",
-          motionIntensity: 0.75,
+          motionIntensity: 0.8,
         }),
       });
 
@@ -256,6 +319,18 @@ export default function TemplatesPage() {
                 <Sparkles className="w-3.5 h-3.5" />
                 {selectedTemplate.duration}s · {selectedTemplate.aspectRatio} · {TEMPLATE_COST} credits
               </div>
+            </div>
+
+            <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <ListOrdered className="w-4 h-4 text-cyan-300" />
+                <p className="text-cyan-200 text-xs font-semibold uppercase tracking-wider">Template Motion Order</p>
+              </div>
+              <ol className="list-decimal pl-4 space-y-1.5 text-xs text-white/75">
+                {selectedTemplate.motionSequence.map((step, i) => (
+                  <li key={`${selectedTemplate.id}-${i}`}>{step}</li>
+                ))}
+              </ol>
             </div>
 
             <button
