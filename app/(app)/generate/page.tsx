@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Download, Loader2, Image as ImageIcon, Settings2, ChevronDown, Sparkles, X, Cpu } from "lucide-react";
 import Image from "next/image";
-import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import { getStylePresetsForMode } from "@/lib/style-presets";
 import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
 import PromptBarTabs from "@/app/components/generation/prompt-bar-tabs";
 
@@ -27,7 +27,7 @@ export default function GeneratePage() {
 
   const [prompt, setPrompt] = useState("");
   const [model, setModel] = useState("nano-banana-2");
-  const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("image"));
+  const [stylePreset, setStylePreset] = useState("none");
   const [enhancePrompt, setEnhancePrompt] = useState(true);
   const [intensity, setIntensity] = useState(70);
   const [customDirection, setCustomDirection] = useState("");
@@ -45,7 +45,7 @@ export default function GeneratePage() {
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
   const selectedModelConfig = IMAGE_MODELS.find(m => m.id === model) || IMAGE_MODELS[0];
-  const selectedPreset = IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0];
+  const selectedPreset = stylePreset === "none" ? null : (IMAGE_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || IMAGE_STYLE_PRESETS[0]);
 
   useEffect(() => {
     fetch("/api/generations?type=image")
@@ -267,6 +267,23 @@ export default function GeneratePage() {
                             <span className="text-[10px] text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">{selectedPreset?.name || "None"}</span>
                         </div>
                         <div className="flex gap-3 overflow-x-auto snap-x pb-4 hide-scrollbar">
+                            <button
+                                type="button"
+                                onClick={() => setStylePreset("none")}
+                                className={`relative flex-shrink-0 w-28 h-28 rounded-2xl overflow-hidden snap-center outline-none transition-all duration-300 ${stylePreset === "none" ? 'ring-2 ring-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]' : 'ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 opacity-60 hover:opacity-100'}`}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#0c1421] to-[#070b14] flex items-center justify-center">
+                                    <X className="w-6 h-6 text-white/30" />
+                                </div>
+                                <div className="absolute bottom-2 left-2 right-2">
+                                    <span className="text-[10px] font-bold text-white leading-tight drop-shadow-md">None</span>
+                                </div>
+                                {stylePreset === "none" && (
+                                    <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-cyan-500 flex items-center justify-center shadow-lg">
+                                        <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                                    </div>
+                                )}
+                            </button>
                             {IMAGE_STYLE_PRESETS.map((preset) => (
                                 <button
                                     key={preset.id}

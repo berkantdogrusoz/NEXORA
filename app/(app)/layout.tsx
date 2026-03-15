@@ -15,12 +15,14 @@ import {
     Zap,
     Settings,
     KeyRound,
+    WandSparkles,
     Menu,
     X,
 } from "lucide-react";
 
 const menuItems = [
     { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+    { href: "/templates", label: "Templates", icon: WandSparkles },
     { href: "/generate", label: "Image", icon: ImagePlus },
     { href: "/studio", label: "Video", icon: Clapperboard },
     { href: "/director", label: "Blueprints", icon: Film },
