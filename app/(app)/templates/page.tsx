@@ -343,8 +343,9 @@ export default function TemplatesPage() {
 
       // Async queue flow (fal.ai models)
       if (data.status === "queued" && data.requestId) {
-        const maxPolls = 120;
+        const maxPolls = 200;
         const pollInterval = 3000;
+        let consecutiveErrors = 0;
         for (let i = 0; i < maxPolls; i++) {
           await new Promise((r) => setTimeout(r, pollInterval));
           try {
@@ -356,7 +357,10 @@ export default function TemplatesPage() {
               prompt: compiledPrompt.slice(0, 500),
             });
             const pollRes = await fetch(`/api/video/status?${params}`);
-            const pollData = await pollRes.json();
+            const pollText = await pollRes.text();
+            let pollData: any;
+            try { pollData = JSON.parse(pollText); } catch { consecutiveErrors++; if (consecutiveErrors > 10) throw new Error("Status check failed repeatedly."); continue; }
+            consecutiveErrors = 0;
 
             if (pollData.status === "completed" && pollData.videoUrl) {
               setLatestVideoUrl(pollData.videoUrl);
@@ -368,10 +372,12 @@ export default function TemplatesPage() {
               throw new Error(pollData.error || "Template video generation failed.");
             }
           } catch (pollErr: any) {
-            if (pollErr?.message?.includes("failed")) throw pollErr;
+            if (pollErr?.message?.includes("failed") || pollErr?.message?.includes("repeatedly")) throw pollErr;
+            consecutiveErrors++;
+            if (consecutiveErrors > 10) throw new Error("Lost connection to server.");
           }
         }
-        throw new Error("Video generation timed out. Please try again.");
+        throw new Error("Video generation timed out (10 min). Please try again.");
       }
 
       // Sync flow fallback

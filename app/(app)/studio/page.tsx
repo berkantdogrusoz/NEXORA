@@ -225,8 +225,9 @@ export default function StudioPage() {
 
             // Async queue flow (fal.ai models)
             if (data.status === "queued" && data.requestId) {
-                const maxPolls = 120;
+                const maxPolls = 200;
                 const pollInterval = 3000;
+                let consecutiveErrors = 0;
                 for (let i = 0; i < maxPolls; i++) {
                     await new Promise((r) => setTimeout(r, pollInterval));
                     try {
@@ -238,7 +239,10 @@ export default function StudioPage() {
                             prompt: (prompt || "").slice(0, 500),
                         });
                         const pollRes = await fetch(`/api/video/status?${params}`);
-                        const pollData = await pollRes.json();
+                        const pollText = await pollRes.text();
+                        let pollData: any;
+                        try { pollData = JSON.parse(pollText); } catch { consecutiveErrors++; if (consecutiveErrors > 10) break; continue; }
+                        consecutiveErrors = 0;
 
                         if (pollData.status === "completed" && pollData.videoUrl) {
                             setPreviewVideo(pollData.videoUrl);
@@ -257,7 +261,8 @@ export default function StudioPage() {
                             return;
                         }
                     } catch {
-                        // poll failed, retry
+                        consecutiveErrors++;
+                        if (consecutiveErrors > 10) break;
                     }
                 }
                 setError("Video generation timed out. Please try again.");

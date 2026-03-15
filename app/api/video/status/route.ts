@@ -4,7 +4,7 @@ import { getAuthUserId } from "@/lib/auth";
 import { createSupabaseServer } from "@/lib/supabase";
 import { uploadVideoFromUrl } from "@/lib/storage";
 
-export const maxDuration = 30;
+export const maxDuration = 120;
 
 export async function GET(req: NextRequest) {
     try {
