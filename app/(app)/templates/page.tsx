@@ -24,7 +24,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     description: "Enerjik, komik ve viral dans hareketi.",
     preview: "/arts/styles/viral-social.png",
     motionPrompt:
-      "Animate the uploaded character with funny off-balance drunk dance moves, rhythmic steps, expressive arms, playful body sway, smooth camera, clean background consistency, highly realistic motion.",
+      "Animate the uploaded character with high-energy dance choreography synced to an upbeat rhythm, full-body motion, expressive arm swings, footwork transitions, clean subject identity preservation, stable background continuity, cinematic realism.",
     duration: "5",
     aspectRatio: "9:16",
   },
@@ -64,7 +64,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     description: "Sokak stili beat'e uyumlu groove dans.",
     preview: "/arts/styles/street-interview.png",
     motionPrompt:
-      "Animate the uploaded character doing smooth urban groove dance with head nods, shoulder rolls and clean foot transitions, social-media style framing, natural human motion.",
+      "Animate the uploaded character performing street-style groove choreography with controlled footwork, shoulder isolations, timing accents, social-media framing, realistic body mechanics and consistent character identity.",
     duration: "10",
     aspectRatio: "9:16",
   },
@@ -278,10 +278,10 @@ export default function TemplatesPage() {
           <h3 className="text-white font-bold mb-4">Latest Output</h3>
           {latestVideoUrl ? (
             <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-4 items-start">
-              <video src={latestVideoUrl} controls loop className="w-full rounded-2xl border border-white/10" />
+              <video src={latestVideoUrl} controls className="w-full rounded-2xl border border-white/10" />
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="text-white text-sm font-semibold">Çıktı formatı: MP4</p>
-                <p className="text-white/60 text-xs mt-1">MP4 loop sosyal platformlar için daha kaliteli ve daha hafif çalışır. İstersen sonra GIF'e çevrilebilir.</p>
+                <p className="text-white text-sm font-semibold">Çıktı formatı: MP4 Video</p>
+                <p className="text-white/60 text-xs mt-1">Çıktı normal MP4 video olarak üretilir. Sosyal medya ve reklam akışları için doğrudan kullanılabilir.</p>
                 <a
                   href={latestVideoUrl}
                   target="_blank"
