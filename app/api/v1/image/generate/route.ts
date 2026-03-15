@@ -11,6 +11,8 @@ import {
     verifyApiKey,
 } from "@/lib/developer-api";
 
+const SUPPORTED_IMAGE_MODELS = ["nano-banana-2", "recraft-v3", "dall-e-3"] as const;
+
 export async function POST(req: Request) {
     const startedAt = Date.now();
     let apiKeyId = "";
@@ -46,7 +48,16 @@ export async function POST(req: Request) {
         await touchApiKeyUsage(apiKeyId);
 
         const body = await req.json();
-        estimatedCostCents = estimateImageCost(String(body?.model || ""));
+        const model = String(body?.model || "");
+
+        if (!SUPPORTED_IMAGE_MODELS.includes(model as any)) {
+            return NextResponse.json({
+                error: `Unsupported image model: ${model || "(empty)"}`,
+                supportedModels: SUPPORTED_IMAGE_MODELS,
+            }, { status: 400 });
+        }
+
+        estimatedCostCents = estimateImageCost(model);
 
         const debit = await deductApiBalanceCents({
             userId,
