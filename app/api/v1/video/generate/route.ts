@@ -11,6 +11,8 @@ import {
     verifyApiKey,
 } from "@/lib/developer-api";
 
+const SUPPORTED_VIDEO_MODELS = ["kling-3", "google-veo-3", "seedance-2", "sora-2"] as const;
+
 export async function POST(req: Request) {
     const startedAt = Date.now();
     let apiKeyId = "";
@@ -46,7 +48,16 @@ export async function POST(req: Request) {
         await touchApiKeyUsage(apiKeyId);
 
         const body = await req.json();
-        estimatedCostCents = estimateVideoCost(String(body?.model || ""));
+        const model = String(body?.model || "");
+
+        if (!SUPPORTED_VIDEO_MODELS.includes(model as any)) {
+            return NextResponse.json({
+                error: `Unsupported video model: ${model || "(empty)"}`,
+                supportedModels: SUPPORTED_VIDEO_MODELS,
+            }, { status: 400 });
+        }
+
+        estimatedCostCents = estimateVideoCost(model);
 
         const debit = await deductApiBalanceCents({
             userId,

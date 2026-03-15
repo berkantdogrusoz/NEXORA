@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useCredits } from "@/app/providers/credit-provider";
 import { Upload, X, Loader2, Settings2, ChevronDown, Clapperboard, Video, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { getDefaultStylePresetId, getStylePresetsForMode } from "@/lib/style-presets";
+import { getStylePresetsForMode } from "@/lib/style-presets";
 import { resizeAndCompress } from "@/app/components/generation/image-upload-utils";
 import GenerationLoadingOverlay from "@/app/components/generation/generation-loading-overlay";
 import VideoPreviewOverlay from "@/app/components/generation/video-preview-overlay";
@@ -24,6 +24,7 @@ const DURATIONS = [
 
 const VIDEO_MODELS = [
     { id: "kling-3", name: "Kling 3.0", tier: "Standard", cost: 50, supportsImage: true, note: "" },
+    { id: "google-veo-3", name: "Google Veo 3", tier: "Free", cost: 40, supportsImage: false, note: "Premium quality" },
     { id: "seedance-2", name: "Seedance 1.5 Pro", tier: "Pro", cost: 100, supportsImage: true, note: "Audio sync" },
     { id: "sora-2", name: "Sora 2", tier: "Pro", cost: 120, supportsImage: true, note: "No 1:1 · 4s/8s" },
 ];
@@ -67,7 +68,7 @@ export default function StudioPage() {
     const [aspectRatio, setAspectRatio] = useState("16:9");
     const [duration, setDuration] = useState("5");
     const [quality, setQuality] = useState<"hd" | "sd">("hd");
-    const [stylePreset, setStylePreset] = useState(getDefaultStylePresetId("video"));
+    const [stylePreset, setStylePreset] = useState("none");
     const [enhanceMode, setEnhanceMode] = useState<"auto" | "on" | "off">("auto");
     const [intensity, setIntensity] = useState(70);
     const [customDirection, setCustomDirection] = useState("");
@@ -91,6 +92,14 @@ export default function StudioPage() {
 
     const selectedModelConfig = VIDEO_MODELS.find(m => m.id === model) || VIDEO_MODELS[0];
     const selectedPreset = stylePreset === "none" ? null : (VIDEO_STYLE_PRESETS.find((preset) => preset.id === stylePreset) || VIDEO_STYLE_PRESETS[0]);
+    const isVeoModel = model === "google-veo-3";
+
+    const handleModelChange = (nextModel: string) => {
+        setModel(nextModel);
+        if (nextModel === "google-veo-3" && aspectRatio === "1:1") {
+            setAspectRatio("16:9");
+        }
+    };
 
     useEffect(() => {
         fetch("/api/generations?type=video")
@@ -308,7 +317,7 @@ export default function StudioPage() {
                                                  {VIDEO_MODELS.map(m => (
                                                      <button
                                                          key={m.id}
-                                                         onClick={() => { setModel(m.id); setIsModelDropdownOpen(false); }}
+                                                         onClick={() => { handleModelChange(m.id); setIsModelDropdownOpen(false); }}
                                                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${model === m.id
                                                             ? 'bg-cyan-500/10 text-cyan-400'
                                                             : 'text-white/70 hover:bg-white/5 hover:text-white'
@@ -377,7 +386,7 @@ export default function StudioPage() {
                                         {VIDEO_MODELS.map(m => (
                                             <button
                                                 key={m.id}
-                                                onClick={() => setModel(m.id)}
+                                                onClick={() => handleModelChange(m.id)}
                                                 className={`px-3 py-2 text-[10px] rounded-xl border text-left transition-all font-medium flex flex-col gap-1 ${model === m.id
                                                     ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                                                     : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
@@ -396,19 +405,26 @@ export default function StudioPage() {
                                 <div>
                                     <label className="block text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3">Aspect Ratio</label>
                                     <div className="flex gap-2">
-                                        {ASPECT_RATIOS.map(ar => (
-                                            <button
-                                                key={ar.value}
-                                                onClick={() => setAspectRatio(ar.value)}
-                                                className={`flex-1 py-2 text-[10px] rounded-xl border text-center transition-all font-bold ${aspectRatio === ar.value
-                                                    ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
-                                                    : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
-                                                }`}
-                                            >
-                                                {ar.label.split(' ')[0]}
-                                            </button>
-                                        ))}
+                                        {ASPECT_RATIOS.map(ar => {
+                                            const disabledForVeo = isVeoModel && ar.value === "1:1";
+                                            return (
+                                                <button
+                                                    key={ar.value}
+                                                    onClick={() => setAspectRatio(ar.value)}
+                                                    disabled={disabledForVeo}
+                                                    className={`flex-1 py-2 text-[10px] rounded-xl border text-center transition-all font-bold ${aspectRatio === ar.value
+                                                        ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400"
+                                                        : "bg-black/40 border-white/5 text-white/50 hover:border-white/10 hover:text-white"
+                                                    } ${disabledForVeo ? "opacity-35 cursor-not-allowed hover:border-white/5 hover:text-white/50" : ""}`}
+                                                >
+                                                    {ar.label.split(' ')[0]}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
+                                    {isVeoModel && (
+                                        <p className="mt-2 text-[10px] text-amber-300/80">Google Veo 3 supports only 16:9 and 9:16.</p>
+                                    )}
                                 </div>
                                 {/* Duration & Quality Row */}
                                 <div className="grid grid-cols-2 gap-4">
