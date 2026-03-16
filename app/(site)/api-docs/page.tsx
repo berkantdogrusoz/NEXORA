@@ -144,7 +144,7 @@ console.log(data.${activeTab === "director" ? "url" : activeTab === "image" ? "i
                             Get API Key <ArrowRight className="w-4 h-4" />
                         </Link>
                         <Link
-                            href="/api-dashboard"
+                            href="/dashboard"
                             className="px-8 py-3.5 rounded-full border border-white/15 text-white font-bold text-sm hover:bg-white/5 transition-all"
                         >
                             Dashboard
