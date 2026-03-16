@@ -138,7 +138,7 @@ console.log(data.${activeTab === "director" ? "url" : activeTab === "image" ? "i
                     </p>
                     <div className="flex items-center justify-center gap-4 flex-wrap">
                         <Link
-                            href="/sign-up"
+                            href="/api-dashboard"
                             className="px-8 py-3.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"
                         >
                             Get API Key <ArrowRight className="w-4 h-4" />
