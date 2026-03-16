@@ -14,6 +14,7 @@ import {
     PlayCircle,
     Menu,
     X,
+    Zap,
 } from "lucide-react";
 import { clerkUserButtonAppearance } from "@/lib/clerk-appearance";
 
@@ -94,6 +95,15 @@ export default function SiteLayout({
                                                 <div>
                                                     <h4 className="text-sm font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">AI Video Studio</h4>
                                                     <p className="text-xs text-white/50 leading-relaxed">Bring visuals to motion with cinematic video generation.</p>
+                                                </div>
+                                            </Link>
+                                            <Link href="/templates" className="flex items-start gap-4 group mt-4 p-2 -ml-2 rounded-xl hover:bg-white/5 transition-colors">
+                                                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center shrink-0 group-hover:bg-amber-500/20 group-hover:text-amber-400 transition-colors">
+                                                    <Zap className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-white mb-1 group-hover:text-amber-300 transition-colors">Template Motion Studio</h4>
+                                                    <p className="text-xs text-white/50 leading-relaxed">Viral dance templates — upload a photo, get a video.</p>
                                                 </div>
                                             </Link>
                                         </div>
@@ -259,6 +269,18 @@ export default function SiteLayout({
                             <div>
                                 <div className="text-sm font-bold text-white">AI Video Studio</div>
                                 <div className="text-[11px] text-white/40">Kling 3.0, Seedance, Sora 2</div>
+                            </div>
+                        </Link>
+                        <Link
+                            href="/templates"
+                            className="flex items-center gap-4 px-4 py-4 rounded-sm bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] transition-all"
+                        >
+                            <div className="w-10 h-10 rounded-sm bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <Zap className="w-5 h-5 text-amber-400" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-bold text-white">Template Motion Studio</div>
+                                <div className="text-[11px] text-white/40">Viral dance templates, one-click</div>
                             </div>
                         </Link>
 
