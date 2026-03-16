@@ -161,6 +161,9 @@ export default function SiteLayout({
                             <Link href="/pricing" className="text-sm font-semibold text-white/90 hover:text-white transition-colors py-2">
                                 Pricing
                             </Link>
+                            <Link href="/api-docs" className="text-sm font-semibold text-emerald-400/90 hover:text-emerald-300 transition-colors py-2">
+                                API
+                            </Link>
                         </div>
                     </div>
 
@@ -290,6 +293,9 @@ export default function SiteLayout({
                         </Link>
                         <Link href="/director" className="block px-4 py-3.5 text-sm font-bold text-white/70 hover:text-white rounded-sm hover:bg-white/[0.04] transition-all">
                             Director Studio
+                        </Link>
+                        <Link href="/api-docs" className="block px-4 py-3.5 text-sm font-bold text-emerald-400/80 hover:text-emerald-300 rounded-sm hover:bg-white/[0.04] transition-all">
+                            Developer API
                         </Link>
 
                         {/* Auth Section */}
