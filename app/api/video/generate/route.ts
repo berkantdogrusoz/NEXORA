@@ -256,6 +256,7 @@ export async function POST(req: Request) {
                     resolution: finalQuality === "sd" ? "medium" : "high",
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
+                    includeAudio: true,
                 },
                 {
                     numberOfVideos: 1,
@@ -263,11 +264,13 @@ export async function POST(req: Request) {
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
+                    includeAudio: true,
                 },
                 {
                     numberOfVideos: 1,
                     durationSeconds: duration === "10" ? 10 : 5,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
+                    includeAudio: true,
                 },
             ];
 
