@@ -233,9 +233,6 @@ export async function POST(req: Request) {
             });
 
         } else if (modelId === "google-veo-3") {
-            if (resolvedImageUrl) {
-                throw new Error("Google Veo 3 currently supports text-to-video only in Nexora.");
-            }
 
             if (aspectRatio === "1:1") {
                 return NextResponse.json({ error: "Google Veo 3 supports only 16:9 and 9:16 aspect ratios." }, { status: 400 });
@@ -246,31 +243,64 @@ export async function POST(req: Request) {
             }
 
             const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY });
-            const veoModel = process.env.GOOGLE_VEO_VIDEO_MODEL || "veo-3.0-generate-preview";
+            const hasImage = !!resolvedImageUrl;
+            // Use Veo 3.1 for image-to-video, Veo 3 for text-to-video
+            const veoModel = hasImage
+                ? (process.env.GOOGLE_VEO_31_VIDEO_MODEL || "veo-3.1-generate-preview")
+                : (process.env.GOOGLE_VEO_VIDEO_MODEL || "veo-3.0-generate-preview");
+
+            // When using reference images, duration must be 8 seconds
+            const veoDuration = hasImage ? 8 : (duration === "10" ? 10 : 5);
+
+            // Build reference images array for image-to-video
+            let referenceImages: any[] | undefined;
+            if (hasImage) {
+                try {
+                    const imgRes = await fetch(resolvedImageUrl);
+                    const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
+                    const imgBase64 = imgBuffer.toString("base64");
+                    const imgMime = resolvedImageUrl.includes(".png") ? "image/png" : "image/jpeg";
+
+                    referenceImages = [{
+                        image: {
+                            imageBytes: imgBase64,
+                            mimeType: imgMime,
+                        },
+                        referenceType: "asset",
+                    }];
+                    console.log(`Veo 3.1 image-to-video: reference image loaded (${imgBuffer.length} bytes)`);
+                } catch (imgErr) {
+                    console.error("Failed to load reference image for Veo 3.1:", imgErr);
+                    throw new Error("Failed to process reference image for Veo 3.1.");
+                }
+            }
 
             const configCandidates: Array<Record<string, any>> = [
                 {
                     numberOfVideos: 1,
-                    durationSeconds: duration === "10" ? 10 : 5,
+                    durationSeconds: veoDuration,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
                     resolution: finalQuality === "sd" ? "medium" : "high",
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
                     includeAudio: true,
+                    ...(referenceImages ? { referenceImages } : {}),
                 },
                 {
                     numberOfVideos: 1,
-                    durationSeconds: duration === "10" ? 10 : 5,
+                    durationSeconds: veoDuration,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
                     personGeneration: "allow_adult",
                     enhancePrompt: true,
                     includeAudio: true,
+                    ...(referenceImages ? { referenceImages } : {}),
                 },
                 {
                     numberOfVideos: 1,
-                    durationSeconds: duration === "10" ? 10 : 5,
+                    durationSeconds: veoDuration,
                     aspectRatio: aspectRatio === "9:16" ? "9:16" : "16:9",
                     includeAudio: true,
+                    ...(referenceImages ? { referenceImages } : {}),
                 },
             ];
 

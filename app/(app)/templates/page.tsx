@@ -10,7 +10,7 @@ type TemplateCard = {
   name: string;
   description: string;
   preview: string;
-  duration: "5" | "10";
+  duration: "5" | "8" | "10";
   aspectRatio: "16:9" | "9:16";
   motionSequence: string[];
   cameraDirection: string;
@@ -27,7 +27,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Drunk Dance",
     description: "Playful viral dance with wobble rhythm and smooth recovery beats.",
     preview: "/arts/styles/viral-social.png",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/drunk-dance.mp3",
     audioVolume: 0.8,
@@ -46,7 +46,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Kitty Sway",
     description: "Sweet side-to-side groove with clean paw and hip timing.",
     preview: "/arts/styles/ugc-creator.png",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/kitty-sway.mp3",
     audioVolume: 0.8,
@@ -65,7 +65,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Paw Pop",
     description: "Quick paw/hand pop choreography with upbeat tempo accents.",
     preview: "/arts/styles/viral-social.png",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/paw-pop.mp3",
     audioVolume: 0.8,
@@ -84,7 +84,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Bubble Bounce",
     description: "Bouncy cheerful dance with shoulder hops and hip circles.",
     preview: "/arts/styles/dramatic-tv-teaser.jpg",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/bubble-bounce.mp3",
     audioVolume: 0.8,
@@ -103,7 +103,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Street Groove",
     description: "Urban groove combo with cleaner footwork and upper-body flow.",
     preview: "/arts/styles/street-interview.png",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/street-groove.mp3",
     audioVolume: 0.8,
@@ -122,7 +122,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Twirl Fun",
     description: "Light twirl choreography with gentle spins and beat pauses.",
     preview: "/arts/styles/anime-opening.jpg",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/twirl-fun.mp3",
     audioVolume: 0.8,
@@ -141,7 +141,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Bounce Shuffle",
     description: "Fast shuffle steps with playful bounce and arm accents.",
     preview: "/arts/styles/product-ads.jpg",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/bounce-shuffle.mp3",
     audioVolume: 0.8,
@@ -160,7 +160,7 @@ const MOTION_TEMPLATES: TemplateCard[] = [
     name: "Hip-Hop Smile",
     description: "Friendly hip-hop combo made for viral short clips.",
     preview: "/arts/styles/faceless-broll.png",
-    duration: "10",
+    duration: "8",
     aspectRatio: "9:16",
     audioTrack: "/audio/templates/hip-hop-smile.mp3",
     audioVolume: 0.8,
@@ -318,7 +318,7 @@ export default function TemplatesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: compiledPrompt,
-          model: "kling-3",
+          model: "google-veo-3",
           duration: selectedTemplate.duration,
           aspectRatio: selectedTemplate.aspectRatio,
           quality: "hd",
@@ -354,7 +354,7 @@ export default function TemplatesPage() {
             const params = new URLSearchParams({
               requestId: data.requestId,
               endpointId: data.endpointId,
-              modelId: data.modelId || "kling-3",
+              modelId: data.modelId || "google-veo-3",
               cost: String(data.cost || TEMPLATE_COST),
               prompt: compiledPrompt.slice(0, 500),
             });
@@ -382,12 +382,13 @@ export default function TemplatesPage() {
         throw new Error("Video generation timed out (10 min). Please try again.");
       }
 
-      // Sync flow fallback
-      if (!data?.videoUrl) {
+      // Sync flow (Veo 3 returns videoUrl directly)
+      if (data?.success && data?.videoUrl) {
+        setLatestVideoUrl(data.videoUrl);
+        setHistory((prev) => [{ url: data.videoUrl, prompt: selectedTemplate.name }, ...prev].slice(0, 8));
+      } else if (!data?.videoUrl) {
         throw new Error(data?.error || "Template video generation failed.");
       }
-      setLatestVideoUrl(data.videoUrl);
-      setHistory((prev) => [{ url: data.videoUrl, prompt: selectedTemplate.name }, ...prev].slice(0, 8));
     } catch (e: any) {
       setError(e?.message || "Template video generation failed.");
       refundCredits(TEMPLATE_COST);
@@ -402,7 +403,7 @@ export default function TemplatesPage() {
         <div className="mb-8">
           <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">Template Motion Studio</h1>
           <p className="text-white/60 mt-2 text-sm md:text-base">
-            Pick a dance template, upload one photo, and generate your video in one click. Auto model: <span className="text-cyan-400 font-semibold">Kling 3.0</span>
+            Pick a dance template, upload one photo, and generate your video in one click. Auto model: <span className="text-cyan-400 font-semibold">Google Veo 3.1</span>
           </p>
         </div>
 
