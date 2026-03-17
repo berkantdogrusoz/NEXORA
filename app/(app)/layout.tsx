@@ -27,7 +27,6 @@ const menuItems = [
     { href: "/studio", label: "Video", icon: Clapperboard },
     { href: "/director", label: "Blueprints", icon: Film },
     { href: "/api-dashboard", label: "API", icon: KeyRound },
-    { href: "/assistant", label: "Assistant", icon: MessageSquare },
 ];
 
 import { useCredits, CreditProvider } from "@/app/providers/credit-provider";
