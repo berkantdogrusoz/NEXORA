@@ -15,8 +15,8 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const aveFedan = localFont({
-  src: "../public/fonts/AveFedan.ttf",
+const displayFont = localFont({
+  src: "../public/fonts/CharlestonDisplay.ttf",
   variable: "--font-display",
   display: "swap",
 });
@@ -103,7 +103,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/dashboard"
       appearance={clerkAppearance}
     >
-      <html lang="en" className={`${inter.variable} ${aveFedan.variable}`} suppressHydrationWarning>
+      <html lang="en" className={`${inter.variable} ${displayFont.variable}`} suppressHydrationWarning>
         <head>
           {/* Google Analytics — consent mode default: denied */}
           <Script
