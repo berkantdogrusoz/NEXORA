@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 const displayFont = localFont({
-  src: "../public/fonts/CharlestonDisplay.ttf",
+  src: "../public/fonts/MonotypeCorsiva.ttf",
   variable: "--font-display",
   display: "swap",
 });
