@@ -27,56 +27,83 @@ export default function Home() {
   const bannerY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const bannerOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  // Hero background carousel state
+  // Hero background carousel — dual-buffer system (no re-mount flicker)
   const [activeIndex, setActiveIndex] = useState(0);
-  const [nextIndex, setNextIndex] = useState<number | null>(null);
-  const [isFading, setIsFading] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const nextVideoRef = useRef<HTMLVideoElement>(null);
+  const [bufferIndex, setBufferIndex] = useState(1 % HERO_MEDIA.length);
+  const [showBuffer, setShowBuffer] = useState(false); // true = buffer layer on top
+  const [transitioning, setTransitioning] = useState(false);
+  const videoRefA = useRef<HTMLVideoElement>(null);
+  const videoRefB = useRef<HTMLVideoElement>(null);
+
+  // Which ref is currently "front" and which is "back"
+  const frontRef = showBuffer ? videoRefB : videoRefA;
+  const backRef = showBuffer ? videoRefA : videoRefB;
+  const frontIndex = showBuffer ? bufferIndex : activeIndex;
+  const backIndex = showBuffer ? activeIndex : bufferIndex;
 
   const goToNext = useCallback(() => {
-    const next = (activeIndex + 1) % HERO_MEDIA.length;
-    setNextIndex(next);
-    setIsFading(true);
+    if (transitioning) return;
+    setTransitioning(true);
 
-    // If next is a video, start preloading
-    if (HERO_MEDIA[next].type === "video" && nextVideoRef.current) {
-      nextVideoRef.current.defaultMuted = true;
-      nextVideoRef.current.muted = true;
-      nextVideoRef.current.currentTime = 0;
-      nextVideoRef.current.play().catch(() => { });
+    const nextIdx = (frontIndex + 1) % HERO_MEDIA.length;
+
+    // Load next media into the back buffer
+    if (showBuffer) {
+      setActiveIndex(nextIdx);
+    } else {
+      setBufferIndex(nextIdx);
     }
 
-    // Crossfade duration
-    setTimeout(() => {
-      setActiveIndex(next);
-      setNextIndex(null);
-      setIsFading(false);
-    }, 1200);
-  }, [activeIndex]);
+    // Wait a frame for src to update, then preload + start playing the back video
+    requestAnimationFrame(() => {
+      const backVideo = backRef.current;
+      if (HERO_MEDIA[nextIdx].type === "video" && backVideo) {
+        backVideo.currentTime = 0;
+        backVideo.muted = true;
+        const readyHandler = () => {
+          backVideo.removeEventListener("canplay", readyHandler);
+          // Video is ready at frame 0 — now start crossfade
+          setShowBuffer((prev) => !prev);
+          setTimeout(() => setTransitioning(false), 1200);
+        };
+        // If already loaded enough, fire immediately
+        if (backVideo.readyState >= 3) {
+          backVideo.play().catch(() => {});
+          setShowBuffer((prev) => !prev);
+          setTimeout(() => setTransitioning(false), 1200);
+        } else {
+          backVideo.addEventListener("canplay", readyHandler);
+          backVideo.load();
+        }
+      } else {
+        // Image — just crossfade
+        setShowBuffer((prev) => !prev);
+        setTimeout(() => setTransitioning(false), 1200);
+      }
+    });
+  }, [frontIndex, showBuffer, transitioning, backRef]);
 
-  // Handle video ended → go to next
+  // When front video ends → go to next
   const handleVideoEnded = useCallback(() => {
     goToNext();
   }, [goToNext]);
 
-  // Handle image timer
+  // Image timer for front layer
   useEffect(() => {
-    const current = HERO_MEDIA[activeIndex];
-    if (current.type === "image") {
+    if (HERO_MEDIA[frontIndex].type === "image" && !transitioning) {
       const timer = setTimeout(goToNext, IMAGE_DISPLAY_DURATION);
       return () => clearTimeout(timer);
     }
-  }, [activeIndex, goToNext]);
+  }, [frontIndex, transitioning, goToNext]);
 
-  // Force play active video to bypass strict autoplay policies
+  // Auto-play front video when it becomes visible
   useEffect(() => {
-    if (HERO_MEDIA[activeIndex].type === "video" && videoRef.current) {
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
+    const front = frontRef.current;
+    if (HERO_MEDIA[frontIndex].type === "video" && front) {
+      front.muted = true;
+      front.play().catch(() => {});
     }
-  }, [activeIndex]);
+  }, [showBuffer, frontIndex, frontRef]);
 
   return (
     <div className="relative min-h-screen bg-[#000000] text-white selection:bg-blue-500/30 overflow-hidden font-sans">
@@ -92,64 +119,59 @@ export default function Home() {
       {/* ═══════ HERO SECTION — FULL BLEED ═══════ */}
       <section className="relative h-screen w-full overflow-hidden" ref={targetRef}>
 
-        {/* Rotating Background Carousel */}
+        {/* Rotating Background Carousel — dual-buffer, no re-mount */}
         <div className="absolute inset-0 z-0">
-          {/* Active layer */}
-          {HERO_MEDIA[activeIndex].type === "video" ? (
-            <video
-              ref={videoRef}
-              key={`active-${activeIndex}`}
-              autoPlay
-              muted
-              playsInline
-              controls={false}
-              preload="auto"
-              disablePictureInPicture
-              onEnded={handleVideoEnded}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
-            >
-              <source src={HERO_MEDIA[activeIndex].src} type="video/mp4" />
-            </video>
-          ) : (
-            <div
-              key={`active-img-${activeIndex}`}
-              className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-0" : "opacity-100"}`}
-              style={{
-                backgroundImage: `url('${HERO_MEDIA[activeIndex].src}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center top",
-              }}
-            />
-          )}
-
-          {/* Next layer (fading in) */}
-          {nextIndex !== null && (
-            HERO_MEDIA[nextIndex].type === "video" ? (
+          {/* Layer A */}
+          <div className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${showBuffer ? "opacity-0" : "opacity-100"}`}>
+            {HERO_MEDIA[activeIndex].type === "video" ? (
               <video
-                ref={nextVideoRef}
-                key={`next-${nextIndex}`}
-                autoPlay
+                ref={videoRefA}
+                src={HERO_MEDIA[activeIndex].src}
                 muted
                 playsInline
                 controls={false}
                 preload="auto"
                 disablePictureInPicture
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
-              >
-                <source src={HERO_MEDIA[nextIndex].src} type="video/mp4" />
-              </video>
+                onEnded={!showBuffer ? handleVideoEnded : undefined}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             ) : (
               <div
-                key={`next-img-${nextIndex}`}
-                className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${isFading ? "opacity-100" : "opacity-0"}`}
+                className="absolute inset-0"
                 style={{
-                  backgroundImage: `url('${HERO_MEDIA[nextIndex].src}')`,
+                  backgroundImage: `url('${HERO_MEDIA[activeIndex].src}')`,
                   backgroundSize: "cover",
                   backgroundPosition: "center top",
                 }}
               />
-            )
-          )}
+            )}
+          </div>
+
+          {/* Layer B */}
+          <div className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${showBuffer ? "opacity-100" : "opacity-0"}`}>
+            {HERO_MEDIA[bufferIndex].type === "video" ? (
+              <video
+                ref={videoRefB}
+                src={HERO_MEDIA[bufferIndex].src}
+                muted
+                playsInline
+                controls={false}
+                preload="auto"
+                disablePictureInPicture
+                onEnded={showBuffer ? handleVideoEnded : undefined}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url('${HERO_MEDIA[bufferIndex].src}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center top",
+                }}
+              />
+            )}
+          </div>
 
           {/* Bottom gradient fade to black */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
