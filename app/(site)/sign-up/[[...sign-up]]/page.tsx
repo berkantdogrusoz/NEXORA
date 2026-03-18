@@ -4,14 +4,14 @@ import { clerkAuthCardAppearance } from "@/lib/clerk-appearance";
 
 export default function SignUpPage() {
     return (
-        <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#06080d] px-4 py-10">
-            <div className="pointer-events-none absolute inset-0">
-                <div className="absolute -top-24 left-1/2 h-[340px] w-[680px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
-                <div className="absolute -bottom-24 right-[-120px] h-[300px] w-[380px] rounded-full bg-blue-500/15 blur-3xl" />
-                <div className="absolute -bottom-24 left-[-140px] h-[280px] w-[320px] rounded-full bg-emerald-500/10 blur-3xl" />
+        <main className="relative min-h-screen flex items-center justify-center bg-[#06080d] px-4 py-10 overflow-x-hidden">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute -top-24 left-1/2 h-[340px] w-[680px] max-w-[100vw] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
+                <div className="absolute -bottom-24 right-0 h-[300px] w-[380px] max-w-[50vw] rounded-full bg-blue-500/15 blur-3xl" />
+                <div className="absolute -bottom-24 left-0 h-[280px] w-[320px] max-w-[50vw] rounded-full bg-emerald-500/10 blur-3xl" />
             </div>
 
-            <div className="relative z-10 w-full max-w-[1100px] rounded-3xl border border-white/10 bg-black/40 p-4 shadow-[0_30px_100px_rgba(0,0,0,0.55)] backdrop-blur-xl md:grid md:grid-cols-[1.1fr,1fr] md:p-8">
+            <div className="relative z-10 w-full max-w-[1100px] md:rounded-3xl md:border md:border-white/10 md:bg-black/40 md:p-8 md:shadow-[0_30px_100px_rgba(0,0,0,0.55)] md:backdrop-blur-xl md:grid md:grid-cols-[1.1fr,1fr]">
                 <section className="hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#0c1523] to-[#090d16] p-8 md:flex md:flex-col md:justify-between">
                     <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300/90">Nexora</p>
@@ -33,7 +33,7 @@ export default function SignUpPage() {
                     </div>
                 </section>
 
-                <section className="flex items-center justify-center p-2 md:p-6">
+                <section className="flex items-center justify-center p-0 md:p-6">
                     <SignUp
                         routing="path"
                         path="/sign-up"

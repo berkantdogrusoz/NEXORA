@@ -61,6 +61,8 @@ export const clerkUserButtonAppearance = {
 
 export const clerkAuthCardAppearance = {
     elements: {
-        rootBox: "w-full max-w-[460px]",
+        rootBox: "w-full max-w-[460px] mx-auto",
+        card: "!shadow-none md:!shadow-[0_20px_80px_rgba(0,0,0,0.55)] !border-0 md:!border md:!border-white/10 !bg-[#090f18]/95 md:!bg-[#090f18]/95 !backdrop-blur-xl !rounded-2xl !overflow-hidden !max-w-full",
+        cardBox: "!max-w-full",
     },
 };
