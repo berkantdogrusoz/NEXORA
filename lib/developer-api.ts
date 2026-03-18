@@ -217,28 +217,28 @@ export function hasScope(scopes: string[] | null | undefined, scope: ApiScope) {
 
 export function estimateImageCost(model: string) {
     const costsInCents: Record<string, number> = {
-        "dall-e-3": 50,
-        "recraft-v3": 40,
-        "nano-banana-2": 30,
+        "dall-e-3": 150,
+        "recraft-v3": 100,
+        "nano-banana-2": 80,
     };
-    return costsInCents[model] ?? 40;
+    return costsInCents[model] ?? 100;
 }
 
 export function estimateVideoCost(model: string) {
     const costsInCents: Record<string, number> = {
-        "kling-3": 100,
-        "google-veo-3": 100,
-        "seedance-2": 100,
-        "sora-2": 100,
+        "kling-3": 250,
+        "google-veo-3": 250,
+        "seedance-2": 250,
+        "sora-2": 250,
     };
-    return costsInCents[model] ?? 100;
+    return costsInCents[model] ?? 250;
 }
 
 export function estimateDirectorCost(model: string) {
     const costsInCents: Record<string, number> = {
-        "dop-lite": 100,
-        "dop-preview": 100,
-        "dop-turbo": 100,
+        "dop-lite": 250,
+        "dop-preview": 300,
+        "dop-turbo": 350,
     };
-    return costsInCents[model] ?? 100;
+    return costsInCents[model] ?? 300;
 }

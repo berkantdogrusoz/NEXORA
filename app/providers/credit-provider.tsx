@@ -13,7 +13,7 @@ interface CreditContextType {
 
 const CreditContext = createContext<CreditContextType>({
     credits: null,
-    maxCredits: 50,
+    maxCredits: 100,
     planName: "Free",
     refreshCredits: async () => { },
     deductCredits: () => { },

@@ -57,16 +57,16 @@ const ENDPOINTS: Record<Tab, { method: string; path: string; desc: string; body:
 };
 
 const PRICING = [
-    { model: "nano-banana-2", type: "Image", cost: "$0.30" },
-    { model: "recraft-v3", type: "Image", cost: "$0.40" },
-    { model: "dall-e-3", type: "Image", cost: "$0.50" },
-    { model: "google-veo-3", type: "Video", cost: "$1.00" },
-    { model: "kling-3", type: "Video", cost: "$1.00" },
-    { model: "seedance-2", type: "Video", cost: "$1.00" },
-    { model: "sora-2", type: "Video", cost: "$1.00" },
-    { model: "dop-lite", type: "Director", cost: "$1.00" },
-    { model: "dop-preview", type: "Director", cost: "$1.00" },
-    { model: "dop-turbo", type: "Director", cost: "$1.00" },
+    { model: "nano-banana-2", type: "Image", cost: "$0.80" },
+    { model: "recraft-v3", type: "Image", cost: "$1.00" },
+    { model: "dall-e-3", type: "Image", cost: "$1.50" },
+    { model: "google-veo-3", type: "Video", cost: "$2.50" },
+    { model: "kling-3", type: "Video", cost: "$2.50" },
+    { model: "seedance-2", type: "Video", cost: "$2.50" },
+    { model: "sora-2", type: "Video", cost: "$2.50" },
+    { model: "dop-lite", type: "Director", cost: "$2.50" },
+    { model: "dop-preview", type: "Director", cost: "$3.00" },
+    { model: "dop-turbo", type: "Director", cost: "$3.50" },
 ];
 
 function CopyButton({ text }: { text: string }) {
@@ -134,7 +134,7 @@ console.log(data.${activeTab === "director" ? "url" : activeTab === "image" ? "i
                         Build with <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Nexora API</span>
                     </h1>
                     <p className="text-lg text-white/50 max-w-2xl mx-auto mb-8">
-                        Generate images, videos and directed scenes programmatically. Pay-per-use pricing starting at $1 per generation. No commitments.
+                        Generate images, videos and directed scenes programmatically. Pay-per-use pricing starting at $0.80 per generation. No commitments.
                     </p>
                     <div className="flex items-center justify-center gap-4 flex-wrap">
                         <Link

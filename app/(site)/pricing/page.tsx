@@ -25,7 +25,7 @@ const PLANS = [
     highlight: false,
     badge: null,
     features: [
-      { text: "50 AI credits (One-time)", has: true },
+      { text: "100 AI credits (One-time)", has: true },
       { text: "GPT-4o Mini (Chat)", has: true },
       { text: "Kling 3.0 + Google Veo 3 (Video)", has: true },
       { text: "Nano Banana 2 (Image Generation)", has: true },
@@ -41,13 +41,13 @@ const PLANS = [
   },
   {
     name: "Standard",
-    price: "$12",
+    price: "$19",
     period: "/mo",
     subtitle: "For regular creators",
     highlight: false,
     badge: null,
     features: [
-      { text: "200 AI credits / month", has: true },
+      { text: "500 AI credits / month", has: true },
       { text: "Daily generation cap (6/day)", has: true },
       { text: "Kling 3.0 + Google Veo 3 (Video)", has: true },
       { text: "Nano Banana 2 (Image)", has: true },
@@ -63,13 +63,13 @@ const PLANS = [
   },
   {
     name: "Nexora",
-    price: "$32",
+    price: "$49",
     period: "/mo",
     subtitle: "For content creators",
     highlight: true,
     badge: "Most Popular",
     features: [
-      { text: "500 AI credits / month", has: true },
+      { text: "1,500 AI credits / month", has: true },
       { text: "GPT-4o + Gemini 1.5 Pro", has: true },
       { text: "All Standard + Pro Video Models", has: true },
       { text: "DALL-E 3 + Nano Banana 2 (Images)", has: true },
@@ -85,13 +85,13 @@ const PLANS = [
   },
   {
     name: "Pro",
-    price: "$62",
+    price: "$99",
     period: "/mo",
     subtitle: "For agencies & brands",
     highlight: false,
     badge: null,
     features: [
-      { text: "1,000 AI credits / month", has: true },
+      { text: "5,000 AI credits / month", has: true },
       { text: "All AI Models (Google Veo 3, Seedance, Kling 3.0, Sora 2, Higgsfield Director)", has: true },
       { text: "Cinematic Video (Highest quality)", has: true },
       { text: "Premium Image Generation (DALL-E 3, Nano Banana 2, Recraft)", has: true },
@@ -117,8 +117,8 @@ export default function PricingPage() {
   const router = useRouter();
 
   const CREDIT_PACKS = [
-    { id: "300", name: "Starter Pack", credits: 300, price: "$10", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
-    { id: "750", name: "Mega Pack", credits: 750, price: "$20", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "25% Bonus" },
+    { id: "300", name: "Starter Pack", credits: 500, price: "$15", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
+    { id: "750", name: "Mega Pack", credits: 1500, price: "$30", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "Best Value" },
   ];
 
   useEffect(() => {
@@ -162,7 +162,7 @@ export default function PricingPage() {
     }
 
     const planTitle = plan === "Growth" ? "Nexora" : plan;
-    const price = plan === "Standard" ? "$12 / month" : plan === "Growth" ? "$32 / month" : "$62 / month";
+    const price = plan === "Standard" ? "$19 / month" : plan === "Growth" ? "$49 / month" : "$99 / month";
 
     goToCheckout({
       variantId,

@@ -1,8 +1,8 @@
 export const PLAN_MAX_CREDITS: Record<string, number> = {
-    Free: 50,
-    Standard: 200,
-    Growth: 500,
-    Pro: 1000,
+    Free: 100,
+    Standard: 500,
+    Growth: 1500,
+    Pro: 5000,
 };
 
 export const STANDARD_DAILY_GENERATION_LIMIT = 6;

@@ -272,7 +272,7 @@ export default function SubscriptionPage() {
                         <div className="space-y-3">
                             {sub.plan_name === "Pro" && (
                                 <>
-                                    <Feature text="1000 credits per month" />
+                                    <Feature text="5,000 credits per month" />
                                     <Feature text="All Pro AI models (Seedance 2.0, Sora 2, Kling 3.0)" />
                                     <Feature text="HD & 10s video generation" />
                                     <Feature text="Priority processing" />
@@ -281,7 +281,7 @@ export default function SubscriptionPage() {
                             )}
                             {sub.plan_name === "Growth" && (
                                 <>
-                                    <Feature text="500 credits per month" />
+                                    <Feature text="1,500 credits per month" />
                                     <Feature text="Standard AI models" />
                                     <Feature text="HD video generation" />
                                     <Feature text="Commercial usage rights" />
@@ -289,7 +289,7 @@ export default function SubscriptionPage() {
                             )}
                             {sub.plan_name === "Standard" && (
                                 <>
-                                    <Feature text="200 credits per month" />
+                                    <Feature text="500 credits per month" />
                                     <Feature text="Daily generation cap (6/day)" />
                                     <Feature text="Core image and video models" />
                                     <Feature text="No Pro/Director model access" />
@@ -297,7 +297,7 @@ export default function SubscriptionPage() {
                             )}
                             {sub.plan_name === "Free" && (
                                 <>
-                                    <Feature text="50 credits (one-time)" />
+                                    <Feature text="100 credits (one-time)" />
                                     <Feature text="Standard AI models only" />
                                     <Feature text="Standard quality" />
                                 </>
