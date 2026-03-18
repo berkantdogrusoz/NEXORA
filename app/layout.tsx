@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Metadata } from "next";
 import Script from "next/script";
@@ -12,6 +13,12 @@ const GA_ID = "G-6Y87W7H5CY";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const aveFedan = localFont({
+  src: "../public/fonts/AveFedan.ttf",
+  variable: "--font-display",
+  display: "swap",
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
@@ -96,7 +103,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/dashboard"
       appearance={clerkAppearance}
     >
-      <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <html lang="en" className={`${inter.variable} ${aveFedan.variable}`} suppressHydrationWarning>
         <head>
           {/* Google Analytics — consent mode default: denied */}
           <Script
