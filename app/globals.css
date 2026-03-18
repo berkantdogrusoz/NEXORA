@@ -15,9 +15,6 @@ body {
   overflow-x: hidden;
 }
 
-h1, h2, h3 {
-  font-family: var(--font-display), 'Inter', sans-serif;
-}
 
 canvas {
   touch-action: none;
