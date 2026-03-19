@@ -9,7 +9,11 @@ export default function JsonLd() {
         logo: `${baseUrl}/icon.svg`,
         description:
             "AI-powered creative studio for generating stunning videos and images from simple text prompts.",
-        sameAs: [],
+        sameAs: [
+            "https://www.instagram.com/getnexorai",
+            "https://rapidapi.com/berkantdogrusoz/api/nexora-ai-studio",
+            "https://www.producthunt.com/products/nexora-ai-3",
+        ],
     };
 
     const webAppSchema = {
@@ -36,6 +40,39 @@ export default function JsonLd() {
         ],
     };
 
+    const websiteSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Nexora AI",
+        url: baseUrl,
+        potentialAction: {
+            "@type": "SearchAction",
+            target: `${baseUrl}/studio?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+        },
+    };
+
+    const siteNavigationSchema = {
+        "@context": "https://schema.org",
+        "@type": "SiteNavigationElement",
+        name: [
+            "Studio",
+            "Pricing",
+            "API Docs",
+            "Templates",
+            "Sign In",
+            "Sign Up",
+        ],
+        url: [
+            `${baseUrl}/studio`,
+            `${baseUrl}/pricing`,
+            `${baseUrl}/api-docs`,
+            `${baseUrl}/templates`,
+            `${baseUrl}/sign-in`,
+            `${baseUrl}/sign-up`,
+        ],
+    };
+
     return (
         <>
             <script
@@ -48,6 +85,18 @@ export default function JsonLd() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify(webAppSchema),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(websiteSchema),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(siteNavigationSchema),
                 }}
             />
         </>

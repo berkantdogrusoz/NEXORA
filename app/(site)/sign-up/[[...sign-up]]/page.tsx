@@ -1,6 +1,12 @@
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import { clerkAuthCardAppearance } from "@/lib/clerk-appearance";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Sign Up – Free AI Studio",
+    description: "Create your free Nexora AI account. Get 100 credits to generate AI videos and images with DALL-E 3, Sora 2, Kling 3.0, and more.",
+};
 
 export default function SignUpPage() {
     return (

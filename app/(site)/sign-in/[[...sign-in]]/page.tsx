@@ -1,6 +1,12 @@
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
 import { clerkAuthCardAppearance } from "@/lib/clerk-appearance";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Sign In",
+    description: "Sign in to Nexora AI Studio. Access AI video and image generation tools powered by 10+ top-tier models.",
+};
 
 export default function SignInPage() {
     return (
