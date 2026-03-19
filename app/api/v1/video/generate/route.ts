@@ -10,6 +10,7 @@ import {
     touchApiKeyUsage,
     verifyApiKey,
 } from "@/lib/developer-api";
+import { isRapidApiRequest, verifyRapidApiRequest } from "@/lib/rapidapi";
 
 const SUPPORTED_VIDEO_MODELS = ["kling-3", "google-veo-3", "seedance-2", "sora-2"] as const;
 
@@ -19,33 +20,46 @@ export async function POST(req: Request) {
     let userId = "";
     let estimatedCostCents = 0;
     let balanceDebited = false;
+    let isRapidApi = false;
 
     try {
-        const rawApiKey = parseApiKeyFromRequest(req);
-        if (!rawApiKey) {
-            return NextResponse.json({ error: "Missing API key" }, { status: 401 });
-        }
+        /* ── RapidAPI proxy path ── */
+        if (isRapidApiRequest(req)) {
+            const rapid = verifyRapidApiRequest(req);
+            if (!rapid.valid) {
+                return NextResponse.json({ error: "Invalid RapidAPI proxy secret" }, { status: 401 });
+            }
+            isRapidApi = true;
+            userId = rapid.userId;
+            apiKeyId = "rapidapi";
+        } else {
+            /* ── Direct API-key path ── */
+            const rawApiKey = parseApiKeyFromRequest(req);
+            if (!rawApiKey) {
+                return NextResponse.json({ error: "Missing API key" }, { status: 401 });
+            }
 
-        const keyRow = await verifyApiKey(rawApiKey);
-        if (!keyRow) {
-            return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
-        }
+            const keyRow = await verifyApiKey(rawApiKey);
+            if (!keyRow) {
+                return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
+            }
 
-        if (!hasScope(keyRow.scopes, "video:generate")) {
-            return NextResponse.json({ error: "API key scope does not allow video generation" }, { status: 403 });
-        }
+            if (!hasScope(keyRow.scopes, "video:generate")) {
+                return NextResponse.json({ error: "API key scope does not allow video generation" }, { status: 403 });
+            }
 
-        if (await isMonthlyQuotaExceeded(keyRow.id, keyRow.monthly_quota)) {
-            return NextResponse.json({ error: "Monthly API quota exceeded for this key" }, { status: 429 });
+            if (await isMonthlyQuotaExceeded(keyRow.id, keyRow.monthly_quota)) {
+                return NextResponse.json({ error: "Monthly API quota exceeded for this key" }, { status: 429 });
+            }
+
+            apiKeyId = keyRow.id;
+            userId = keyRow.user_id;
+            await touchApiKeyUsage(apiKeyId);
         }
 
         if (!process.env.INTERNAL_API_SECRET) {
             return NextResponse.json({ error: "Server misconfiguration: INTERNAL_API_SECRET missing" }, { status: 500 });
         }
-
-        apiKeyId = keyRow.id;
-        userId = keyRow.user_id;
-        await touchApiKeyUsage(apiKeyId);
 
         const body = await req.json();
         const model = String(body?.model || "");
@@ -59,25 +73,28 @@ export async function POST(req: Request) {
 
         estimatedCostCents = estimateVideoCost(model);
 
-        const debit = await deductApiBalanceCents({
-            userId,
-            amountCents: estimatedCostCents,
-            reason: "api_v1_video_generate",
-            apiKeyId,
-            metadata: { model: body?.model || null },
-        });
+        /* RapidAPI handles billing — skip balance deduction */
+        if (!isRapidApi) {
+            const debit = await deductApiBalanceCents({
+                userId,
+                amountCents: estimatedCostCents,
+                reason: "api_v1_video_generate",
+                apiKeyId,
+                metadata: { model: body?.model || null },
+            });
 
-        if (!debit.ok) {
-            return NextResponse.json(
-                {
-                    error: "Insufficient API balance. Please top up your API wallet.",
-                    balanceUsd: Number((debit.balanceCents / 100).toFixed(2)),
-                    requiredUsd: Number((estimatedCostCents / 100).toFixed(2)),
-                },
-                { status: 402 }
-            );
+            if (!debit.ok) {
+                return NextResponse.json(
+                    {
+                        error: "Insufficient API balance. Please top up your API wallet.",
+                        balanceUsd: Number((debit.balanceCents / 100).toFixed(2)),
+                        requiredUsd: Number((estimatedCostCents / 100).toFixed(2)),
+                    },
+                    { status: 402 }
+                );
+            }
+            balanceDebited = true;
         }
-        balanceDebited = true;
 
         const targetUrl = new URL("/api/video/generate", req.url);
         const upstream = await fetch(targetUrl.toString(), {
