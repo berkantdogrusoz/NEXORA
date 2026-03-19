@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://getnexorai.com";
+    const baseUrl = "https://getnexorai.com";
 
     return [
         {
@@ -13,8 +13,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
         {
             url: `${baseUrl}/pricing`,
             lastModified: new Date(),
-            changeFrequency: "monthly",
+            changeFrequency: "weekly",
             priority: 0.9,
+        },
+        {
+            url: `${baseUrl}/api-docs`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/studio`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/templates`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.7,
         },
         {
             url: `${baseUrl}/sign-in`,
@@ -27,6 +45,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
             lastModified: new Date(),
             changeFrequency: "monthly",
             priority: 0.5,
+        },
+        {
+            url: `${baseUrl}/privacy`,
+            lastModified: new Date(),
+            changeFrequency: "yearly",
+            priority: 0.3,
+        },
+        {
+            url: `${baseUrl}/terms`,
+            lastModified: new Date(),
+            changeFrequency: "yearly",
+            priority: 0.3,
         },
     ];
 }
