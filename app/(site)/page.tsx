@@ -10,7 +10,6 @@ import { Sparkles, Video, Image as ImageIcon, Zap, Layers, Wand2, PlayCircle } f
 const HERO_MEDIA = [
   { type: "video" as const, src: "/arts/Latina_Woman_Dancing_With_Luxury_Cars.mp4" },
   { type: "video" as const, src: "/arts/nexora-1773693816687.mp4" },
-  { type: "video" as const, src: "/arts/hf_20260316_085515_cdd67d77-3c2d-4308-830d-8a80058d2f2a.mp4" },
   { type: "video" as const, src: "/arts/nexora-1772315602835.mp4" },
   { type: "video" as const, src: "/arts/uzay.mp4" },
   { type: "image" as const, src: "/arts/nexora-1772283133285.png" },
