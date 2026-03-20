@@ -38,8 +38,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Uncross arms explosively outward, step right foot forward with a heel-toe stomp, swing both arms in a windmill circle ending with hands clapping at center chest level.",
       "Finish with a confident lean-back, one hand pointing at camera, other hand on hip, slight head tilt and smirk — hold this power pose for the final two beats.",
     ],
-    cameraDirection: "Vertical 9:16 full-body shot, camera locked at waist height, slight zoom-in on the final pose, keep subject perfectly centered throughout.",
-    styleDirection: "TikTok viral dance energy, punchy rhythm-synced movements, confident facial expressions, Gen-Z social media aesthetic, crisp motion clarity.",
+    cameraDirection: "Vertical 9:16 full-body shot starting at waist height. On the arm wave (step 2), push in with a smooth zoom to mid-body. On the body roll drop (step 3), camera dips down slightly with the movement. On the windmill (step 4), pull back to full-body with a subtle handheld shake on the clap. On the final pose (step 5), dramatic slow zoom-in to chest-up framing — hold tight on the face and pointing hand.",
+    styleDirection: "TikTok viral dance energy, punchy rhythm-synced movements, confident facial expressions, Gen-Z social media aesthetic, crisp motion clarity. Camera must feel alive — never static, always reacting to the biggest hits.",
   },
   {
     id: "hip-hop-krump",
@@ -57,8 +57,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Pull both arms back into a criss-cross at the chest, then explode outward into a T-pose with a simultaneous stomp of the right foot, head snapping to the right on the accent beat.",
       "Finish by pulling both fists to the chin, dropping into a low squat bounce twice, then rise up with one arm raised overhead in a fist — confident victory stance freeze.",
     ],
-    cameraDirection: "Vertical full-body framing, slightly low-angle to add power, steady cam with subtle shake on the hard hits for energy.",
-    styleDirection: "Raw hip-hop street dance energy, powerful and aggressive movements, sweat-glistening skin, urban environment feel, every hit lands on the beat.",
+    cameraDirection: "Vertical full-body framing, low-angle looking up for power. On the chest pop (step 1), camera punches forward with a quick zoom-in then snaps back. On the arm thrusts (step 3), camera shakes on impact like a bass hit. On the T-pose stomp (step 4), quick whip-pan following the head snap direction. On the final fist raise (step 5), slow dramatic tilt upward from low squat to raised fist — ending on a hero angle close-up.",
+    styleDirection: "Raw hip-hop street dance energy, powerful and aggressive movements, sweat-glistening skin, urban environment feel, every hit lands on the beat. Camera should feel like it's in the cypher — reactive and punchy.",
   },
   {
     id: "kpop-point",
@@ -76,8 +76,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Cross both arms over the chest in an X-shape, then burst them open while doing a quarter turn, ending with one hand on the hip and the other arm extended with a finger heart gesture — thumb and index finger forming a tiny heart.",
       "Finish with a powerful ending pose: both knees slightly bent, one shoulder dropped, head tilted, both hands forming finger hearts at chin level — seductive confident K-Pop idol expression, hold for final beats.",
     ],
-    cameraDirection: "Vertical 9:16 mid-body to full-body shot, smooth dolly feel, slight glamour lighting effect, keep the face and hand details sharp.",
-    styleDirection: "Polished K-Pop music video aesthetic, razor-sharp timing on every move, fierce but cute expressions, stage-performance precision, every gesture is intentional and camera-aware.",
+    cameraDirection: "Vertical 9:16 starting mid-body. On the point-at-camera (step 1), quick snap zoom to the pointing hand then pull back. On the hair flip (step 2), camera does a smooth arc upward following the hair motion. On the step-touch hip pops (step 3), camera sways side-to-side matching the rhythm. On the finger heart (step 4), push in tight to capture the hand detail. On the ending pose (step 5), cinematic slow zoom-in to face level with a slight tilt — idol fancam energy.",
+    styleDirection: "Polished K-Pop music video aesthetic, razor-sharp timing on every move, fierce but cute expressions, stage-performance precision, every gesture is intentional and camera-aware. Camera moves like a professional fancam — smooth but dynamic.",
   },
   {
     id: "afro-body-roll",
@@ -95,8 +95,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Step forward with the right foot into a slow-motion hip dip — right hip drops dramatically, left arm sweeps up overhead, body creating an S-curve shape, then reverse the S-curve flowing back to center.",
       "Finish with three quick booty pops in succession, hands on knees, then smoothly rise up with arms spreading wide, eyes closed, chin lifted — feeling-the-music pose, hold for the final beats.",
     ],
-    cameraDirection: "Vertical full-body shot, warm golden-hour lighting feel, camera at hip level to emphasize the body roll and waist movements, smooth and steady.",
-    styleDirection: "Authentic Afrobeats dance energy, sensual but tasteful body isolations, warm vibrant mood, the movement should feel groovy and effortless — never stiff.",
+    cameraDirection: "Vertical full-body shot at hip level. On the body roll (step 1), camera slowly rises from hip to chest following the wave motion upward. On the waist wine (step 2), camera orbits slightly left-to-right in a subtle arc matching the hip circle. On the shoulder shimmy (step 3), quick gentle shake matching the shimmy vibration. On the hip dip S-curve (step 4), camera tilts to mirror the S-curve angle. On the final rise (step 5), smooth crane-up from low to high as arms spread wide — golden hour lens flare feel.",
+    styleDirection: "Authentic Afrobeats dance energy, sensual but tasteful body isolations, warm vibrant mood, the movement should feel groovy and effortless — never stiff. Camera floats like it's vibing with the dancer.",
   },
   {
     id: "shuffle-king",
@@ -114,8 +114,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Drop into the Criss-Cross: feet crossing over each other alternately while sliding forward — right over left, then left over right — upper body staying level and smooth while feet do the complex work below.",
       "Finish with a power slide to the right, dropping low into a wide stance, then pop back up with both arms thrown skyward and one foot kicked forward — explosive final pose with maximum energy.",
     ],
-    cameraDirection: "Vertical full-body shot, camera must capture feet clearly, slightly wider framing to show the footwork travel, high-energy feel with stable tracking.",
-    styleDirection: "Melbourne shuffle / cutting shapes dance style, feet are the star — every slide and stomp must be crisp and visible, EDM festival energy, neon-glow aesthetic feel.",
+    cameraDirection: "Vertical full-body shot, wide enough for footwork travel. On the Running Man (step 1), camera bounces vertically with each stomp like it's on a spring. On the T-Step (step 2), camera tracks the lateral sliding motion smoothly. On the 360 spin (step 3), camera does a quick counter-rotation for dramatic effect. On the Criss-Cross (step 4), push in closer to highlight the foot crossing detail. On the power slide finale (step 5), camera drops low with the dancer then rockets up on the explosive pop — maximum impact.",
+    styleDirection: "Melbourne shuffle / cutting shapes dance style, feet are the star — every slide and stomp must be crisp and visible, EDM festival energy, neon-glow aesthetic feel. Camera has festival-crowd energy — bouncing, reactive, hype.",
   },
   {
     id: "latin-salsa",
@@ -133,8 +133,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Drop into a suzy-Q move: twist both feet inward pigeon-toed then outward duck-footed in rapid succession, traveling sideways — arms waving at shoulder height, fingers snapping on every other beat.",
       "Finish with a dramatic dip-and-rise: lean back with the upper body while one leg extends forward, one arm reaches back overhead, then snap upright into a proud chest-out pose with both arms framing the face — passionate expression, hold.",
     ],
-    cameraDirection: "Vertical full-body shot, warm amber lighting, smooth tracking that follows the lateral movement, close enough to see hip detail but wide enough for footwork.",
-    styleDirection: "Authentic Latin salsa energy, passionate and fiery expression, every hip movement sharp and intentional, the dance should radiate heat and confidence.",
+    cameraDirection: "Vertical full-body shot with warm amber lighting. On the basic step hip sway (step 1), camera gently rocks left-right matching the weight shifts. On the Cuban hip motion (step 2), push in to mid-body to capture the sharp hip pops. On the cross-body spin (step 3), camera follows the rotation with a smooth whip-pan then settles. On the suzy-Q (step 4), camera tracks the lateral travel. On the dramatic dip (step 5), camera swoops down following the lean-back then rises with the snap-upright — passionate and cinematic.",
+    styleDirection: "Authentic Latin salsa energy, passionate and fiery expression, every hip movement sharp and intentional, the dance should radiate heat and confidence. Camera dances with the subject — never a passive observer.",
   },
   {
     id: "vogue-serve",
@@ -152,8 +152,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Rise up from the duckwalk into a dramatic spin, arms extending outward like a blooming flower, then pull into a sharp vogue freeze — one hand behind the head, other arm creating a frame around the face, back arched.",
       "Finish with the death drop: lean back dramatically with one arm reaching toward the sky, back arching toward the ground, then freeze mid-dip in a powerful reclined pose — pure ballroom elegance and drama.",
     ],
-    cameraDirection: "Vertical full-body framing, runway/catwalk perspective, dramatic shadow lighting, camera slightly below eye level for power angle.",
-    styleDirection: "Ballroom vogue culture aesthetic, high fashion meets street dance, every pose is a magazine cover, fierce confidence, dramatic theatrical energy — serve face throughout.",
+    cameraDirection: "Vertical full-body framing, below eye level for power. On the runway walk (step 1), camera slowly pulls backward as subject walks toward it — runway show tracking. On the hand performance (step 2), snap zoom to hands for the geometric angles, pull back on each pose switch. On the duckwalk (step 3), camera drops to floor level looking up — dramatic power angle. On the spin (step 4), camera circles opposite to the spin direction for double-speed visual effect. On the death drop (step 5), camera dramatically tilts and pushes in as the subject falls — freeze frame energy on the final pose.",
+    styleDirection: "Ballroom vogue culture aesthetic, high fashion meets street dance, every pose is a magazine cover, fierce confidence, dramatic theatrical energy — serve face throughout. Camera is the audience at the ball — gasping at every serve.",
   },
   {
     id: "tiktok-woah",
@@ -171,8 +171,8 @@ const MOTION_TEMPLATES: TemplateCard[] = [
       "Transition into the SWAGG SURF: lean right with a wave-riding motion, both arms sweeping right at chest level, then lean left and sweep left — like riding a wave, knees bending with each lean, smooth and controlled.",
       "Finish with a combo: quick Woah freeze, immediate dab, then stand tall with both arms crossed over the chest, chin up, one eyebrow raised — ultimate swag pose, zero movement on the final two beats.",
     ],
-    cameraDirection: "Vertical 9:16 full-body social media framing, phone-camera feel, subject centered, slight bounce in the camera matching the dance energy.",
-    styleDirection: "Pure TikTok viral energy, Gen-Z swag, every move is a recognizable trend dance, confident and fun facial expressions, the kind of clip that gets 10M views.",
+    cameraDirection: "Vertical 9:16 full-body with phone-camera handheld feel. On THE WOAH freeze (step 1), camera jolts to a stop matching the freeze — sudden stillness after movement. On HIT THE QUAN squat (step 2), camera drops down with the squat. On the DAB (step 3), quick whip-pan in the dab direction then snap back. On SWAGG SURF (step 4), camera sways side-to-side like it's riding the same wave. On the final combo (step 5), rapid zoom-in on each hit — Woah freeze, dab snap, then slow dramatic push-in on the crossed-arms final pose ending tight on the face.",
+    styleDirection: "Pure TikTok viral energy, Gen-Z swag, every move is a recognizable trend dance, confident and fun facial expressions, the kind of clip that gets 10M views. Camera is your hype friend filming you — reactive, shaky on the hits, tight on the money shots.",
   },
 ];
 
