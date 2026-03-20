@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         // Cost mapping
         const costMap: Record<string, number> = {
             "kling-3": 50,
-            "google-veo-3": 40,
+            "google-veo-3": 50,
             "seedance-2": 100,
             "sora-2": 120,
         };

@@ -19,7 +19,7 @@ type TemplateCard = {
   audioVolume: number;
 };
 
-const TEMPLATE_COST = 20;
+const TEMPLATE_COST = 50;
 
 const MOTION_TEMPLATES: TemplateCard[] = [
   {
