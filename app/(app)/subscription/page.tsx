@@ -26,8 +26,8 @@ export default function SubscriptionPage() {
     const [buyingCredits, setBuyingCredits] = useState<string | null>(null);
 
     const CREDIT_PACKS = [
-        { id: "300", name: "Starter Pack", credits: 300, price: "$10", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
-        { id: "750", name: "Mega Pack", credits: 750, price: "$20", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "25% Bonus" },
+        { id: "300", name: "Starter Pack", credits: 500, price: "$15", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_300 || "1364332", badge: null },
+        { id: "750", name: "Mega Pack", credits: 1500, price: "$30", priceNote: "one-time", variantId: process.env.NEXT_PUBLIC_LEMON_CREDIT_750 || "1364335", badge: "Best Value" },
     ];
 
     useEffect(() => {
